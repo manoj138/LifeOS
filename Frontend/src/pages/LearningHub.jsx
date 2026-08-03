@@ -398,9 +398,9 @@ export const LearningHub = () => {
       setCompletedLessons(['js-0']);
       setPassedQuizzes({ 'js-0': 100 });
       setActiveLessonIdx(0);
-      localStorage.removeItem('lifeos_learning_hub_progress_v2');
     }
   };
+
 
   return (
     <div className="space-y-8 pb-12">

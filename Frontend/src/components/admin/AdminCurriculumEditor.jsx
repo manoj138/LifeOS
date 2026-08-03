@@ -80,7 +80,19 @@ export const AdminCurriculumEditor = () => {
     setTimeout(() => setIsSaved(false), 2500);
   };
 
+  const handleAiPolish = async () => {
+    setIsAiGenerating(true);
+    setTimeout(() => {
+      setFormData((prev) => ({
+        ...prev,
+        conceptExplanation: `${prev.conceptExplanation || ''}\n\n💡 AI Enhanced Explanation: Step-by-step breakdown with memory allocation insights, real-world industry applications, and common interview questions.`,
+      }));
+      setIsAiGenerating(false);
+    }, 800);
+  };
+
   const filteredTopics = topics.filter((t) => t.moduleId === selectedModule);
+
 
   return (
 

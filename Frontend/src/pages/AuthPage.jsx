@@ -13,7 +13,7 @@ export const AuthPage = () => {
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { onboardingCompleted, completeOnboarding, resetOnboarding, updateUserProfile, clearAllLocalState } = useUser();
+  const { onboardingCompleted, completeOnboarding, resetOnboarding, updateUserProfile } = useUser();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,17 +21,19 @@ export const AuthPage = () => {
     setTimeout(() => {
       setIsLoading(false);
       const inputEmail = email.trim().toLowerCase();
-      const isAdminUser = inputEmail === 'admin@lifeos.ai' || inputEmail.startsWith('admin');
+      const isAdminRole = inputEmail === 'admin@lifeos.ai' || inputEmail.startsWith('admin');
 
-      if (isAdminUser) {
+      if (isAdminRole) {
         completeOnboarding({
-          user: { name: 'System Admin', email: 'admin@lifeos.ai', role: 'admin' },
+          user: { name: name.trim() || 'System Admin', email: inputEmail || 'admin@lifeos.ai', role: 'admin' },
           preferences: { targetRole: 'System Administrator', careerLevel: 'Admin Console' }
         });
         navigate('/app/admin');
       } else {
+
+
         const userProfileName = name.trim() || email.split('@')[0] || 'Member';
-        updateUserProfile({ name: userProfileName, email: email || 'user@lifeos.ai' });
+        updateUserProfile({ name: userProfileName, email: inputEmail || 'user@lifeos.ai', role: 'candidate' });
 
         if (activeTab === 'register') {
           resetOnboarding();
@@ -46,9 +48,6 @@ export const AuthPage = () => {
       }
     }, 600);
   };
-
-
-
 
   return (
     <div className="space-y-6">
@@ -74,6 +73,8 @@ export const AuthPage = () => {
           onChange={setActiveTab}
         />
       </div>
+
+
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {activeTab === 'register' && (

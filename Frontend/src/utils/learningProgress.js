@@ -1,20 +1,8 @@
 // Helper utility for LearningHub progress persistence & level unlocking logic
 
-const STORAGE_KEY = 'lifeos_learning_hub_progress_v2';
-
 export const loadLearningProgress = () => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      return JSON.parse(data);
-    }
-  } catch (err) {
-    console.error("Failed to load learning progress from localStorage:", err);
-  }
-
-  // Default initial progress state
   return {
-    completedLessons: ['js-0'], // Starts with js-0 completed or first topic unlocked
+    completedLessons: ['js-0'],
     passedQuizzes: { 'js-0': 100 },
     lastActiveModule: 'js',
     lastActiveLessonId: 'js-0'
@@ -22,12 +10,9 @@ export const loadLearningProgress = () => {
 };
 
 export const saveLearningProgress = (progressState) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progressState));
-  } catch (err) {
-    console.error("Failed to save learning progress to localStorage:", err);
-  }
+  // Pure in-memory progress saved via Backend API in LearningHub.jsx
 };
+
 
 /**
  * Checks whether a topic is unlocked for the user.

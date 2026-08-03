@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Unlock, ShieldCheck, Sparkles, Volume2, Globe, Delete, ArrowRight, Bot, Mic } from 'lucide-react';
 import { useVoiceGuider } from '../../context/VoiceGuiderContext';
+import { useUser } from '../../context/UserContext';
 import { AudioSpectrum } from '../ui/AudioSpectrum';
 import liveChatbotSvg from '../../assets/graident-ai-robot-vectorart/Live chatbot.svg';
 
 export const PinLockModal = () => {
+  const navigate = useNavigate();
+  const { user } = useUser();
   const { isLocked, unlockWithPin, userName, language, setLanguage, isSpeaking, pinCode } = useVoiceGuider();
   const [pinInput, setPinInput] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -50,27 +54,35 @@ export const PinLockModal = () => {
     setErrorMessage('');
   };
 
-  const handleUnlock = () => {
+  const handleUnlock = async () => {
     if (!pinInput) {
       setErrorMessage('Please enter PIN');
       triggerShake();
       return;
     }
 
-    const result = unlockWithPin(pinInput);
+    const result = await unlockWithPin(pinInput);
     if (!result.success) {
       setErrorMessage(result.message);
       triggerShake();
       setPinInput('');
+    } else {
+      if (user?.role === 'admin' || user?.email?.toLowerCase().includes('admin')) {
+        navigate('/app/admin');
+      }
     }
   };
+
 
   const triggerShake = () => {
     setIsShaking(true);
     setTimeout(() => setIsShaking(false), 500);
   };
 
-  if (!isLocked) return null;
+  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
+  if (!isLocked || isAdmin) return null;
+
+
 
   return (
     <AnimatePresence>

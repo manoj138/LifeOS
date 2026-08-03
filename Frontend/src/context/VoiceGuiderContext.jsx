@@ -7,42 +7,18 @@ export const VoiceGuiderProvider = ({ children }) => {
   const navigate = useNavigate();
 
   // App Security State
-  const [isLocked, setIsLocked] = useState(() => {
-    const saved = localStorage.getItem('lifeos_app_locked');
-    return saved !== null ? JSON.parse(saved) : true;
-  });
-
-  const [pinCode, setPinCode] = useState(() => {
-    return localStorage.getItem('lifeos_pin_code') || '1234';
-  });
-
-  const [userName, setUserName] = useState(() => {
-    return localStorage.getItem('lifeos_user_name') || 'Manoj';
-  });
-
-  const [aiName, setAiName] = useState(() => {
-    return localStorage.getItem('lifeos_ai_name') || 'LifeOS';
-  });
+  const [isLocked, setIsLocked] = useState(true);
+  const [pinCode, setPinCode] = useState('1234');
+  const [userName, setUserName] = useState('Manoj');
+  const [aiName, setAiName] = useState('LifeOS');
 
   // Voice Personality Tone: 'sakhi' | 'coach' | 'mentor'
-  const [voicePersonality, setVoicePersonality] = useState(() => {
-    return localStorage.getItem('lifeos_voice_personality') || 'sakhi';
-  });
+  const [voicePersonality, setVoicePersonality] = useState('sakhi');
 
   // Hands-Free Mode State
-  const [isHandsFreeEnabled, setIsHandsFreeEnabled] = useState(() => {
-    const saved = localStorage.getItem('lifeos_handsfree_mode');
-    return saved !== null ? JSON.parse(saved) : true;
-  });
-
-  const [language, setLanguage] = useState(() => {
-    return localStorage.getItem('lifeos_voice_lang') || 'mr';
-  });
-
-  const [isMuted, setIsMuted] = useState(() => {
-    const saved = localStorage.getItem('lifeos_voice_muted');
-    return saved !== null ? JSON.parse(saved) : false;
-  });
+  const [isHandsFreeEnabled, setIsHandsFreeEnabled] = useState(true);
+  const [language, setLanguage] = useState('mr');
+  const [isMuted, setIsMuted] = useState(false);
 
   // Single Deterministic Voice State Machine: 'IDLE' | 'LISTENING' | 'SPEAKING'
   const [voiceStatus, setVoiceStatus] = useState('IDLE');
@@ -60,27 +36,19 @@ export const VoiceGuiderProvider = ({ children }) => {
   const speechPitch = voicePersonality === 'coach' ? 1.1 : voicePersonality === 'mentor' ? 0.9 : 1.0;
 
   // Data persistence states
-  const [pendingTasks, setPendingTasks] = useState(() => {
-    const saved = localStorage.getItem('lifeos_pending_tasks');
-    return saved ? JSON.parse(saved) : [
-      { id: 1, title: 'Complete React Advanced State Management', time: '11:00 AM' },
-      { id: 2, title: 'System Design Interview Practice', time: '03:00 PM' }
-    ];
-  });
+  const [pendingTasks, setPendingTasks] = useState([
+    { id: 1, title: 'Complete React Advanced State Management', time: '11:00 AM' },
+    { id: 2, title: 'System Design Interview Practice', time: '03:00 PM' }
+  ]);
 
-  const [habits, setHabits] = useState(() => {
-    const saved = localStorage.getItem('lifeos_user_habits');
-    return saved ? JSON.parse(saved) : [
-      { id: 1, title: 'Drink 3 Liters Water', streak: 5 }
-    ];
-  });
+  const [habits, setHabits] = useState([
+    { id: 1, title: 'Drink 3 Liters Water', streak: 5 }
+  ]);
 
-  const [userGoals, setUserGoals] = useState(() => {
-    const saved = localStorage.getItem('lifeos_user_goals');
-    return saved ? JSON.parse(saved) : [
-      { id: 1, title: 'Master MERN Fullstack & Hostinger VPS', status: 'In Progress' }
-    ];
-  });
+  const [userGoals, setUserGoals] = useState([
+    { id: 1, title: 'Master MERN Fullstack & Hostinger VPS', status: 'In Progress' }
+  ]);
+
 
   // Safe Microphone Stopper
   const safeStopMic = useCallback(() => {

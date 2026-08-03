@@ -5,24 +5,38 @@ import {
   LayoutDashboard, Calendar, Target, BookOpen, MessageSquareCode,
   Mic, Code2, Server, FolderKanban, Dumbbell, Flame, LineChart,
   Briefcase, BookMarked, Settings, ChevronLeft, ChevronRight,
-  Sparkles, Zap, Bot, ShieldCheck
+  Sparkles, Zap, Bot, ShieldCheck, Users, Award, BookCheck
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { useUser } from '../../context/UserContext';
 
 export const Sidebar = ({ isCollapsed, onToggle }) => {
   const location = useLocation();
+  const { user } = useUser();
 
-  const navSections = [
+  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
+
+  // 100% Isolated Navigation Sections for System Administrators
+  const ADMIN_NAV_SECTIONS = [
+    {
+      title: "Admin Controls",
+      items: [
+        { path: '/app/admin', label: 'Admin Console', icon: ShieldCheck, badge: 'Live Network' },
+        { path: '/app/settings', label: 'System Settings', icon: Settings, badge: null }
+      ]
+    }
+  ];
+
+  // 100% Isolated Navigation Sections for Candidates / Students
+  const CANDIDATE_NAV_SECTIONS = [
     {
       title: "Core",
       items: [
         { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
-        { path: '/app/admin', label: 'Admin Console', icon: ShieldCheck, badge: 'Network' },
         { path: '/app/planner', label: 'Daily Planner', icon: Calendar, badge: 'Today' },
         { path: '/app/goals', label: 'Goals', icon: Target, badge: null }
       ]
     },
-
     {
       title: "Skills & Career",
       items: [
@@ -45,10 +59,13 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
         { path: '/app/fitness', label: 'Fitness', icon: Dumbbell, badge: null },
         { path: '/app/habits', label: 'Habits', icon: Flame, badge: '🔥 14' },
         { path: '/app/journal', label: 'Journal', icon: BookMarked, badge: null },
-        { path: '/app/analytics', label: 'Analytics', icon: LineChart, badge: null }
+        { path: '/app/analytics', label: 'Analytics', icon: LineChart, badge: null },
+        { path: '/app/settings', label: 'Settings', icon: Settings, badge: null }
       ]
     }
   ];
+
+  const navSections = isAdmin ? ADMIN_NAV_SECTIONS : CANDIDATE_NAV_SECTIONS;
 
   return (
     <motion.aside
@@ -58,81 +75,96 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
     >
       {/* Top Header Logo */}
       <div>
-        <div className="h-16 px-4 flex items-center justify-between border-b border-white/10">
-          <NavLink to="/app/dashboard" className="flex items-center gap-3 overflow-hidden">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 p-0.5 shrink-0 shadow-lg shadow-indigo-500/30 flex items-center justify-center">
-              <div className="w-full h-full bg-[#0c0c10] rounded-[10px] flex items-center justify-center">
-                <Bot className="w-5 h-5 text-cyan-400" />
+        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between">
+          <NavLink to={isAdmin ? "/app/admin" : "/app/dashboard"} className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 p-0.5 shadow-lg shadow-purple-500/20 group-hover:shadow-cyan-500/40 transition-all duration-300">
+              <div className="w-full h-full bg-[#0c0c10] rounded-[14px] flex items-center justify-center">
+                {isAdmin ? <ShieldCheck className="w-5 h-5 text-cyan-400" /> : <Bot className="w-5 h-5 text-purple-400" />}
               </div>
             </div>
+
             {!isCollapsed && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col whitespace-nowrap"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-col"
               >
-                <span className="font-extrabold text-base tracking-tight text-white flex items-center gap-1.5">
-                  LifeOS <span className="text-gradient font-black text-xs px-1.5 py-0.5 rounded bg-white/10">AI</span>
+                <span className="font-bold text-white text-base tracking-tight leading-none group-hover:text-cyan-300 transition-colors">
+                  LifeOS <span className="text-cyan-400 text-xs">AI</span>
                 </span>
-                <span className="text-[10px] text-gray-400 uppercase tracking-widest">Personal Coach</span>
+                <span className="text-[10px] text-gray-400 font-medium tracking-wider uppercase mt-1">
+                  {isAdmin ? 'System Admin' : 'Personal Coach'}
+                </span>
               </motion.div>
             )}
           </NavLink>
 
           <button
             onClick={onToggle}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-            title="Toggle Sidebar (Cmd+B)"
+            className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all"
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         </div>
 
-        {/* Navigation Items */}
-        <div className="px-3 py-4 max-h-[calc(100vh-140px)] overflow-y-auto space-y-6">
+        {/* Navigation Sections */}
+        <div className="px-3 py-4 space-y-6 overflow-y-auto max-h-[calc(100vh-140px)] scrollbar-thin scrollbar-thumb-white/10">
           {navSections.map((section, idx) => (
-            <div key={idx} className="space-y-1">
+            <div key={idx} className="space-y-1.5">
               {!isCollapsed && (
-                <h4 className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
+                <div className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                   {section.title}
-                </h4>
+                </div>
               )}
-              {section.items.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.path;
-                return (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "relative group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
-                      isActive
-                        ? "text-white bg-gradient-to-r from-blue-600/30 to-purple-600/30 border border-white/10 shadow-lg shadow-purple-500/10"
-                        : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
-                    )}
-                  >
-                    <Icon className={cn("w-5 h-5 shrink-0 transition-colors", isActive ? "text-cyan-400" : "text-gray-400 group-hover:text-gray-200")} />
 
-                    {!isCollapsed && (
-                      <span className="truncate whitespace-nowrap">{item.label}</span>
-                    )}
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.path;
 
-                    {!isCollapsed && item.badge && (
-                      <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/10 text-cyan-300 border border-white/10">
-                        {item.badge}
-                      </span>
-                    )}
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 group relative",
+                          isActive
+                            ? "bg-gradient-to-r from-purple-600/30 to-cyan-500/20 text-white border border-purple-500/30 shadow-md shadow-purple-500/10"
+                            : "text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent"
+                        )
+                      }
+                    >
+                      <Icon className={cn("w-4 h-4 shrink-0 transition-transform group-hover:scale-110", isActive ? "text-cyan-400" : "text-gray-400 group-hover:text-gray-200")} />
 
-                    {/* Tooltip on collapse */}
-                    {isCollapsed && (
-                      <div className="absolute left-full ml-3 px-3 py-1.5 rounded-lg bg-[#181822] text-white text-xs font-medium border border-white/10 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                        {item.label}
-                      </div>
-                    )}
-                  </NavLink>
-                );
-              })}
+                      {!isCollapsed && (
+                        <div className="flex items-center justify-between flex-1 truncate">
+                          <span className="truncate">{item.label}</span>
+                          {item.badge && (
+                            <span className={cn(
+                              "text-[9px] px-1.5 py-0.5 rounded-full font-bold tracking-wide",
+                              isActive
+                                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                                : "bg-white/5 text-gray-400 group-hover:bg-white/10"
+                            )}>
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Active Indicator Glow */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeGlow"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-r-full"
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                    </NavLink>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
@@ -143,15 +175,17 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
         <div className={cn("flex items-center gap-3", isCollapsed && "justify-center")}>
           <div className="relative">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-              M
+              {(user?.name || 'M').charAt(0).toUpperCase()}
             </div>
             <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0c0c10]" />
           </div>
 
           {!isCollapsed && (
             <div className="flex flex-col truncate">
-              <span className="text-xs font-semibold text-white truncate">Manoj Kumar</span>
-              <span className="text-[10px] text-cyan-400 font-mono">Pro Member • AI Active</span>
+              <span className="text-xs font-semibold text-white truncate">{user?.name || 'System User'}</span>
+              <span className="text-[10px] text-cyan-400 font-mono">
+                {isAdmin ? 'System Admin • Online' : 'Candidate • Active'}
+              </span>
             </div>
           )}
         </div>

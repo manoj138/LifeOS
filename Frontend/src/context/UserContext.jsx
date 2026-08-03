@@ -29,39 +29,40 @@ const DEFAULT_PREFERENCES = {
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('lifeos_user_profile');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const session = localStorage.getItem('lifeos_session');
+      return session ? JSON.parse(session).user : null;
+    } catch (e) {
+      return null;
+    }
   });
 
   const [preferences, setPreferences] = useState(() => {
-    const savedPrefs = localStorage.getItem('lifeos_user_preferences');
-    return savedPrefs ? JSON.parse(savedPrefs) : null;
+    try {
+      const session = localStorage.getItem('lifeos_session');
+      return session ? JSON.parse(session).preferences : DEFAULT_PREFERENCES;
+    } catch (e) {
+      return DEFAULT_PREFERENCES;
+    }
   });
 
   const [onboardingCompleted, setOnboardingCompleted] = useState(() => {
-    return localStorage.getItem('lifeos_onboarding_completed') === 'true';
+    try {
+      const session = localStorage.getItem('lifeos_session');
+      return session ? JSON.parse(session).onboardingCompleted : false;
+    } catch (e) {
+      return false;
+    }
   });
 
+  // Sync active login session to localStorage for F5 refresh persistence
   useEffect(() => {
     if (user) {
-      localStorage.setItem('lifeos_user_profile', JSON.stringify(user));
+      localStorage.setItem('lifeos_session', JSON.stringify({ user, preferences, onboardingCompleted }));
     } else {
-      localStorage.removeItem('lifeos_user_profile');
+      localStorage.removeItem('lifeos_session');
     }
-  }, [user]);
-
-  useEffect(() => {
-    if (preferences) {
-      localStorage.setItem('lifeos_user_preferences', JSON.stringify(preferences));
-    } else {
-      localStorage.removeItem('lifeos_user_preferences');
-    }
-  }, [preferences]);
-
-  useEffect(() => {
-    localStorage.setItem('lifeos_onboarding_completed', onboardingCompleted ? 'true' : 'false');
-  }, [onboardingCompleted]);
-
+  }, [user, preferences, onboardingCompleted]);
 
   const completeOnboarding = (data) => {
     if (data.user) {
@@ -71,7 +72,6 @@ export const UserProvider = ({ children }) => {
       setPreferences((prev) => ({ ...prev, ...data.preferences }));
     }
     setOnboardingCompleted(true);
-    localStorage.setItem('lifeos_onboarding_completed', 'true');
 
     // Asynchronously sync with Backend API
     apiService.saveOnboarding({
@@ -79,7 +79,6 @@ export const UserProvider = ({ children }) => {
       ...data.preferences,
     }).catch((err) => console.log('Backend sync offline fallback active.'));
   };
-
 
   const updatePreferences = (newPrefs) => {
     setPreferences((prev) => ({ ...prev, ...newPrefs }));
@@ -91,20 +90,15 @@ export const UserProvider = ({ children }) => {
 
   const resetOnboarding = () => {
     setOnboardingCompleted(false);
-    localStorage.setItem('lifeos_onboarding_completed', 'false');
   };
 
   const clearAllLocalState = () => {
-    localStorage.removeItem('lifeos_user_profile');
-    localStorage.removeItem('lifeos_user_preferences');
-    localStorage.removeItem('lifeos_onboarding_completed');
-    localStorage.removeItem('lifeos_auth_token');
-    localStorage.removeItem('lifeos_goals');
-    localStorage.removeItem('lifeos_planner_tasks');
-    setUser(DEFAULT_PROFILE);
-    setPreferences(DEFAULT_PREFERENCES);
+    localStorage.removeItem('lifeos_session');
+    setUser(null);
+    setPreferences(null);
     setOnboardingCompleted(false);
   };
+
 
   return (
     <UserContext.Provider

@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { OnboardingGuard } from '../components/auth/OnboardingGuard';
+import { AdminGuard } from '../components/auth/AdminGuard';
 
 import { LandingPage } from '../pages/LandingPage';
 import { AuthPage } from '../pages/AuthPage';
@@ -25,6 +26,14 @@ import { AdminPage } from '../pages/AdminPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { LoadingStatePage } from '../pages/LoadingStatePage';
 
+import { useUser } from '../context/UserContext';
+
+const AppIndexRedirect = () => {
+  const { user } = useUser();
+  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
+  return <Navigate to={isAdmin ? "/app/admin" : "/app/dashboard"} replace />;
+};
+
 export const AppRoutes = () => {
   return (
     <Routes>
@@ -42,9 +51,13 @@ export const AppRoutes = () => {
       {/* Authenticated Application Shell (Guarded by Onboarding) */}
       <Route element={<OnboardingGuard />}>
         <Route path="/app" element={<MainLayout />}>
-          <Route index element={<Navigate to="/app/dashboard" replace />} />
+          <Route index element={<AppIndexRedirect />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="admin" element={<AdminPage />} />
+          <Route element={<AdminGuard />}>
+            <Route path="admin" element={<AdminPage />} />
+          </Route>
+
+
           <Route path="planner" element={<DailyPlanner />} />
           <Route path="goals" element={<GoalsPage />} />
           <Route path="learning" element={<LearningHub />} />

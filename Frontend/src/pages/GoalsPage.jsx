@@ -38,11 +38,7 @@ const DEFAULT_GOALS = [
 export const GoalsPage = () => {
   const { user, preferences } = useUser();
 
-  const [goals, setGoals] = useState(() => {
-    const saved = localStorage.getItem('lifeos_goals');
-    return saved ? JSON.parse(saved) : DEFAULT_GOALS;
-  });
-
+  const [goals, setGoals] = useState(DEFAULT_GOALS);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -51,9 +47,6 @@ export const GoalsPage = () => {
   const [newCategory, setNewCategory] = useState('Career');
   const [newMilestonesText, setNewMilestonesText] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem('lifeos_goals', JSON.stringify(goals));
-  }, [goals]);
 
   const toggleMilestone = (goalId, milestoneId) => {
     setGoals((prev) =>

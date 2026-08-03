@@ -20,7 +20,14 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const { user, preferences, resetOnboarding } = useUser();
 
+  React.useEffect(() => {
+    if (user?.role === 'admin' || user?.email?.toLowerCase().includes('admin')) {
+      navigate('/app/admin', { replace: true });
+    }
+  }, [user, navigate]);
+
   const metrics = [
+
     { title: "Target Specialization", value: 88, suffix: "%", icon: Code2, color: "cyan", change: preferences?.targetRole || "Full-Stack Web Dev" },
     { title: "Skill Readiness", value: 92, suffix: "%", icon: MessageSquareCode, color: "purple", change: `${preferences?.skillLevels?.dsa || 'Intermediate'} Level` },
     { title: "Daily Target Commitment", value: preferences?.dailyHours || 4, suffix: " hrs/day", icon: Server, color: "emerald", change: `${preferences?.careerLevel || 'Intermediate'}` },

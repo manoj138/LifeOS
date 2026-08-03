@@ -39,10 +39,7 @@ const playPomodoroChime = () => {
 export const DailyPlanner = () => {
   const { user, preferences } = useUser();
 
-  const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('lifeos_planner_tasks');
-    return saved ? JSON.parse(saved) : DEFAULT_TASKS;
-  });
+  const [tasks, setTasks] = useState(DEFAULT_TASKS);
 
   useEffect(() => {
     let isMounted = true;
@@ -66,9 +63,6 @@ export const DailyPlanner = () => {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem('lifeos_planner_tasks', JSON.stringify(tasks));
-  }, [tasks]);
 
   // Pomodoro countdown effect
   useEffect(() => {

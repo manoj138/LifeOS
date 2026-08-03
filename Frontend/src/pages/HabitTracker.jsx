@@ -28,20 +28,12 @@ const generate90Days = () => {
 };
 
 export const HabitTracker = () => {
-  const [habits, setHabits] = useState(() => {
-    const saved = localStorage.getItem('lifeos_habits');
-    return saved ? JSON.parse(saved) : DEFAULT_HABITS;
-  });
+  const [habits, setHabits] = useState(DEFAULT_HABITS);
 
   const [logs, setLogs] = useState(() => {
-    const saved = localStorage.getItem('lifeos_habit_logs');
-    if (saved) return JSON.parse(saved);
-    
-    // Default demo data for initial history
     const demoLogs = {};
     const dates = generate90Days();
     dates.forEach((dateStr, idx) => {
-      // Simulate random history for initial experience
       if (idx < 85) {
         demoLogs[dateStr] = idx % 2 === 0 ? ['h1', 'h2', 'h3'] : ['h1', 'h4'];
       }
@@ -55,13 +47,6 @@ export const HabitTracker = () => {
   const [newHabitCategory, setNewHabitCategory] = useState('Skills');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  useEffect(() => {
-    localStorage.setItem('lifeos_habits', JSON.stringify(habits));
-  }, [habits]);
-
-  useEffect(() => {
-    localStorage.setItem('lifeos_habit_logs', JSON.stringify(logs));
-  }, [logs]);
 
   const todayStr = getTodayString();
   const todayCompletedIds = logs[todayStr] || [];
