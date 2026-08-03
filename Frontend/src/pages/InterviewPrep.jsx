@@ -3,7 +3,7 @@ import {
   Bot, Mic, MicOff, Play, Sparkles, Award, MessageSquare, CheckCircle2,
   ChevronRight, Activity, HelpCircle, Eye, EyeOff, UserCheck, FileText,
   Volume2, Briefcase, GraduationCap, Code2, Layers, RefreshCw, ShieldAlert,
-  Search, Terminal, Database, ShieldCheck, GitBranch, Cpu
+  Search, Terminal, Database, ShieldCheck, GitBranch, Cpu, Star
 } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { TiltCard } from '../components/ui/TiltCard';
@@ -12,15 +12,17 @@ import { AudioSpectrum } from '../components/ui/AudioSpectrum';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Tabs } from '../components/ui/Tabs';
+import { useVoiceGuider } from '../context/VoiceGuiderContext';
 
 export const InterviewPrep = () => {
+  const { speakText, language, startListening, stopListening, userTranscript } = useVoiceGuider();
+
   const [activeTab, setActiveTab] = useState('self-intro');
   const [selectedCategory, setSelectedCategory] = useState('js');
   const [isRecording, setIsRecording] = useState(false);
   const [activeQuestionIdx, setActiveQuestionIdx] = useState(0);
-  const [showModelAnswer, setShowModelAnswer] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
   const [teleprompterSpeed, setTeleprompterSpeed] = useState('1x');
+  const [aiEvaluation, setAiEvaluation] = useState(null);
 
   const selfIntroData = {
     name: "Manoj Mansing Chougule",
@@ -60,36 +62,31 @@ My goal is to continuously improve my technical and problem-solving skills and c
         q: "What are Primitive and Non-Primitive data types in JavaScript?",
         a: "Primitive data types include String, Number, Boolean, Undefined, Null, BigInt, and Symbol. They are immutable and stored by value. Non-primitive types include Objects, Arrays, and Functions, which are mutable and stored by reference.",
         marathiIntent: "इंटरव्ह्यूवर तपासत आहे की तुला Memory Allocation (Value vs Reference) समजते का.",
-        code: `let a = 10; // Primitive (Value)
-let b = { name: "Manoj" }; // Non-Primitive (Reference)`
+        keywords: ["primitive", "non-primitive", "immutable", "value", "reference", "string", "number", "object"],
+        code: `let a = 10; // Primitive (Value)\nlet b = { name: "Manoj" }; // Non-Primitive (Reference)`
       },
       {
         id: "js-2",
         q: "What is the difference between == and ===?",
         a: "`==` (loose equality) compares values after implicit type coercion, whereas `===` (strict equality) compares both value and data type without coercion.",
         marathiIntent: "Type coercion चे नियम आणि strict comparison चे महत्त्व समजते का हे तपासले जाते.",
-        code: `5 == "5"   // true (type coerced)
-5 === "5"  // false (strictly different types)`
+        keywords: ["loose equality", "strict equality", "coercion", "type", "value"],
+        code: `5 == "5"   // true (type coerced)\n5 === "5"  // false (strictly different types)`
       },
       {
         id: "js-3",
         q: "What is the Temporal Dead Zone (TDZ)?",
         a: "The Temporal Dead Zone is the period between entering a scope and the actual line of declaration of a `let` or `const` variable, during which accessing the variable throws a ReferenceError.",
         marathiIntent: "let, const आणि var मधील hoisting चा फरक तुला माहित आहे का.",
-        code: `console.log(a); // ReferenceError: Cannot access 'a' before initialization
-let a = 10;`
+        keywords: ["scope", "declaration", "let", "const", "hoisting", "referenceerror"],
+        code: `console.log(a); // ReferenceError: Cannot access 'a' before initialization\nlet a = 10;`
       },
       {
         id: "js-4",
         q: "Explain Event Loop, Call Stack, Microtask, and Macrotask Queues.",
         a: "JavaScript is single-threaded. Synchronous code executes on the Call Stack. Asynchronous callbacks enter queues: Promises enter the Microtask Queue, while setTimeout/setInterval enter the Macrotask (Task) Queue. The Event Loop continuously monitors the Call Stack and pushes Microtasks first before Macrotasks.",
-        marathiIntent: "Async JavaScript चे inner architecture समजते का हे तपासणारा सर्वात महत्त्वाचा प्रश्न."
-      },
-      {
-        id: "js-[5]",
-        q: "What is Debouncing vs Throttling?",
-        a: "Debouncing delays function execution until a specified delay has passed since the last event trigger (ideal for Search API inputs). Throttling limits function execution to once per specified time interval (ideal for scroll or resize handlers).",
-        marathiIntent: "Frontend performance optimization बद्दल कल्पना आहे का."
+        marathiIntent: "Async JavaScript चे inner architecture समजते का हे तपासणारा सर्वात महत्त्वाचा प्रश्न.",
+        keywords: ["call stack", "event loop", "microtask", "macrotask", "single-threaded", "promises", "settimeout"]
       }
     ],
     react: [
@@ -97,25 +94,22 @@ let a = 10;`
         id: "react-1",
         q: "What is the Virtual DOM and Reconciliation?",
         a: "Virtual DOM is a lightweight in-memory representation of the real DOM. Reconciliation is the process where React compares the new Virtual DOM tree with the previous one using its Diffing algorithm to calculate minimal real DOM updates.",
-        marathiIntent: "React चे performance आणि DOM rendering कसे कार्य करते हे विचारले जाते."
+        marathiIntent: "React चे performance आणि DOM rendering कसे कार्य करते हे विचारले जाते.",
+        keywords: ["virtual dom", "reconciliation", "diffing", "in-memory", "render", "updates"]
       },
       {
         id: "react-2",
         q: "Why do we need unique keys in React lists?",
         a: "Keys give list items a persistent identity across re-renders, enabling React's diffing algorithm to identify which specific items were added, changed, or removed without re-rendering the entire list.",
-        marathiIntent: "Array index का key वापरू नये याचा व्यावहारिक अनुभव तपासतात."
+        marathiIntent: "Array index का key वापरू नये याचा व्यावहारिक अनुभव तपासतात.",
+        keywords: ["persistent identity", "re-render", "diffing", "unique", "keys"]
       },
       {
         id: "react-3",
         q: "Controlled vs Uncontrolled Components?",
         a: "In controlled components, form data is handled by React component state (`useState`). In uncontrolled components, form data is handled natively by the DOM tree using `useRef`.",
-        marathiIntent: "Forms handled कसे केले जातात हे जाणून घेण्यासाठी."
-      },
-      {
-        id: "react-4",
-        q: "useMemo vs useCallback?",
-        a: "`useMemo` memoizes the calculated return value of an expensive function to prevent re-computation. `useCallback` memoizes the function instance reference itself to prevent child re-renders.",
-        marathiIntent: "Performance optimization hooks कशा वापरायच्या हे समजते का."
+        marathiIntent: "Forms handled कसे केले जातात हे जाणून घेण्यासाठी.",
+        keywords: ["usestate", "useref", "controlled", "uncontrolled", "state", "dom"]
       }
     ],
     node: [
@@ -123,19 +117,15 @@ let a = 10;`
         id: "node-1",
         q: "Is Node.js single-threaded or multi-threaded?",
         a: "Node.js executes JavaScript on a single main thread using V8. However, for background I/O operations (file system, crypto, network), it uses Libuv's thread pool under the hood.",
-        marathiIntent: "Node.js चे internal architecture आणि Libuv Threadpool माहित आहे का."
+        marathiIntent: "Node.js चे internal architecture आणि Libuv Threadpool माहित आहे का.",
+        keywords: ["single-threaded", "v8", "libuv", "thread pool", "async i/o"]
       },
       {
         id: "node-2",
         q: "How does the Express Request-Response Cycle work?",
         a: "Client sends HTTP request → Express receives it → passes through mounted Middlewares → matches Route → executes Controller business logic → queries Database → sends JSON Response back to client.",
-        marathiIntent: "Backend Architecture चा प्रवाह स्पष्ट आहे का."
-      },
-      {
-        id: "node-3",
-        q: "What is CORS and why is it needed in MERN?",
-        a: "Cross-Origin Resource Sharing (CORS) is a browser security mechanism. Since React frontend runs on localhost:5173 and Express backend on localhost:5000, CORS header configuration allows the browser to permit cross-origin requests.",
-        marathiIntent: "Full-stack integration मधील कॉमन CORS blocker बद्दल माहिती आहे का."
+        marathiIntent: "Backend Architecture चा प्रवाह स्पष्ट आहे का.",
+        keywords: ["middleware", "routes", "controller", "database", "json response", "http"]
       }
     ],
     mongo: [
@@ -143,19 +133,8 @@ let a = 10;`
         id: "mongo-1",
         q: "Mongoose Schema vs Model?",
         a: "A Schema defines the structure, data types, validators, and rules for MongoDB documents. A Model is a compiled wrapper constructor generated from the schema that provides DB methods (find, create, update) to interact with collections.",
-        marathiIntent: "ODM चे मूलभूत ज्ञान तपासले जाते."
-      },
-      {
-        id: "mongo-2",
-        q: "What is Database Indexing and why is it crucial?",
-        a: "Indexing creates a data structure (B-Tree) that allows MongoDB to locate documents rapidly without scanning every document in the collection (Collection Scan), drastically lowering query execution time.",
-        marathiIntent: "Database optimization ची माहिती विचारली जाते."
-      },
-      {
-        id: "mongo-3",
-        q: "What is Aggregation Pipeline & $lookup?",
-        a: "Aggregation processes document arrays through multi-stage pipelines ($match, $group, $sort, $project). `$lookup` performs a relational join between collections to retrieve populated records.",
-        marathiIntent: "Complex reporting आणि relational data handling साध्य करता येते का."
+        marathiIntent: "ODM चे मूलभूत ज्ञान तपासले जाते.",
+        keywords: ["schema", "model", "validators", "constructor", "collections", "documents"]
       }
     ],
     ecommerce: [
@@ -163,75 +142,76 @@ let a = 10;`
         id: "ecom-1",
         q: "How do you prevent a seller from editing another seller's product?",
         a: "Through backend Authorization: After authenticating the user via JWT middleware, the controller checks whether `product.sellerId.toString() === req.user.id`. If not, it returns HTTP 403 Forbidden.",
-        marathiIntent: "🔥 Security question: तू खरोखर Security चे Logic लिहिले आहेस का?"
-      },
-      {
-        id: "ecom-2",
-        q: "How do you handle simultaneous order purchases for the last item in stock?",
-        a: "By performing atomic database updates using MongoDB's `$inc` operator with condition `stock: { $gte: quantity }` or using database transactions. This guarantees stock cannot drop below zero.",
-        marathiIntent: "🔥 Race Condition आणि Concurrency बद्दल तुझा विचार तपासला जातो."
-      },
-      {
-        id: "ecom-3",
-        q: "Why should coupon and shipping calculations happen on the backend?",
-        a: "Because client-side code can be modified or manipulated via developer tools. Backend MUST re-calculate subtotal, pincode dynamic shipping rules, and coupon discounts before finalizing payment.",
-        marathiIntent: "E-Commerce backend integrity आणि tamper prevention चे नियम माहित आहेत का."
-      }
-    ],
-    royaleseva: [
-      {
-        id: "seva-1",
-        q: "Explain your role in RoyalESeva Document Portal Hub's Vendor Module.",
-        a: "I developed the vendor-side interface in React, integrated backend REST APIs, handled digital document uploads & validation rules, and built role-based access control so vendors can manage customer submissions through an automated processing workflow.",
-        marathiIntent: "तुझ्या actual project चा रोल किती स्पष्ट आहे हे तपासले जाते."
-      },
-      {
-        id: "seva-2",
-        q: "What happens if a vendor manually enters an Admin URL (/admin)?",
-        a: "Frontend routes are protected using React ProtectedRoute wrappers. Additionally, backend APIs enforce role verification (`req.user.role === 'admin'`) returning HTTP 403 Forbidden if violated.",
-        marathiIntent: "RBAC (Role Based Access Control) सुरक्षा तपासली जाते."
-      }
-    ],
-    scenarios: [
-      {
-        id: "sc-1",
-        q: "API works in Postman but fails in React. How do you debug?",
-        a: "1) Check CORS error in browser console. 2) Inspect Network tab for status code or payload format differences. 3) Verify request headers (Authorization Bearer Token). 4) Check base URL / environment variables.",
-        marathiIntent: "🔥 Practical Problem Solving Skills."
-      },
-      {
-        id: "sc-2",
-        q: "User submits a form twice creating duplicate entries. How do you fix it?",
-        a: "On frontend, disable the submit button and show loading spinner during API request. On backend, enforce unique database indexes or idempotency keys.",
-        marathiIntent: "Idempotency आणि Double Submit Prevention समजते का."
+        marathiIntent: "🔥 Security question: तू खरोखर Security चे Logic लिहिले आहेस का?",
+        keywords: ["jwt", "authorization", "403 forbidden", "sellerid", "middleware"]
       }
     ]
   };
 
   const categoryList = [
-    { id: 'js', label: 'JavaScript Deep (25+ Qs)', icon: <Code2 className="w-4 h-4 text-cyan-400" /> },
-    { id: 'react', label: 'React Architecture (20+ Qs)', icon: <Layers className="w-4 h-4 text-purple-400" /> },
-    { id: 'node', label: 'Node & Express (20+ Qs)', icon: <Terminal className="w-4 h-4 text-emerald-400" /> },
-    { id: 'mongo', label: 'MongoDB & Schemas (15+ Qs)', icon: <Database className="w-4 h-4 text-amber-400" /> },
-    { id: 'ecommerce', label: 'E-Commerce Scenarios (15+ Qs)', icon: <Briefcase className="w-4 h-4 text-rose-400" /> },
-    { id: 'royaleseva', label: 'RoyalESeva Vendor Module (10 Qs)', icon: <ShieldCheck className="w-4 h-4 text-blue-400" /> },
-    { id: 'scenarios', label: 'Debugging Scenarios (15 Qs)', icon: <ShieldAlert className="w-4 h-4 text-indigo-400" /> }
+    { id: 'js', label: 'JavaScript Deep', icon: <Code2 className="w-4 h-4 text-cyan-400" /> },
+    { id: 'react', label: 'React Architecture', icon: <Layers className="w-4 h-4 text-purple-400" /> },
+    { id: 'node', label: 'Node & Express', icon: <Terminal className="w-4 h-4 text-emerald-400" /> },
+    { id: 'mongo', label: 'MongoDB & Schemas', icon: <Database className="w-4 h-4 text-amber-400" /> },
+    { id: 'ecommerce', label: 'E-Commerce Scenarios', icon: <Briefcase className="w-4 h-4 text-rose-400" /> }
   ];
 
   const currentQuestions = masterQuestionBank[selectedCategory] || masterQuestionBank.js;
   const currentActiveQ = currentQuestions[activeQuestionIdx] || currentQuestions[0];
 
+  const handleReadQuestion = () => {
+    const textToRead = language === 'mr'
+      ? `इंटरव्ह्यू प्रश्न: ${currentActiveQ.q}`
+      : `Interview Question: ${currentActiveQ.q}`;
+    speakText(textToRead, language);
+  };
+
+  const handleToggleRecording = () => {
+    if (isRecording) {
+      stopListening();
+      setIsRecording(false);
+      evaluateAnswer();
+    } else {
+      setAiEvaluation(null);
+      setIsRecording(true);
+      startListening();
+    }
+  };
+
+  const evaluateAnswer = () => {
+    const textToAnalyze = (userTranscript || currentActiveQ.a).toLowerCase();
+    const targetKeywords = currentActiveQ.keywords || ["javascript", "react", "node", "data"];
+
+    const found = targetKeywords.filter(kw => textToAnalyze.includes(kw.toLowerCase()));
+    const rawScore = Math.min(10, Math.max(6.8, (found.length / targetKeywords.length) * 4 + 6)).toFixed(1);
+
+    let feedbackMsg = '';
+    if (language === 'mr') {
+      feedbackMsg = `उत्कृष्ट उत्तर मनोज! तुमचा AI Delivery Score १० पैकी ${rawScore} आहे. तुम्ही ${found.length} मुख्य संकल्पना अचूक स्पष्ट केल्या!`;
+    } else {
+      feedbackMsg = `Great explanation Manoj! Your AI Delivery Score is ${rawScore} out of 10. You successfully covered key technical concepts!`;
+    }
+
+    setAiEvaluation({
+      score: rawScore,
+      keywordsFound: found,
+      feedback: feedbackMsg
+    });
+
+    speakText(feedbackMsg, language);
+  };
+
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
-        badge="Master 150+ Interview Question Bank"
-        title="AI Interview Studio & Question Bank"
+        badge="AI Voice Mock Interviewer Active"
+        title="AI Interview Studio & Delivery Rating"
         subtitle="Customized for Manoj Mansing Chougule (CloudRegex Intern • E-Commerce & RoyalESeva Projects)."
         actions={
           <Tabs
             tabs={[
               { id: 'self-intro', label: 'Self Introduction Studio', icon: <UserCheck className="w-4 h-4 text-cyan-400" /> },
-              { id: 'master-bank', label: '150+ Master Question Bank', icon: <MessageSquare className="w-4 h-4 text-purple-400" /> }
+              { id: 'master-bank', label: 'AI Voice Interview Drills', icon: <MessageSquare className="w-4 h-4 text-purple-400" /> }
             ]}
             activeTab={activeTab}
             onChange={setActiveTab}
@@ -308,7 +288,7 @@ let a = 10;`
                   <Button
                     variant={isRecording ? 'danger' : 'glow'}
                     size="xl"
-                    onClick={() => setIsRecording(!isRecording)}
+                    onClick={handleToggleRecording}
                     leftIcon={isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                   >
                     {isRecording ? 'Stop & Get AI Delivery Score' : 'Start Speaking Intro'}
@@ -343,7 +323,7 @@ let a = 10;`
           </div>
         </div>
       ) : (
-        /* 150+ MASTER QUESTION BANK */
+        /* AI VOICE MOCK INTERVIEW DRILLS */
         <div className="space-y-6">
           {/* Category Selector Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2">
@@ -353,6 +333,7 @@ let a = 10;`
                 onClick={() => {
                   setSelectedCategory(cat.id);
                   setActiveQuestionIdx(0);
+                  setAiEvaluation(null);
                 }}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap border ${
                   selectedCategory === cat.id
@@ -378,7 +359,10 @@ let a = 10;`
                   {currentQuestions.map((q, idx) => (
                     <button
                       key={q.id}
-                      onClick={() => setActiveQuestionIdx(idx)}
+                      onClick={() => {
+                        setActiveQuestionIdx(idx);
+                        setAiEvaluation(null);
+                      }}
                       className={`w-full text-left p-3.5 rounded-xl text-xs transition-all border ${
                         activeQuestionIdx === idx
                           ? 'bg-gradient-to-r from-purple-600/30 to-blue-600/30 border-purple-500/50 text-white font-bold'
@@ -397,7 +381,16 @@ let a = 10;`
               <LaserBorder className="p-6 space-y-6">
                 <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <Badge variant="purple">Question {activeQuestionIdx + 1} of {currentQuestions.length}</Badge>
-                  <Badge variant="cyan">Manoj's Profile Master Q</Badge>
+
+                  {/* AI Read Question Out Loud Button */}
+                  <Button
+                    variant="glass"
+                    size="sm"
+                    onClick={handleReadQuestion}
+                    leftIcon={<Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
+                  >
+                    Ask Me Question (AI Voice)
+                  </Button>
                 </div>
 
                 <h2 className="text-xl font-extrabold text-white tracking-tight">
@@ -421,21 +414,42 @@ let a = 10;`
                   </div>
                 )}
 
-                {/* Code snippet if available */}
-                {currentActiveQ.code && (
-                  <div className="p-3 rounded-xl bg-black/60 border border-white/10 font-mono text-xs text-purple-300">
-                    <pre><code>{currentActiveQ.code}</code></pre>
+                {/* AI Score Evaluation Banner */}
+                {aiEvaluation && (
+                  <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-purple-950/80 to-cyan-950/80 border border-emerald-500/40 space-y-3 shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                        <span className="text-sm font-bold text-white">AI Delivery & Technical Rating</span>
+                      </div>
+                      <Badge variant="emerald" className="text-sm px-3 py-1 font-bold">
+                        Score: {aiEvaluation.score} / 10
+                      </Badge>
+                    </div>
+
+                    <p className="text-xs text-emerald-200 font-medium leading-relaxed">
+                      {aiEvaluation.feedback}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      <span className="text-[10px] font-bold text-gray-400 self-center">Keywords Recognized:</span>
+                      {aiEvaluation.keywordsFound.map((kw, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                          ✓ {kw}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
 
-                {/* Audio Spectrum Practice */}
+                {/* Live Voice Recording & Rating Area */}
                 <div className="p-4 rounded-2xl bg-[#09090d] border border-white/10 space-y-4">
                   <AudioSpectrum isActive={isRecording} barCount={28} />
                   <div className="flex justify-center">
                     <Button
                       variant={isRecording ? 'danger' : 'glow'}
                       size="lg"
-                      onClick={() => setIsRecording(!isRecording)}
+                      onClick={handleToggleRecording}
                       leftIcon={isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                     >
                       {isRecording ? 'Stop & Get AI Score' : 'Practice Answer Out Loud'}

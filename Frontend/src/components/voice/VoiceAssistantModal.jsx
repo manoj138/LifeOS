@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, X, Sparkles, Globe, Compass, Send } from 'lucide-react';
+import { X, Sparkles, Globe, Compass, Send, Plus } from 'lucide-react';
 import { useVoiceGuider } from '../../context/VoiceGuiderContext';
 import { AudioSpectrum } from '../ui/AudioSpectrum';
+import { AIRobotAvatar } from './AIRobotAvatar';
 
 export const VoiceAssistantModal = () => {
   const {
@@ -24,21 +25,23 @@ export const VoiceAssistantModal = () => {
 
   const promptSuggestions = language === 'mr'
     ? [
-        `Hey ${aiName}, आज काय pending आहे?`,
-        `${aiName}, open learning hub`,
-        `तुझे नाव काय आहे?`
+        `Add task: Prepare MERN Resume`,
+        `Add habit: Drink 3L Water`,
+        `Add goal: Master Docker and VPS`,
+        `Dashboard open kar`
       ]
     : [
-        `Hey ${aiName}, what is pending today?`,
-        `${aiName}, open Learning Hub`,
-        `What is your name?`
+        `Add task: Prepare MERN Resume`,
+        `Add habit: Drink 3L Water`,
+        `Add goal: Master Docker and VPS`,
+        `Open Dashboard`
       ];
 
   return (
     <AnimatePresence>
-      {/* NON-BLOCKING FLOATING CONTAINER (pointer-events-none allows clicks on page beneath) */}
+      {/* NON-BLOCKING FLOATING CONTAINER */}
       <div className="fixed bottom-6 right-6 z-[9990] pointer-events-none flex flex-col items-end">
-        {/* Floating Voice HUD Capsule (pointer-events-auto captures clicks on HUD itself) */}
+        {/* Floating Voice HUD Capsule */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -87,8 +90,8 @@ export const VoiceAssistantModal = () => {
             </div>
           </div>
 
-          {/* Central Pulsing Orb & Audio Wave */}
-          <div className="flex items-center justify-between gap-3 py-1 bg-white/[0.02] border border-white/5 rounded-2xl px-3 py-2">
+          {/* 3D Animated Floating AI Robot Companion & Audio Wave */}
+          <div className="flex items-center justify-between gap-3 py-1 bg-white/[0.02] border border-white/5 rounded-2xl p-3">
             <button
               type="button"
               onClick={() => {
@@ -98,13 +101,10 @@ export const VoiceAssistantModal = () => {
                   startListening();
                 }
               }}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md shrink-0 ${
-                isListening
-                  ? 'bg-gradient-to-tr from-rose-600 to-purple-600 text-white animate-pulse'
-                  : 'bg-gradient-to-tr from-purple-600 to-cyan-500 hover:scale-105 text-white'
-              }`}
+              title="Click to toggle listening"
+              className="cursor-pointer hover:scale-105 transition-transform shrink-0"
             >
-              <Mic className="w-5 h-5 text-white" />
+              <AIRobotAvatar size="md" />
             </button>
 
             <div className="flex-1 min-w-0">
@@ -121,7 +121,7 @@ export const VoiceAssistantModal = () => {
                 </div>
               ) : (
                 <p className="text-[10px] text-gray-400 truncate">
-                  {language === 'mr' ? 'नेव्हिगेशन किंवा प्रलंबित कामे विचारा' : 'Ask about pending tasks or navigation'}
+                  {language === 'mr' ? 'बोलून काम किंवा सवय जोडण्यास सांगा' : 'Say "Add task..." or "Add habit..."'}
                 </p>
               )}
             </div>
@@ -146,8 +146,8 @@ export const VoiceAssistantModal = () => {
             {!userTranscript && !aiResponseText && (
               <p className="text-[11px] text-gray-400 text-center italic">
                 {language === 'mr'
-                  ? `उदा. "Hey ${aiName}, आज काय pending आहे?"`
-                  : `Try: "Hey ${aiName}, what is pending today?"`}
+                  ? `उदा. "Add task: Prepare Resume" किंवा "Add habit: Exercise"`
+                  : `Try: "Add task: Prepare Resume" or "Add habit: Exercise"`}
               </p>
             )}
           </div>
@@ -155,8 +155,8 @@ export const VoiceAssistantModal = () => {
           {/* Quick Suggested Voice Commands */}
           <div className="space-y-1.5 text-left pt-0.5">
             <span className="text-[10px] font-semibold text-gray-400 flex items-center gap-1">
-              <Compass className="w-3 h-3 text-purple-400" />
-              {language === 'mr' ? 'त्वरित विचारण्यासाठी क्लिक करा:' : 'Quick Voice Prompts:'}
+              <Plus className="w-3 h-3 text-purple-400" />
+              {language === 'mr' ? 'त्वरित काम जोडण्यासाठी क्लिक करा:' : 'Quick Voice Data Creation:'}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {promptSuggestions.map((prompt, idx) => (

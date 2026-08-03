@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Lock, Globe, Sparkles, Mic, Sliders, Radio } from 'lucide-react';
+import { Volume2, VolumeX, Lock, Globe, Sparkles, Sliders, Radio } from 'lucide-react';
 import { useVoiceGuider } from '../../context/VoiceGuiderContext';
 import { AudioSpectrum } from '../ui/AudioSpectrum';
+import { AIRobotAvatar } from './AIRobotAvatar';
 
 export const VoiceGuiderWidget = () => {
   const {
@@ -14,12 +15,15 @@ export const VoiceGuiderWidget = () => {
     isListening,
     isHandsFreeEnabled,
     setIsHandsFreeEnabled,
+    voicePersonality,
+    setVoicePersonality,
     requestMicPermission,
     startListening,
     speakGreetingAndBriefing,
     lockApp,
     setIsVoiceModalOpen,
-    aiName
+    aiName,
+    userTranscript
   } = useVoiceGuider();
 
   const [showSettingsPopover, setShowSettingsPopover] = useState(false);
@@ -34,7 +38,7 @@ export const VoiceGuiderWidget = () => {
 
   return (
     <div className="relative flex items-center">
-      {/* Sleek Single AI Voice Capsule */}
+      {/* Sleek Fixed-Size AI Voice Capsule (Prevents Layout Shifting) */}
       <div className="flex items-center gap-2 bg-[#12121a]/90 hover:bg-[#181824] border border-white/15 hover:border-purple-500/50 rounded-full px-3.5 py-1.5 backdrop-blur-2xl shadow-[0_0_20px_rgba(168,85,247,0.25)] transition-all">
         {/* Animated Mic Orb & Capsule Action */}
         <button
@@ -43,39 +47,31 @@ export const VoiceGuiderWidget = () => {
           className="flex items-center gap-2 text-left group"
           title={`Click to talk or say "Hey ${aiName}" hands-free`}
         >
-          {/* Glowing Voice Orb / Waves */}
-          <div className="relative flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 p-0.5 shadow-[0_0_12px_rgba(168,85,247,0.6)]">
-            <div className="w-full h-full bg-[#0a0a0f] rounded-full flex items-center justify-center">
-              {isSpeaking ? (
-                <Sparkles className="w-3.5 h-3.5 text-cyan-300 animate-spin" />
-              ) : isListening ? (
-                <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-              ) : (
-                <Mic className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
-              )}
-            </div>
-          </div>
+          {/* 3D Animated Floating AI Robot Companion Icon */}
+          <AIRobotAvatar size="sm" />
 
-          {/* Audio Spectrum when AI is speaking */}
-          {isSpeaking ? (
-            <div className="scale-75 origin-left">
-              <AudioSpectrum isActive={true} barCount={5} />
-            </div>
-          ) : (
-            <div className="hidden sm:flex flex-col">
-              <span className="text-xs font-bold text-white tracking-tight flex items-center gap-1">
-                <span>{aiName} AI</span>
-                {isHandsFreeEnabled && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                )}
-              </span>
-              <span className="text-[10px] text-gray-400 font-mono">
-                {isListening
-                  ? (language === 'mr' ? 'ऐकत आहे...' : 'Listening...')
-                  : (language === 'mr' ? `हाक मारा: 'Hey ${aiName}'` : `Say "Hey ${aiName}"`)}
-              </span>
-            </div>
-          )}
+          {/* Fixed-Width Label Box (Prevents Layout Shifting & Jitter) */}
+          <div className="w-32 min-w-[128px] max-w-[128px] h-7 flex flex-col justify-center overflow-hidden">
+            {isSpeaking ? (
+              <div className="scale-75 origin-left">
+                <AudioSpectrum isActive={true} barCount={6} />
+              </div>
+            ) : (
+              <>
+                <span className="text-xs font-bold text-white tracking-tight flex items-center gap-1 truncate">
+                  <span>{aiName} AI</span>
+                  {isHandsFreeEnabled && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
+                  )}
+                </span>
+                <span className="text-[10px] text-gray-400 font-mono truncate">
+                  {isListening
+                    ? (userTranscript ? `"${userTranscript}"` : (language === 'mr' ? 'ऐकत आहे...' : 'Listening...'))
+                    : (language === 'mr' ? `हाक मारा: 'Hey ${aiName}'` : `Say "Hey ${aiName}"`)}
+                </span>
+              </>
+            )}
+          </div>
         </button>
 
         {/* Divider */}
@@ -94,15 +90,57 @@ export const VoiceGuiderWidget = () => {
 
       {/* Popover Quick Settings Dropdown */}
       {showSettingsPopover && (
-        <div className="absolute top-12 right-0 z-50 w-56 bg-[#12121a]/95 border border-white/20 rounded-2xl p-3 shadow-2xl backdrop-blur-2xl space-y-2 text-xs">
+        <div className="absolute top-12 right-0 z-50 w-64 bg-[#12121a]/95 border border-white/20 rounded-2xl p-3.5 shadow-2xl backdrop-blur-2xl space-y-2.5 text-xs">
           <div className="flex items-center justify-between font-bold text-white pb-2 border-b border-white/10">
-            <span>{aiName} Voice Controls</span>
+            <span>{aiName} Controls & Tone</span>
             <button
               onClick={() => setShowSettingsPopover(false)}
               className="text-gray-400 hover:text-white"
             >
               ✕
             </button>
+          </div>
+
+          {/* Voice Personality Selector */}
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">AI Voice Tone:</span>
+            <div className="grid grid-cols-3 gap-1">
+              <button
+                type="button"
+                onClick={() => setVoicePersonality('sakhi')}
+                className={`p-1.5 rounded-xl border text-[10px] font-semibold text-center transition-all ${
+                  voicePersonality === 'sakhi'
+                    ? 'bg-purple-600/30 border-purple-500 text-white'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                }`}
+              >
+                🌸 Sakhi
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setVoicePersonality('coach')}
+                className={`p-1.5 rounded-xl border text-[10px] font-semibold text-center transition-all ${
+                  voicePersonality === 'coach'
+                    ? 'bg-rose-600/30 border-rose-500 text-white'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                }`}
+              >
+                ⚡ Coach
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setVoicePersonality('mentor')}
+                className={`p-1.5 rounded-xl border text-[10px] font-semibold text-center transition-all ${
+                  voicePersonality === 'mentor'
+                    ? 'bg-cyan-600/30 border-cyan-500 text-white'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                }`}
+              >
+                💼 Mentor
+              </button>
+            </div>
           </div>
 
           {/* Hands-Free Toggle */}
@@ -126,19 +164,6 @@ export const VoiceGuiderWidget = () => {
             <span className="text-gray-300 font-medium">Voice Language</span>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
               {language === 'mr' ? 'मराठी' : 'English'}
-            </span>
-          </div>
-
-          {/* Mute Toggle */}
-          <div
-            onClick={() => setIsMuted(prev => !prev)}
-            className="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 cursor-pointer transition-colors"
-          >
-            <span className="text-gray-300 font-medium">AI Audio Mute</span>
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-              isMuted ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-            }`}>
-              {isMuted ? 'MUTED' : 'ACTIVE'}
             </span>
           </div>
 
