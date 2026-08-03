@@ -25,6 +25,9 @@ export const VoiceGuiderProvider = ({ children }) => {
     return localStorage.getItem('lifeos_ai_name') || 'LifeOS';
   });
 
+  // Centralized Mutex Voice Mode: 'GLOBAL_HANDS_FREE' | 'INTERVIEW_DRILL' | 'ASSISTANT_HUD'
+  const [activeVoiceMode, setActiveVoiceMode] = useState('GLOBAL_HANDS_FREE');
+
   // Voice Personality Tone: 'sakhi' | 'coach' | 'mentor'
   const [voicePersonality, setVoicePersonality] = useState(() => {
     return localStorage.getItem('lifeos_voice_personality') || 'sakhi';
@@ -181,6 +184,21 @@ export const VoiceGuiderProvider = ({ children }) => {
     }
   }, []);
 
+  // Stop TTS
+  const stopSpeaking = useCallback(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  }, []);
+
+  // Centralized Mutex Mode Switcher
+  const setVoiceMode = useCallback((mode) => {
+    safeStopMic();
+    stopSpeaking();
+    setActiveVoiceMode(mode);
+  }, [safeStopMic, stopSpeaking]);
+
   // Text-To-Speech Helper
   const speakText = useCallback((text, targetLang = language) => {
     if (isMuted) return;
@@ -218,7 +236,7 @@ export const VoiceGuiderProvider = ({ children }) => {
 
     utterance.onend = () => {
       setIsSpeaking(false);
-      if (isHandsFreeEnabled && !isLocked) {
+      if (isHandsFreeEnabled && !isLocked && activeVoiceMode !== 'INTERVIEW_DRILL') {
         setTimeout(() => {
           if (startListeningRef.current) startListeningRef.current();
         }, 300);
@@ -227,7 +245,7 @@ export const VoiceGuiderProvider = ({ children }) => {
 
     utterance.onerror = () => {
       setIsSpeaking(false);
-      if (isHandsFreeEnabled && !isLocked) {
+      if (isHandsFreeEnabled && !isLocked && activeVoiceMode !== 'INTERVIEW_DRILL') {
         setTimeout(() => {
           if (startListeningRef.current) startListeningRef.current();
         }, 300);
@@ -235,15 +253,7 @@ export const VoiceGuiderProvider = ({ children }) => {
     };
 
     window.speechSynthesis.speak(utterance);
-  }, [isMuted, language, speechRate, speechPitch, isHandsFreeEnabled, isLocked, safeStopMic]);
-
-  // Stop TTS
-  const stopSpeaking = useCallback(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-    }
-  }, []);
+  }, [isMuted, language, speechRate, speechPitch, isHandsFreeEnabled, isLocked, activeVoiceMode, safeStopMic]);
 
   // Expanded 175+ Topic Knowledge Engine (MERN, DevOps, DSA, System Design)
   const generateKnowledgeAnswer = useCallback((cleanQuery, targetLang) => {
@@ -552,10 +562,10 @@ export const VoiceGuiderProvider = ({ children }) => {
         isMicRunningRef.current = false;
         setIsListening(false);
 
-        if (isHandsFreeEnabled && !isLocked && !isSpeaking) {
+        if (isHandsFreeEnabled && !isLocked && activeVoiceMode !== 'INTERVIEW_DRILL') {
           if (restartTimeoutRef.current) clearTimeout(restartTimeoutRef.current);
           restartTimeoutRef.current = setTimeout(() => {
-            if (!isMicRunningRef.current && !isLocked) {
+            if (!isMicRunningRef.current && !isLocked && activeVoiceMode !== 'INTERVIEW_DRILL') {
               startListening();
             }
           }, 300);
@@ -567,7 +577,7 @@ export const VoiceGuiderProvider = ({ children }) => {
       isMicRunningRef.current = false;
       setIsListening(false);
     }
-  }, [language, aiName, isHandsFreeEnabled, isLocked, isSpeaking, isVoiceModalOpen, processVoiceQuery, safeStopMic, requestMicPermission]);
+  }, [language, aiName, isHandsFreeEnabled, isLocked, isSpeaking, isVoiceModalOpen, activeVoiceMode, processVoiceQuery, safeStopMic, requestMicPermission]);
 
   useEffect(() => {
     startListeningRef.current = startListening;
@@ -575,16 +585,16 @@ export const VoiceGuiderProvider = ({ children }) => {
 
   // Self-Healing Mic Watchdog (Auto-restarts if mic stalls for > 4 seconds)
   useEffect(() => {
-    if (isLocked || !isHandsFreeEnabled || isSpeaking) return;
+    if (isLocked || !isHandsFreeEnabled || isSpeaking || activeVoiceMode === 'INTERVIEW_DRILL') return;
 
     const watchdog = setInterval(() => {
-      if (!isMicRunningRef.current && !isSpeaking && !isLocked) {
+      if (!isMicRunningRef.current && !isSpeaking && !isLocked && activeVoiceMode !== 'INTERVIEW_DRILL') {
         startListening();
       }
     }, 4000);
 
     return () => clearInterval(watchdog);
-  }, [isLocked, isHandsFreeEnabled, isSpeaking, startListening]);
+  }, [isLocked, isHandsFreeEnabled, isSpeaking, activeVoiceMode, startListening]);
 
   // PIN Unlock Handler & Speech Trigger
   const unlockWithPin = useCallback(async (enteredPin) => {
@@ -627,7 +637,7 @@ export const VoiceGuiderProvider = ({ children }) => {
 
   // Periodic Reminder Speech
   const speakPeriodicReminder = useCallback(() => {
-    if (isLocked || isMuted || pendingTasks.length === 0) return;
+    if (isLocked || isMuted || pendingTasks.length === 0 || activeVoiceMode === 'INTERVIEW_DRILL') return;
 
     const randomTask = pendingTasks[Math.floor(Math.random() * pendingTasks.length)];
     let reminderText = '';
@@ -640,11 +650,11 @@ export const VoiceGuiderProvider = ({ children }) => {
 
     setAiResponseText(reminderText);
     speakText(reminderText, language);
-  }, [isLocked, isMuted, pendingTasks, language, userName, aiName, speakText]);
+  }, [isLocked, isMuted, pendingTasks, language, userName, aiName, activeVoiceMode, speakText]);
 
   // Periodic Timer for Logged-In Users
   useEffect(() => {
-    if (isLocked || reminderIntervalMins <= 0) return;
+    if (isLocked || reminderIntervalMins <= 0 || activeVoiceMode === 'INTERVIEW_DRILL') return;
 
     const intervalMs = reminderIntervalMins * 60 * 1000;
     const timer = setInterval(() => {
@@ -656,7 +666,7 @@ export const VoiceGuiderProvider = ({ children }) => {
     }, intervalMs);
 
     return () => clearInterval(timer);
-  }, [isLocked, reminderIntervalMins, speakPeriodicReminder]);
+  }, [isLocked, reminderIntervalMins, activeVoiceMode, speakPeriodicReminder]);
 
   const value = {
     isLocked,
@@ -667,6 +677,8 @@ export const VoiceGuiderProvider = ({ children }) => {
     setUserName,
     aiName,
     setAiName,
+    activeVoiceMode,
+    setVoiceMode,
     voicePersonality,
     setVoicePersonality,
     isHandsFreeEnabled,
