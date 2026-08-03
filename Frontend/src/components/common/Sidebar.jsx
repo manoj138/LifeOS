@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Target, BookOpen, MessageSquareCode,
   Mic, Code2, Server, FolderKanban, Dumbbell, Flame, LineChart,
   Briefcase, BookMarked, Settings, ChevronLeft, ChevronRight,
-  Sparkles, Zap, Bot, ShieldCheck, Users, Award, BookCheck
+  Sparkles, Zap, Bot, ShieldCheck, Users, Award, BookCheck, LogOut
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useUser } from '../../context/UserContext';
 
 export const Sidebar = ({ isCollapsed, onToggle }) => {
   const location = useLocation();
-  const { user } = useUser();
+  const navigate = useNavigate();
+  const { user, clearAllLocalState } = useUser();
+
+  const handleLogout = () => {
+    clearAllLocalState();
+    navigate('/auth');
+  };
 
   const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
 
@@ -181,11 +187,20 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
           </div>
 
           {!isCollapsed && (
-            <div className="flex flex-col truncate">
-              <span className="text-xs font-semibold text-white truncate">{user?.name || 'System User'}</span>
-              <span className="text-[10px] text-cyan-400 font-mono">
-                {isAdmin ? 'System Admin • Online' : 'Candidate • Active'}
-              </span>
+            <div className="flex items-center justify-between flex-1 truncate">
+              <div className="flex flex-col truncate">
+                <span className="text-xs font-semibold text-white truncate">{user?.name || 'System User'}</span>
+                <span className="text-[10px] text-cyan-400 font-mono">
+                  {isAdmin ? 'System Admin • Online' : 'Candidate • Active'}
+                </span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 transition-colors ml-2"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
         </div>

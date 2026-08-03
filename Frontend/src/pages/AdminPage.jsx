@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Users, BarChart3, Award, Server, RefreshCw, Download, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ShieldCheck, Users, BarChart3, Award, Server, RefreshCw, Download, Sparkles, LogOut } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { Button } from '../components/ui/Button';
 import { Tabs } from '../components/ui/Tabs';
@@ -10,10 +11,18 @@ import { PlacementQueue } from '../components/admin/PlacementQueue';
 import { AdminCurriculumEditor } from '../components/admin/AdminCurriculumEditor';
 import { LiveTerminal } from '../components/ui/LiveTerminal';
 import { apiService } from '../services/api';
+import { useUser } from '../context/UserContext';
 
 export const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('analytics');
   const [stats, setStats] = useState(null);
+  const navigate = useNavigate();
+  const { clearAllLocalState } = useUser();
+
+  const handleLogout = () => {
+    clearAllLocalState();
+    navigate('/auth');
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -38,6 +47,15 @@ export const AdminPage = () => {
           <div className="flex items-center gap-3">
             <Button variant="glass" size="sm" leftIcon={<Download className="w-4 h-4 text-purple-400" />}>
               Export Report
+            </Button>
+            <Button
+              variant="glass"
+              size="sm"
+              leftIcon={<LogOut className="w-4 h-4 text-rose-400" />}
+              onClick={handleLogout}
+              className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30"
+            >
+              Sign Out Admin
             </Button>
           </div>
         }
