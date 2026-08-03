@@ -30,7 +30,7 @@ export const DevOpsPage = () => {
       step: "Step 1",
       title: "Provision Hostinger VPS Server",
       desc: "Order an Ubuntu 24.04 LTS KVM VPS instance on Hostinger. Note your Server IP and SSH root credentials.",
-      command: "ssh root@185.220.101.42"
+      command: "ssh root@YOUR_SERVER_IP"
     },
     {
       step: "Step 2",

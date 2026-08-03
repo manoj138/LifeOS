@@ -26,11 +26,16 @@ export const Dashboard = () => {
     }
   }, [user, navigate]);
 
+  const onboardingDone = preferences?.onboardingCompleted || false;
+  const targetSpecializationScore = onboardingDone ? 85 : 40;
+  const skillReadinessScore = onboardingDone ? 90 : 45;
+  const currentStreak = user?.streak || (onboardingDone ? 7 : 0);
+
   const stats = [
-    { title: "Target Specialization", value: 88, suffix: "%", icon: Code2, color: "cyan", change: preferences?.targetRole || "Full-Stack Web Dev" },
-    { title: "Skill Readiness", value: 92, suffix: "%", icon: MessageSquareCode, color: "purple", change: `${preferences?.skillLevels?.dsa || 'Intermediate'} Level` },
+    { title: "Target Specialization", value: targetSpecializationScore, suffix: "%", icon: Code2, color: "cyan", change: preferences?.targetRole || "Full-Stack Web Dev" },
+    { title: "Skill Readiness", value: skillReadinessScore, suffix: "%", icon: MessageSquareCode, color: "purple", change: `${preferences?.skillLevels?.dsa || 'Intermediate'} Level` },
     { title: "Daily Target Commitment", value: preferences?.dailyHours || 4, suffix: " hrs/day", icon: Server, color: "emerald", change: `${preferences?.careerLevel || 'Intermediate'}` },
-    { title: "Habit & Fitness Streak", value: 14, suffix: " Days", icon: Flame, color: "rose", change: preferences?.fitnessGoal || "Build Muscle" },
+    { title: "Habit & Fitness Streak", value: currentStreak, suffix: " Days", icon: Flame, color: "rose", change: preferences?.fitnessGoal || "Build Muscle" },
   ];
 
   const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
@@ -134,7 +139,7 @@ export const Dashboard = () => {
           </TiltCard>
 
           {/* Live Terminal Stream Monitor */}
-          <LiveTerminal title="Hostinger VPS Server Stream (185.220.101.42)" />
+          <LiveTerminal title="Production Server Telemetry Stream" />
         </div>
 
         {/* Right Col: Candidate Profile & Quick Shortcuts */}
@@ -143,7 +148,7 @@ export const Dashboard = () => {
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div>
                 <h3 className="text-base font-bold text-white tracking-tight">Active User Profile</h3>
-                <span className="text-xs text-cyan-400">{user?.name || 'Manoj Kumar'}</span>
+                <span className="text-xs text-cyan-400">{user?.name || user?.email?.split('@')[0] || 'Active User'}</span>
               </div>
               <Badge variant="emerald">Personalized</Badge>
             </div>

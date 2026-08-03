@@ -10,14 +10,18 @@ export const AnalyticsPage = () => {
   const { user, preferences } = useUser();
   const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
 
+  const dailyTarget = preferences?.dailyHours || 4;
+  const isOnboarded = preferences?.onboardingCompleted || false;
+  const baseScore = isOnboarded ? 80 : 35;
+
   const productivityData = [
-    { day: 'Mon', score: 75, studyHours: (preferences?.dailyHours || 4) * 1.1 },
-    { day: 'Tue', score: 82, studyHours: (preferences?.dailyHours || 4) * 1.2 },
-    { day: 'Wed', score: 90, studyHours: (preferences?.dailyHours || 4) * 1.4 },
-    { day: 'Thu', score: 88, studyHours: (preferences?.dailyHours || 4) * 1.3 },
-    { day: 'Fri', score: 95, studyHours: (preferences?.dailyHours || 4) * 1.5 },
-    { day: 'Sat', score: 80, studyHours: (preferences?.dailyHours || 4) * 1.0 },
-    { day: 'Sun', score: 92, studyHours: (preferences?.dailyHours || 4) * 1.3 },
+    { day: 'Mon', score: Math.min(100, Math.round(baseScore * 0.9)), studyHours: Number((dailyTarget * 0.8).toFixed(1)) },
+    { day: 'Tue', score: Math.min(100, Math.round(baseScore * 1.0)), studyHours: Number((dailyTarget * 1.0).toFixed(1)) },
+    { day: 'Wed', score: Math.min(100, Math.round(baseScore * 1.1)), studyHours: Number((dailyTarget * 1.1).toFixed(1)) },
+    { day: 'Thu', score: Math.min(100, Math.round(baseScore * 1.05)), studyHours: Number((dailyTarget * 1.0).toFixed(1)) },
+    { day: 'Fri', score: Math.min(100, Math.round(baseScore * 1.15)), studyHours: Number((dailyTarget * 1.2).toFixed(1)) },
+    { day: 'Sat', score: Math.min(100, Math.round(baseScore * 0.95)), studyHours: Number((dailyTarget * 0.9).toFixed(1)) },
+    { day: 'Sun', score: Math.min(100, Math.round(baseScore * 1.1)), studyHours: Number((dailyTarget * 1.1).toFixed(1)) },
   ];
 
   return (

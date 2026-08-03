@@ -8,45 +8,24 @@ import { Input } from '../components/ui/Input';
 import { useUser } from '../context/UserContext';
 import { apiService } from '../services/api';
 
-const DEFAULT_TASKS = [
-  { id: 't1', title: 'Deep Work: React 19 Server Actions & Compiler', start: '08:00 AM', end: '10:00 AM', category: 'Deep Work', energy: 'High', completed: true },
-  { id: 't2', title: 'MERN Microservices Architecture & Redis Caching', start: '10:30 AM', end: '12:00 PM', category: 'MERN', energy: 'High', completed: true },
-  { id: 't3', title: 'Lunch & 20-min AI English Speaking Drill', start: '12:30 PM', end: '01:30 PM', category: 'English', energy: 'Medium', completed: false },
-  { id: 't4', title: 'AI Mock Interview Practice (System Design)', start: '02:00 PM', end: '03:30 PM', category: 'Interview', energy: 'High', completed: false },
-  { id: 't5', title: 'Hostinger VPS Nginx & Docker Deployment', start: '04:00 PM', end: '05:30 PM', category: 'DevOps', energy: 'Medium', completed: false },
-  { id: 't6', title: 'Evening Workout & Recovery Hydration', start: '06:30 PM', end: '08:00 PM', category: 'Fitness', energy: 'Medium', completed: false },
-];
-
-const playPomodoroChime = () => {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3); // A5
-    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 1.2);
-  } catch (e) {
-    console.warn('Audio chime notice:', e);
-  }
-};
-
 export const DailyPlanner = () => {
   const { user, preferences } = useUser();
 
-  const [tasks, setTasks] = useState(DEFAULT_TASKS);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
     const fetchTasks = async () => {
+      setLoading(true);
       const res = await apiService.getPlannerTasks();
-      if (isMounted && res?.success && res.data && res.data.length > 0) {
-        setTasks(res.data);
+      if (isMounted) {
+        if (res?.success && Array.isArray(res.data)) {
+          setTasks(res.data);
+        } else {
+          setTasks([]);
+        }
+        setLoading(false);
       }
     };
     fetchTasks();
@@ -178,7 +157,16 @@ export const DailyPlanner = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Timeline Blocks */}
         <div className="lg:col-span-2 space-y-4">
-          {tasks.map((task) => (
+          {tasks.length === 0 ? (
+            <div className="p-10 text-center border border-white/10 rounded-2xl bg-white/5 space-y-3">
+              <Clock className="w-10 h-10 text-cyan-400 mx-auto" />
+              <p className="text-sm font-semibold text-gray-200">No Time Blocks Scheduled Today</p>
+              <p className="text-xs text-gray-400 max-w-sm mx-auto">
+                Use the input form above to block out your deep work focus sessions, MERN coding drills, and workout times.
+              </p>
+            </div>
+          ) : (
+            tasks.map((task) => (
             <GlassCard
               key={task.id}
               className={`p-6 transition-all duration-300 ${
@@ -230,7 +218,8 @@ export const DailyPlanner = () => {
                 </div>
               </div>
             </GlassCard>
-          ))}
+          ))
+          )}
         </div>
 
         {/* Pomodoro Timer & Energy Breakdown Sidebar */}

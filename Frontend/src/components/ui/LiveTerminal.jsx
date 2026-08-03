@@ -2,29 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { Terminal, ShieldCheck, RefreshCw, Circle } from 'lucide-react';
 import { Badge } from './Badge';
 
-export const LiveTerminal = ({ title = "Hostinger VPS Live Stream" }) => {
+export const LiveTerminal = ({ title = "System Health & API Telemetry" }) => {
+  const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+
   const [logs, setLogs] = useState([
-    { time: "10:14:02", text: "[systemd] Started Nginx Reverse Proxy Service.", type: "info" },
-    { time: "10:14:05", text: "[cloudpanel] SSL Let's Encrypt Certificate Auto-Renewed.", type: "success" },
-    { time: "10:14:12", text: "[docker] Container 'lifeos-api-gateway' health check OK (2ms).", type: "success" },
-    { time: "10:14:20", text: "[redis] Memory usage: 142MB / 2048MB (7.1%).", type: "info" }
+    { time: new Date().toTimeString().split(' ')[0], text: `[system] Express & SQLite server connection OK (${currentHost}:1235).`, type: "success" },
+    { time: new Date().toTimeString().split(' ')[0], text: `[db] SQLite database models synchronized.`, type: "info" }
   ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const newLogs = [
-        `[redis] PING response from 185.220.101.42: 1ms.`,
-        `[nginx] GET /api/v1/auth/session -> 200 OK`,
-        `[cloudpanel] CPU Load: 12% • Memory: 2.1GB`,
-        `[docker] Container lifeos-redis health check PASSED.`
+      const dynamicLogs = [
+        `[api] GET /api/admin/metrics -> 200 OK (1ms)`,
+        `[db] SQLite connection pool active (${currentHost})`,
+        `[api] GET /api/curriculum/topics -> 200 OK`,
+        `[system] Host ${currentHost} memory health check PASSED.`
       ];
-      const randomLog = newLogs[Math.floor(Math.random() * newLogs.length)];
+      const randomLog = dynamicLogs[Math.floor(Math.random() * dynamicLogs.length)];
       const now = new Date().toTimeString().split(' ')[0];
       setLogs(prev => [...prev.slice(-6), { time: now, text: randomLog, type: "info" }]);
     }, 4000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [currentHost]);
 
   return (
     <div className="rounded-3xl bg-[#09090e] border border-white/15 overflow-hidden shadow-2xl font-mono text-xs">

@@ -10,7 +10,7 @@ import express from 'express';
 import { createClient } from 'redis';
 
 const app = express();
-const redis = createClient({ url: 'redis://185.220.101.42:6379' });
+const redis = createClient({ url: 'redis://localhost:6379' });
 
 app.get('/api/v1/health', async (req, res) => {
   const isHealthy = await redis.ping();

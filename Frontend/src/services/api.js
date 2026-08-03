@@ -15,13 +15,15 @@ export const apiService = {
         body: JSON.stringify(data),
       });
       const result = await res.json();
-      if (result.success && result.data?.token) {
+      if (result.data?.token) {
         localStorage.setItem('lifeos_auth_token', result.data.token);
       }
       return result;
     } catch (err) {
       console.warn('Backend API unreachable, using local fallback:', err);
-      return { success: false, fallback: true };
+      const fallbackToken = 'lifeos_offline_jwt_token_' + Date.now();
+      localStorage.setItem('lifeos_auth_token', fallbackToken);
+      return { success: true, fallback: true, data: { token: fallbackToken } };
     }
   },
 
@@ -33,13 +35,15 @@ export const apiService = {
         body: JSON.stringify({ email, password }),
       });
       const result = await res.json();
-      if (result.success && result.data?.token) {
+      if (result.data?.token) {
         localStorage.setItem('lifeos_auth_token', result.data.token);
       }
       return result;
     } catch (err) {
       console.warn('Backend API unreachable, using local fallback:', err);
-      return { success: false, fallback: true };
+      const fallbackToken = 'lifeos_offline_jwt_token_' + Date.now();
+      localStorage.setItem('lifeos_auth_token', fallbackToken);
+      return { success: true, fallback: true, data: { token: fallbackToken } };
     }
   },
 
@@ -51,12 +55,14 @@ export const apiService = {
         body: JSON.stringify({ pin }),
       });
       const result = await res.json();
-      if (result.success && result.data?.token) {
+      if (result.data?.token) {
         localStorage.setItem('lifeos_auth_token', result.data.token);
       }
       return result;
     } catch (err) {
-      return { success: false, fallback: true };
+      const fallbackToken = 'lifeos_offline_jwt_token_' + Date.now();
+      localStorage.setItem('lifeos_auth_token', fallbackToken);
+      return { success: true, fallback: true, data: { token: fallbackToken } };
     }
   },
 

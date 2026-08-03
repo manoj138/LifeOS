@@ -1,37 +1,28 @@
-import React from 'react';
-import { FolderKanban, Plus, MoreHorizontal, User, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { FolderKanban, Plus, MoreHorizontal } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { GlassCard } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 
 export const ProjectManager = () => {
-  const columns = [
+  const [columns, setColumns] = useState([
     {
       title: "Backlog",
       color: "border-gray-500/30",
-      cards: [
-        { title: "Implement WebSockets for AI Live Voice Feedback", tag: "Backend", priority: "High" },
-        { title: "Design Custom Dark Theme Palette Tokens", tag: "Design", priority: "Medium" }
-      ]
+      cards: []
     },
     {
       title: "In Progress",
       color: "border-purple-500/30",
-      cards: [
-        { title: "LifeOS AI Command Palette Keyboard Navigation", tag: "Frontend", priority: "Urgent" },
-        { title: "Docker Compose Setup on Hostinger VPS", tag: "DevOps", priority: "High" }
-      ]
+      cards: []
     },
     {
       title: "Completed",
       color: "border-emerald-500/30",
-      cards: [
-        { title: "Linear Style Sidebar Navigation Shell", tag: "UI/UX", priority: "Done" },
-        { title: "Framer Motion Magnetic Button Component", tag: "Frontend", priority: "Done" }
-      ]
+      cards: []
     }
-  ];
+  ]);
 
   return (
     <div className="space-y-8 pb-12">
@@ -57,25 +48,29 @@ export const ProjectManager = () => {
             </div>
 
             <div className="space-y-3">
-              {col.cards.map((card, cIdx) => (
-                <GlassCard key={cIdx} className="p-5 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Badge variant={card.priority === 'Urgent' ? 'rose' : card.priority === 'High' ? 'amber' : 'purple'}>
-                      {card.priority}
-                    </Badge>
-                    <MoreHorizontal className="w-4 h-4 text-gray-500 cursor-pointer" />
-                  </div>
-
-                  <h4 className="text-sm font-bold text-white tracking-tight">{card.title}</h4>
-
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
-                    <span className="font-mono">{card.tag}</span>
-                    <div className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 font-bold flex items-center justify-center text-[10px]">
-                      M
+              {col.cards.length === 0 ? (
+                <div className="p-8 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.01] space-y-2">
+                  <FolderKanban className="w-8 h-8 text-gray-500 mx-auto" />
+                  <p className="text-xs font-medium text-gray-400">No tasks in {col.title}</p>
+                </div>
+              ) : (
+                col.cards.map((card, cIdx) => (
+                  <GlassCard key={cIdx} className="p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Badge variant={card.priority === 'Urgent' ? 'rose' : card.priority === 'High' ? 'amber' : 'purple'}>
+                        {card.priority}
+                      </Badge>
+                      <MoreHorizontal className="w-4 h-4 text-gray-500 cursor-pointer" />
                     </div>
-                  </div>
-                </GlassCard>
-              ))}
+
+                    <h4 className="text-sm font-bold text-white tracking-tight">{card.title}</h4>
+
+                    <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
+                      <span className="font-mono">{card.tag}</span>
+                    </div>
+                  </GlassCard>
+                ))
+              )}
             </div>
           </div>
         ))}

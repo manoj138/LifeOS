@@ -145,6 +145,7 @@ export const UserProvider = ({ children }) => {
   const clearAllLocalState = () => {
     localStorage.removeItem('lifeos_session');
     localStorage.removeItem('lifeos_user_progress');
+    localStorage.removeItem('lifeos_auth_token');
     setUser(null);
     setPreferences(null);
     setOnboardingCompleted(false);

@@ -1,3 +1,4 @@
+// LifeOS Express & SQLite Backend Entry Point - Updated 2026-08-03 (Refreshed)
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -44,25 +45,29 @@ app.get('/', (req, res) => {
 });
 
 const smartCurriculumSeeder = require('./src/helper/smartCurriculumSeeder');
+const smartUserSeeder = require('./src/helper/smartUserSeeder');
 
 // Database Sync & Server Start
-sequelize.sync({ alter: true })
-  .then(async () => {
+const startServer = async () => {
+  try {
+    await sequelize.sync();
     console.log('✅ SQLite Database Models synced successfully.');
     
-    // Auto-run Incremental Smart Seeder (only inserts missing topics, leaves existing untouched)
     try {
       await smartCurriculumSeeder();
+      await smartUserSeeder();
     } catch (e) {
       console.warn('Smart seeder background notice:', e.message);
     }
+  } catch (err) {
+    console.error('❌ Database sync notice:', err.message);
+  }
 
-    app.listen(port, () => {
-      console.log(`🚀 LifeOS Backend Server listening on http://localhost:${port}`);
-    });
-  })
-  .catch((err) => {
-    console.error('❌ Failed to sync SQLite database models:', err.message);
+  app.listen(port, () => {
+    console.log(`🚀 LifeOS Backend Server listening on http://localhost:${port}`);
   });
+};
+
+startServer();
 
 

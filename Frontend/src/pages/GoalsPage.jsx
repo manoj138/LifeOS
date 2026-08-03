@@ -9,36 +9,13 @@ import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { useUser } from '../context/UserContext';
 
-const DEFAULT_GOALS = [
-  {
-    id: 'g1',
-    title: "Master Target Specialization & Technical Career Goals",
-    deadline: "Q4 2026",
-    category: "Career",
-    milestones: [
-      { id: 'm1_1', text: "Master System Design & Web Architecture Patterns", completed: true },
-      { id: 'm1_2', text: "Solve 100+ LeetCode Medium/Hard Problems", completed: true },
-      { id: 'm1_3', text: "Build Production Ready Applications", completed: true },
-      { id: 'm1_4', text: "Complete Mock Technical Interviews with AI Teleprompter", completed: false },
-    ]
-  },
-  {
-    id: 'g2',
-    title: "Deploy Production SaaS Infrastructure & DevOps Systems",
-    deadline: "Q3 2026",
-    category: "Engineering",
-    milestones: [
-      { id: 'm2_1', text: "LifeOS AI Assistant Suite", completed: true },
-      { id: 'm2_2', text: "Hostinger VPS & Nginx Containerization", completed: true },
-      { id: 'm2_3', text: "DevOps & Cloud Monitoring Dashboard", completed: false },
-    ]
-  },
-];
+import { apiService } from '../services/api';
 
 export const GoalsPage = () => {
   const { user, preferences } = useUser();
 
-  const [goals, setGoals] = useState(DEFAULT_GOALS);
+  const [goals, setGoals] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -46,6 +23,24 @@ export const GoalsPage = () => {
   const [newDeadline, setNewDeadline] = useState('Q4 2026');
   const [newCategory, setNewCategory] = useState('Career');
   const [newMilestonesText, setNewMilestonesText] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchGoals = async () => {
+      setLoading(true);
+      const res = await apiService.getGoals();
+      if (isMounted) {
+        if (res?.success && Array.isArray(res.data)) {
+          setGoals(res.data);
+        } else {
+          setGoals([]);
+        }
+        setLoading(false);
+      }
+    };
+    fetchGoals();
+    return () => { isMounted = false; };
+  }, []);
 
 
   const toggleMilestone = (goalId, milestoneId) => {
@@ -134,8 +129,22 @@ export const GoalsPage = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {filteredGoals.map((g) => {
+      {filteredGoals.length === 0 ? (
+        <div className="p-12 text-center border border-white/10 rounded-2xl bg-white/5 space-y-4">
+          <Target className="w-12 h-12 text-purple-400 mx-auto" />
+          <div>
+            <h3 className="text-base font-bold text-white">No Career Goals Set Yet</h3>
+            <p className="text-xs text-gray-400 max-w-md mx-auto mt-1">
+              Set your target career milestones, certification deadlines, and key roadmap objectives to track your progress.
+            </p>
+          </div>
+          <Button variant="primary" leftIcon={<Plus className="w-4 h-4" />} onClick={() => setIsModalOpen(true)}>
+            Create Your First Goal
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {filteredGoals.map((g) => {
           const totalMilestones = g.milestones.length;
           const completedCount = g.milestones.filter((m) => m.completed).length;
           const progress = totalMilestones > 0 ? Math.round((completedCount / totalMilestones) * 100) : 0;
@@ -197,6 +206,7 @@ export const GoalsPage = () => {
           );
         })}
       </div>
+      )}
 
       {/* Create New Goal Modal */}
       <Modal

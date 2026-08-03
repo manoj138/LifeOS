@@ -7,12 +7,7 @@ import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 
-const DEFAULT_HABITS = [
-  { id: 'h1', name: "Coding / MERN Practice", category: "Skills", targetPerWeek: 7, createdAt: new Date().toISOString() },
-  { id: 'h2', name: "Daily LeetCode Problem", category: "DSA", targetPerWeek: 7, createdAt: new Date().toISOString() },
-  { id: 'h3', name: "1 Hour Reading / English Drill", category: "Mindset", targetPerWeek: 6, createdAt: new Date().toISOString() },
-  { id: 'h4', name: "Gym Workout & 3L Water", category: "Fitness", targetPerWeek: 5, createdAt: new Date().toISOString() },
-];
+import { apiService } from '../services/api';
 
 const getTodayString = () => new Date().toISOString().split('T')[0];
 
@@ -28,24 +23,32 @@ const generate90Days = () => {
 };
 
 export const HabitTracker = () => {
-  const [habits, setHabits] = useState(DEFAULT_HABITS);
-
-  const [logs, setLogs] = useState(() => {
-    const demoLogs = {};
-    const dates = generate90Days();
-    dates.forEach((dateStr, idx) => {
-      if (idx < 85) {
-        demoLogs[dateStr] = idx % 2 === 0 ? ['h1', 'h2', 'h3'] : ['h1', 'h4'];
-      }
-    });
-    demoLogs[getTodayString()] = ['h1', 'h4'];
-    return demoLogs;
-  });
+  const [habits, setHabits] = useState([]);
+  const [logs, setLogs] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
   const [newHabitCategory, setNewHabitCategory] = useState('Skills');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchHabits = async () => {
+      setLoading(true);
+      const res = await apiService.getHabits();
+      if (isMounted) {
+        if (res?.success && Array.isArray(res.data)) {
+          setHabits(res.data);
+        } else {
+          setHabits([]);
+        }
+        setLoading(false);
+      }
+    };
+    fetchHabits();
+    return () => { isMounted = false; };
+  }, []);
 
 
   const todayStr = getTodayString();

@@ -32,18 +32,45 @@ export const OnboardingAnalyticsChart = () => {
         { role: 'Backend & Data Engineer', percentage: 0, count: 0, color: 'bg-amber-500', icon: Database },
       ];
 
-  const skillLevelBreakdown = [
-    { level: 'Beginner', count: `${analyticsData?.totalCandidates ? Math.round(analyticsData.totalCandidates * 0.2) : 0} Candidates`, color: 'from-blue-500 to-indigo-600', width: 'w-1/5' },
-    { level: 'Intermediate', count: `${analyticsData?.totalCandidates ? Math.round(analyticsData.totalCandidates * 0.6) : 0} Candidates`, color: 'from-purple-500 to-pink-600', width: 'w-7/12' },
-    { level: 'Advanced', count: `${analyticsData?.totalCandidates ? Math.round(analyticsData.totalCandidates * 0.2) : 0} Candidates`, color: 'from-emerald-500 to-teal-600', width: 'w-1/4' },
-  ];
+  const skillColors = {
+    Beginner: 'from-blue-500 to-indigo-600',
+    Intermediate: 'from-purple-500 to-pink-600',
+    Advanced: 'from-emerald-500 to-teal-600',
+  };
 
-  const dailyCommitment = [
-    { hours: '1 Hour / day', percentage: 15, label: 'Casual' },
-    { hours: '2 Hours / day', percentage: 25, label: 'Steady' },
-    { hours: '4 Hours / day', percentage: 45, label: 'Intensive (Popular)' },
-    { hours: '6+ Hours / day', percentage: 15, label: 'Bootcamp Pace' },
-  ];
+  const skillLevelBreakdown = (analyticsData?.skillLevelDistribution && analyticsData.skillLevelDistribution.length > 0)
+    ? analyticsData.skillLevelDistribution.map((item) => ({
+        level: item.level,
+        count: `${item.count} Candidate${item.count === 1 ? '' : 's'}`,
+        percentage: item.percentage,
+        color: skillColors[item.level] || 'from-purple-500 to-pink-600',
+      }))
+    : [
+        { level: 'Beginner', count: '0 Candidates', percentage: 0, color: skillColors.Beginner },
+        { level: 'Intermediate', count: '0 Candidates', percentage: 0, color: skillColors.Intermediate },
+        { level: 'Advanced', count: '0 Candidates', percentage: 0, color: skillColors.Advanced },
+      ];
+
+  const commitmentLabels = {
+    '1 Hour / day': 'Casual',
+    '2 Hours / day': 'Steady',
+    '4 Hours / day': 'Intensive',
+    '6+ Hours / day': 'Bootcamp Pace',
+  };
+
+  const dailyCommitment = (analyticsData?.dailyCommitmentDistribution && analyticsData.dailyCommitmentDistribution.length > 0)
+    ? analyticsData.dailyCommitmentDistribution.map((item) => ({
+        hours: item.hours,
+        percentage: item.percentage,
+        count: item.count,
+        label: commitmentLabels[item.hours] || 'Study Pace',
+      }))
+    : [
+        { hours: '1 Hour / day', percentage: 0, count: 0, label: 'Casual' },
+        { hours: '2 Hours / day', percentage: 0, count: 0, label: 'Steady' },
+        { hours: '4 Hours / day', percentage: 0, count: 0, label: 'Intensive' },
+        { hours: '6+ Hours / day', percentage: 0, count: 0, label: 'Bootcamp Pace' },
+      ];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -99,7 +126,10 @@ export const OnboardingAnalyticsChart = () => {
                 <span className="text-gray-400">{item.count}</span>
               </div>
               <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className={`h-full bg-gradient-to-r ${item.color} rounded-full ${item.width}`} />
+                <div
+                  className={`h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-500`}
+                  style={{ width: `${item.percentage || (analyticsData?.totalCandidates ? Math.round((parseInt(item.count) / analyticsData.totalCandidates) * 100) : 0)}%` }}
+                />
               </div>
             </div>
           ))}
@@ -113,7 +143,7 @@ export const OnboardingAnalyticsChart = () => {
             <Clock className="w-5 h-5 text-amber-400" />
             <h3 className="text-base font-bold text-white tracking-tight">Daily Commitment Pace</h3>
           </div>
-          <span className="text-xs text-amber-400">Avg 4.2h</span>
+          <span className="text-xs text-amber-400">Avg {analyticsData?.avgVelocity ?? 0}h/day</span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-2">

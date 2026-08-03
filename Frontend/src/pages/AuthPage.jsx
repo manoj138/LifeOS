@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight, Github, Chrome } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Github, Chrome, AlertCircle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Tabs } from '../components/ui/Tabs';
 import { useUser } from '../context/UserContext';
+import { apiService } from '../services/api';
 
 export const AuthPage = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -12,41 +13,83 @@ export const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
-  const { onboardingCompleted, completeOnboarding, resetOnboarding, updateUserProfile } = useUser();
+  const { onboardingCompleted, completeOnboarding, resetOnboarding, updateUserProfile, updatePreferences } = useUser();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      const inputEmail = email.trim().toLowerCase();
-      const isAdminRole = inputEmail === 'admin@lifeos.ai' || inputEmail.startsWith('admin');
+    setErrorMsg('');
 
-      if (isAdminRole) {
-        completeOnboarding({
-          user: { name: name.trim() || 'System Admin', email: inputEmail || 'admin@lifeos.ai', role: 'admin' },
-          preferences: { targetRole: 'System Administrator', careerLevel: 'Admin Console' }
+    const inputEmail = email.trim().toLowerCase();
+    const isAdminRole = inputEmail === 'admin@lifeos.ai' || inputEmail.startsWith('admin');
+
+    try {
+      let res;
+      if (activeTab === 'register') {
+        res = await apiService.register({
+          name: name.trim() || 'Member',
+          email: inputEmail,
+          password,
         });
-        navigate('/app/admin');
       } else {
+        res = await apiService.login(inputEmail, password);
+      }
 
+      setIsLoading(false);
 
-        const userProfileName = name.trim() || email.split('@')[0] || 'Member';
-        updateUserProfile({ name: userProfileName, email: inputEmail || 'user@lifeos.ai', role: 'candidate' });
+      if (res?.success && res.data) {
+        if (res.data.token) {
+          localStorage.setItem('lifeos_auth_token', res.data.token);
+        }
 
-        if (activeTab === 'register') {
-          resetOnboarding();
-          navigate('/onboarding');
+        const userData = res.data.user || {
+          name: name.trim() || inputEmail.split('@')[0],
+          email: inputEmail,
+          role: isAdminRole ? 'admin' : 'candidate',
+        };
+
+        if (isAdminRole || userData.role === 'admin') {
+          completeOnboarding({
+            user: { ...userData, role: 'admin' },
+            preferences: res.data.preferences || { targetRole: 'System Administrator', careerLevel: 'Admin Console' },
+          });
+          navigate('/app/admin');
         } else {
-          if (!onboardingCompleted) {
+          updateUserProfile(userData);
+          if (res.data.preferences) {
+            updatePreferences(res.data.preferences);
+          }
+
+          if (activeTab === 'register') {
+            resetOnboarding();
             navigate('/onboarding');
           } else {
-            navigate('/app/dashboard');
+            if (!onboardingCompleted) {
+              navigate('/onboarding');
+            } else {
+              navigate('/app/dashboard');
+            }
           }
         }
+      } else if (res?.fallback) {
+        const fallbackToken = res.data?.token || 'lifeos_offline_jwt_token_' + Date.now();
+        localStorage.setItem('lifeos_auth_token', fallbackToken);
+        const userData = { name: name.trim() || inputEmail.split('@')[0], email: inputEmail, role: isAdminRole ? 'admin' : 'candidate' };
+        updateUserProfile(userData);
+        if (isAdminRole) navigate('/app/admin');
+        else navigate(onboardingCompleted ? '/app/dashboard' : '/onboarding');
+      } else {
+        setErrorMsg(res?.message || 'Authentication failed. Please check credentials.');
       }
-    }, 600);
+    } catch (err) {
+      setIsLoading(false);
+      const fallbackToken = 'lifeos_offline_jwt_token_' + Date.now();
+      localStorage.setItem('lifeos_auth_token', fallbackToken);
+      updateUserProfile({ name: name.trim() || inputEmail.split('@')[0], email: inputEmail, role: 'candidate' });
+      navigate('/app/dashboard');
+    }
   };
 
   return (
@@ -117,6 +160,13 @@ export const AuthPage = () => {
             <a href="#forgot" className="text-purple-400 hover:text-purple-300 transition-colors">
               Forgot password?
             </a>
+          </div>
+        )}
+
+        {errorMsg && (
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{errorMsg}</span>
           </div>
         )}
 

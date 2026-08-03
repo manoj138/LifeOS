@@ -33,20 +33,20 @@ export const InterviewPrep = () => {
 
   const selfIntroData = {
     name: userName,
-    location: "Maharashtra, India",
-    education: "B.Tech in Computer Science & Engineering",
+    location: preferences?.location || "India",
+    education: preferences?.education || "Engineering / Computer Science Background",
     currentRole: `${targetRole} Candidate (${careerLevel})`,
     skills: preferences?.focusAreas || ["React.js", "Node.js", "System Architecture", "DevOps & Cloud", "DSA Algorithms"],
     projects: [
       {
-        name: "LifeOS AI Productivity Ecosystem",
-        panels: "Personalised Learning, Onboarding Wizard & Teleprompter Studio",
-        features: "Dynamic Routing, Voice Guider, Daily Time-blocking & Fitness Metrics"
+        name: `${targetRole} Portfolio Project`,
+        panels: "Personalised Learning & Interactive Teleprompter Studio",
+        features: "Dynamic Routing, Voice Guider, Daily Time-blocking & Metrics"
       },
       {
-        name: "Full-Stack Enterprise Hub",
+        name: "Full-Stack Web Architecture Application",
         module: "RESTful API Integration & Database Management",
-        features: "Authentication Guard, SQLite/MongoDB Persistence & Responsive UI"
+        features: "Authentication Guard, SQLite Persistence & Responsive UI"
       }
     ],
     fullScript: `Good morning, sir/madam. My name is ${userName}. I hold a Computer Science background and I am specializing as a ${targetRole}.
@@ -54,7 +54,7 @@ export const InterviewPrep = () => {
 I have hands-on experience in building scalable applications, system design optimization, and full-stack development. My experience level is ${careerLevel}.
 
 Key highlights of my recent work include:
-1. LifeOS AI Autonomous Platform featuring a 5-step interactive onboarding wizard, dynamic telemetry, and voice assistant integration.
+1. Production web application featuring dynamic routing, authentication, telemetry, and AI voice assistant integration.
 2. Full-stack RESTful web applications with robust authentication, clean database schemas, and responsive UI design.
 
 My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, DevOps, and Communication'}. I am guided by my AI persona, ${aiPersona}, maintaining a daily commitment of ${preferences?.dailyHours || 4} hours. My objective is to deliver high-performance software engineering solutions. Thank you for giving me this opportunity to introduce myself.`

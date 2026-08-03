@@ -93,7 +93,7 @@ export const AdminPage = () => {
       {/* Tab 5: VPS & AI Telemetry */}
       {activeTab === 'telemetry' && (
         <div className="space-y-6 animate-fadeIn">
-          <LiveTerminal title="Hostinger VPS Production Server (185.220.101.42)" />
+          <LiveTerminal title="Production Server System Telemetry & Log Stream" />
         </div>
       )}
     </div>
