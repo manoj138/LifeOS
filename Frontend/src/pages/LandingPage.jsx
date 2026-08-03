@@ -12,8 +12,11 @@ import { Badge } from '../components/ui/Badge';
 import { HeroSVG } from '../components/illustrations/HeroSVG';
 import { AnimatedCounter } from '../components/ui/AnimatedCounter';
 
+import { useUser } from '../context/UserContext';
+
 export const LandingPage = () => {
   const navigate = useNavigate();
+  const { user, onboardingCompleted } = useUser();
 
   const bentoFeatures = [
     {
@@ -46,6 +49,16 @@ export const LandingPage = () => {
     }
   ];
 
+  const handleLaunchApp = () => {
+    if (!user) {
+      navigate('/auth');
+    } else if (!onboardingCompleted) {
+      navigate('/onboarding');
+    } else {
+      navigate('/app/dashboard');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#070709] text-gray-100 selection:bg-purple-500/30 selection:text-purple-200 overflow-hidden">
       {/* Top Floating Glass Navigation */}
@@ -71,11 +84,9 @@ export const LandingPage = () => {
           <Link to="/auth">
             <Button variant="ghost" size="sm">Sign In</Button>
           </Link>
-          <Link to="/app/dashboard">
-            <Button variant="primary" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
-              Launch Dashboard
-            </Button>
-          </Link>
+          <Button variant="primary" size="sm" onClick={handleLaunchApp} rightIcon={<ArrowRight className="w-4 h-4" />}>
+            Launch Dashboard
+          </Button>
         </div>
       </nav>
 
@@ -98,7 +109,7 @@ export const LandingPage = () => {
           <Button
             size="xl"
             variant="glow"
-            onClick={() => navigate('/app/dashboard')}
+            onClick={handleLaunchApp}
             rightIcon={<ArrowRight className="w-5 h-5" />}
           >
             Launch LifeOS AI Now
@@ -113,6 +124,7 @@ export const LandingPage = () => {
             Sign Up Free
           </Button>
         </div>
+
 
         {/* Hero Hologram Matrix */}
         <div className="mt-12 w-full max-w-4xl">

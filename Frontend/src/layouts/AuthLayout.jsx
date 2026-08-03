@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Bot, Sparkles } from 'lucide-react';
-import { HeroSVG } from '../components/illustrations/HeroSVG';
+import aiRobotVectorArtSvg from '../assets/graident-ai-robot-vectorart/Ai Robot Vector Art.svg';
 
 export const AuthLayout = () => {
   return (
@@ -24,8 +24,13 @@ export const AuthLayout = () => {
             </span>
           </Link>
 
-          <div className="my-8 flex flex-col items-center text-center">
-            <HeroSVG className="w-full max-w-xs h-auto my-4" />
+          <div className="my-6 flex flex-col items-center text-center relative">
+            <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 via-cyan-500/20 to-pink-500/20 rounded-full blur-2xl pointer-events-none animate-pulse-glow" />
+            <img
+              src={aiRobotVectorArtSvg}
+              alt="LifeOS AI Robot Mentor"
+              className="w-full max-w-xs h-auto my-4 drop-shadow-[0_10px_30px_rgba(168,85,247,0.4)] transform hover:scale-105 transition-transform duration-300 relative z-10"
+            />
             <h2 className="text-2xl font-extrabold text-white tracking-tight">
               Elevate Your Career & Life
             </h2>
@@ -33,6 +38,7 @@ export const AuthLayout = () => {
               Your Personal AI Coach for MERN Stack, Interview Prep, DSA, DevOps, Fitness & Habit Mastery.
             </p>
           </div>
+
 
           <div className="flex items-center gap-2 text-xs text-purple-300 bg-purple-500/10 border border-purple-500/20 px-3 py-2 rounded-xl w-fit">
             <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />

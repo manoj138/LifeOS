@@ -12,13 +12,19 @@ import { AudioSpectrum } from '../components/ui/AudioSpectrum';
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
-  const { user, preferences, resetOnboarding } = useUser();
+  const { user, preferences, resetOnboarding, clearAllLocalState } = useUser();
   const [selectedModel, setSelectedModel] = useState('gpt4o');
 
   const handleReRunOnboarding = () => {
     resetOnboarding();
     navigate('/onboarding');
   };
+
+  const handleClearStateAndRegisterNewUser = () => {
+    clearAllLocalState();
+    navigate('/onboarding');
+  };
+
 
 
   // Voice Context
@@ -86,16 +92,28 @@ export const SettingsPage = () => {
             </p>
           </div>
 
-          <Button
-            variant="primary"
-            onClick={handleReRunOnboarding}
-            leftIcon={<RefreshCw className="w-4 h-4" />}
-            className="shrink-0 bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-600/30"
-          >
-            Re-run Onboarding Wizard
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+            <Button
+              variant="primary"
+              onClick={handleReRunOnboarding}
+              leftIcon={<RefreshCw className="w-4 h-4" />}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-600/30 text-xs"
+            >
+              Re-run Onboarding
+            </Button>
+
+            <Button
+              variant="glow"
+              onClick={handleClearStateAndRegisterNewUser}
+              leftIcon={<Sparkles className="w-4 h-4 text-cyan-400" />}
+              className="text-xs border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20"
+            >
+              Clear Local State & Register Fresh User
+            </Button>
+          </div>
         </div>
       </GlassCard>
+
 
 
       {/* Top Banner: AI Voice Guider Overview */}

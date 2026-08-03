@@ -8,20 +8,22 @@ import { useUser } from '../context/UserContext';
 
 export const AuthPage = () => {
   const [activeTab, setActiveTab] = useState('login');
-  const [email, setEmail] = useState('manoj@lifeos.ai');
-  const [password, setPassword] = useState('••••••••••••');
-  const [name, setName] = useState('Manoj Kumar');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { onboardingCompleted, resetOnboarding, updateUserProfile } = useUser();
+  const { onboardingCompleted, resetOnboarding, updateUserProfile, clearAllLocalState } = useUser();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
+      const userProfileName = name.trim() || email.split('@')[0] || 'Member';
+      updateUserProfile({ name: userProfileName, email: email || 'user@lifeos.ai' });
+
       if (activeTab === 'register') {
-        updateUserProfile({ name, email });
         resetOnboarding();
         navigate('/onboarding');
       } else {
@@ -31,8 +33,9 @@ export const AuthPage = () => {
           navigate('/app/dashboard');
         }
       }
-    }, 800);
+    }, 600);
   };
+
 
 
   return (
@@ -144,6 +147,22 @@ export const AuthPage = () => {
           Google
         </Button>
       </div>
+
+      {/* 1-Click Clear State & Test Fresh Registration Helper */}
+      <div className="pt-2 text-center border-t border-white/10">
+        <button
+          type="button"
+          onClick={() => {
+            clearAllLocalState();
+            setActiveTab('register');
+            navigate('/onboarding');
+          }}
+          className="text-xs text-purple-400 hover:text-purple-300 font-semibold underline underline-offset-4 flex items-center justify-center gap-1.5 mx-auto"
+        >
+          <span>⚡ Clear State & Test Fresh Registration (Step 1 Onboarding)</span>
+        </button>
+      </div>
     </div>
   );
 };
+

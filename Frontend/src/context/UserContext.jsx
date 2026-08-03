@@ -30,12 +30,12 @@ const DEFAULT_PREFERENCES = {
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('lifeos_user_profile');
-    return savedUser ? JSON.parse(savedUser) : DEFAULT_PROFILE;
+    return savedUser ? JSON.parse(savedUser) : null;
   });
 
   const [preferences, setPreferences] = useState(() => {
     const savedPrefs = localStorage.getItem('lifeos_user_preferences');
-    return savedPrefs ? JSON.parse(savedPrefs) : DEFAULT_PREFERENCES;
+    return savedPrefs ? JSON.parse(savedPrefs) : null;
   });
 
   const [onboardingCompleted, setOnboardingCompleted] = useState(() => {
@@ -43,16 +43,25 @@ export const UserProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem('lifeos_user_profile', JSON.stringify(user));
+    if (user) {
+      localStorage.setItem('lifeos_user_profile', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('lifeos_user_profile');
+    }
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('lifeos_user_preferences', JSON.stringify(preferences));
+    if (preferences) {
+      localStorage.setItem('lifeos_user_preferences', JSON.stringify(preferences));
+    } else {
+      localStorage.removeItem('lifeos_user_preferences');
+    }
   }, [preferences]);
 
   useEffect(() => {
     localStorage.setItem('lifeos_onboarding_completed', onboardingCompleted ? 'true' : 'false');
   }, [onboardingCompleted]);
+
 
   const completeOnboarding = (data) => {
     if (data.user) {
@@ -85,6 +94,18 @@ export const UserProvider = ({ children }) => {
     localStorage.setItem('lifeos_onboarding_completed', 'false');
   };
 
+  const clearAllLocalState = () => {
+    localStorage.removeItem('lifeos_user_profile');
+    localStorage.removeItem('lifeos_user_preferences');
+    localStorage.removeItem('lifeos_onboarding_completed');
+    localStorage.removeItem('lifeos_auth_token');
+    localStorage.removeItem('lifeos_goals');
+    localStorage.removeItem('lifeos_planner_tasks');
+    setUser(DEFAULT_PROFILE);
+    setPreferences(DEFAULT_PREFERENCES);
+    setOnboardingCompleted(false);
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -95,12 +116,14 @@ export const UserProvider = ({ children }) => {
         updatePreferences,
         updateUserProfile,
         resetOnboarding,
+        clearAllLocalState,
       }}
     >
       {children}
     </UserContext.Provider>
   );
 };
+
 
 export const useUser = () => {
   const context = useContext(UserContext);
