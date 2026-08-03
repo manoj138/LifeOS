@@ -3,12 +3,6 @@ import { apiService } from '../services/api';
 
 const UserContext = createContext(null);
 
-
-const DEFAULT_PROFILE = {
-  name: 'Manoj Kumar',
-  email: 'manoj@lifeos.ai',
-};
-
 const DEFAULT_PREFERENCES = {
   targetRole: 'Full-Stack Web Developer',
   careerLevel: 'Intermediate (1-3 yrs experience)',
@@ -55,6 +49,20 @@ export const UserProvider = ({ children }) => {
     }
   });
 
+  // Centralized Dynamic User Progress Tracking
+  const [userProgress, setUserProgress] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lifeos_user_progress');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      completedTopicIds: [],
+      solvedDsaIds: [],
+      completedTaskIds: [],
+      workoutLogs: []
+    };
+  });
+
   // Sync active login session to localStorage for F5 refresh persistence
   useEffect(() => {
     if (user) {
@@ -64,12 +72,54 @@ export const UserProvider = ({ children }) => {
     }
   }, [user, preferences, onboardingCompleted]);
 
+  // Sync progress state
+  useEffect(() => {
+    localStorage.setItem('lifeos_user_progress', JSON.stringify(userProgress));
+  }, [userProgress]);
+
+  const toggleCompletedTopic = (topicId) => {
+    setUserProgress((prev) => {
+      const current = prev.completedTopicIds || [];
+      const updated = current.includes(topicId)
+        ? current.filter((id) => id !== topicId)
+        : [...current, topicId];
+      return { ...prev, completedTopicIds: updated };
+    });
+  };
+
+  const toggleSolvedDsa = (dsaId) => {
+    setUserProgress((prev) => {
+      const current = prev.solvedDsaIds || [];
+      const updated = current.includes(dsaId)
+        ? current.filter((id) => id !== dsaId)
+        : [...current, dsaId];
+      return { ...prev, solvedDsaIds: updated };
+    });
+  };
+
+  const toggleCompletedTask = (taskId) => {
+    setUserProgress((prev) => {
+      const current = prev.completedTaskIds || [];
+      const updated = current.includes(taskId)
+        ? current.filter((id) => id !== taskId)
+        : [...current, taskId];
+      return { ...prev, completedTaskIds: updated };
+    });
+  };
+
+  const logWorkout = (logEntry) => {
+    setUserProgress((prev) => ({
+      ...prev,
+      workoutLogs: [logEntry, ...(prev.workoutLogs || [])]
+    }));
+  };
+
   const completeOnboarding = (data) => {
     if (data.user) {
-      setUser((prev) => ({ ...prev, ...data.user }));
+      setUser((prev) => ({ ...(prev || {}), ...data.user }));
     }
     if (data.preferences) {
-      setPreferences((prev) => ({ ...prev, ...data.preferences }));
+      setPreferences((prev) => ({ ...(prev || {}), ...data.preferences }));
     }
     setOnboardingCompleted(true);
 
@@ -81,11 +131,11 @@ export const UserProvider = ({ children }) => {
   };
 
   const updatePreferences = (newPrefs) => {
-    setPreferences((prev) => ({ ...prev, ...newPrefs }));
+    setPreferences((prev) => ({ ...(prev || {}), ...newPrefs }));
   };
 
   const updateUserProfile = (newProfile) => {
-    setUser((prev) => ({ ...prev, ...newProfile }));
+    setUser((prev) => ({ ...(prev || {}), ...newProfile }));
   };
 
   const resetOnboarding = () => {
@@ -94,11 +144,17 @@ export const UserProvider = ({ children }) => {
 
   const clearAllLocalState = () => {
     localStorage.removeItem('lifeos_session');
+    localStorage.removeItem('lifeos_user_progress');
     setUser(null);
     setPreferences(null);
     setOnboardingCompleted(false);
+    setUserProgress({
+      completedTopicIds: [],
+      solvedDsaIds: [],
+      completedTaskIds: [],
+      workoutLogs: []
+    });
   };
-
 
   return (
     <UserContext.Provider
@@ -106,6 +162,11 @@ export const UserProvider = ({ children }) => {
         user,
         preferences,
         onboardingCompleted,
+        userProgress,
+        toggleCompletedTopic,
+        toggleSolvedDsa,
+        toggleCompletedTask,
+        logWorkout,
         completeOnboarding,
         updatePreferences,
         updateUserProfile,
@@ -118,7 +179,6 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
@@ -126,3 +186,4 @@ export const useUser = () => {
   }
   return context;
 };
+

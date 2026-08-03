@@ -145,7 +145,14 @@ export const AuthPage = () => {
         <Button
           variant="glass"
           size="sm"
-          onClick={() => navigate('/app/dashboard')}
+          onClick={() => {
+            updateUserProfile({ name: 'GitHub Developer', email: 'dev@github.com', role: 'candidate' });
+            if (!onboardingCompleted) {
+              navigate('/onboarding');
+            } else {
+              navigate('/app/dashboard');
+            }
+          }}
           leftIcon={<Github className="w-4 h-4" />}
         >
           GitHub
@@ -154,7 +161,14 @@ export const AuthPage = () => {
         <Button
           variant="glass"
           size="sm"
-          onClick={() => navigate('/app/dashboard')}
+          onClick={() => {
+            updateUserProfile({ name: 'Google Developer', email: 'user@gmail.com', role: 'candidate' });
+            if (!onboardingCompleted) {
+              navigate('/onboarding');
+            } else {
+              navigate('/app/dashboard');
+            }
+          }}
           leftIcon={<Chrome className="w-4 h-4 text-rose-400" />}
         >
           Google

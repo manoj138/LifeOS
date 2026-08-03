@@ -9,7 +9,7 @@ export const VoiceGuiderProvider = ({ children }) => {
   // App Security State
   const [isLocked, setIsLocked] = useState(true);
   const [pinCode, setPinCode] = useState('1234');
-  const [userName, setUserName] = useState('Manoj');
+  const [userName, setUserName] = useState('');
   const [aiName, setAiName] = useState('LifeOS');
 
   // Voice Personality Tone: 'sakhi' | 'coach' | 'mentor'

@@ -11,12 +11,19 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 
 export const OnboardingPage = () => {
   const navigate = useNavigate();
-  const { user, preferences, completeOnboarding } = useUser();
+  const { user, preferences, onboardingCompleted, completeOnboarding } = useUser();
   const [currentStep, setCurrentStep] = useState(1);
+
+  // If onboarding is already completed and user manually visits /onboarding, redirect to dashboard
+  React.useEffect(() => {
+    if (user && onboardingCompleted) {
+      navigate('/app/dashboard', { replace: true });
+    }
+  }, [user, onboardingCompleted, navigate]);
 
   // Form State
   const [formData, setFormData] = useState({
-    name: user?.name || 'Manoj Kumar',
+    name: user?.name || user?.email?.split('@')[0] || '',
     careerLevel: preferences?.careerLevel || 'Intermediate (1-3 yrs experience)',
     targetRole: preferences?.targetRole || 'Full-Stack Web Developer',
     focusAreas: preferences?.focusAreas || ['Coding & DSA', 'DevOps & Cloud', 'English Fluency', 'Fitness & Energy'],

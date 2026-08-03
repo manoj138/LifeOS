@@ -100,11 +100,13 @@ export const GoalsPage = () => {
     ? goals
     : goals.filter((g) => g.category === selectedCategory);
 
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
+
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
         badge={`Target Deadline: ${preferences?.targetDate || '2026-12-31'}`}
-        title={`Career & Growth Milestones for ${user?.name || 'Manoj'} ⚡`}
+        title={`Career & Growth Milestones for ${displayName} ⚡`}
         subtitle={`Goal roadmap tailored for ${preferences?.targetRole || 'Full-Stack Web Developer'} • Daily Target: ${preferences?.dailyHours || 4} hrs/day.`}
 
         actions={

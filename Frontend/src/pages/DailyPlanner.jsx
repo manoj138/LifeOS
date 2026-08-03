@@ -127,11 +127,13 @@ export const DailyPlanner = () => {
   const totalPomodoroTime = pomodoroMode === 'work' ? 25 * 60 : pomodoroMode === 'shortBreak' ? 5 * 60 : 15 * 60;
   const timerProgress = Math.round(((totalPomodoroTime - timeLeft) / totalPomodoroTime) * 100);
 
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
+
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
         badge={`Daily Goal: ${preferences?.dailyHours || 4} Hours Commitment`}
-        title={`Daily Timeline for ${user?.name || 'Manoj'} ⚡`}
+        title={`Daily Timeline for ${displayName} ⚡`}
         subtitle={`Time-blocking schedule tailored for ${preferences?.targetRole || 'Full-Stack Developer'} • ${completionPercentage}% Daily Target Completed.`}
 
         actions={

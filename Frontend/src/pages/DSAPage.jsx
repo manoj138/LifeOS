@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Code2, Cpu, CheckCircle2, Play, ArrowRight, Sparkles, Terminal, HelpCircle, Eye, EyeOff } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { TiltCard } from '../components/ui/TiltCard';
@@ -6,9 +7,16 @@ import { CodeEditor } from '../components/ui/CodeEditor';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { apiService } from '../services/api';
+import { useUser } from '../context/UserContext';
 
 export const DSAPage = () => {
-  const [selectedDifficulty, setSelectedDifficulty] = useState('All');
+  const [searchParams] = useSearchParams();
+  const initialTopic = searchParams.get('topic') || 'All';
+  const initialDiff = searchParams.get('difficulty') || 'All';
+
+  const { userProgress, toggleSolvedDsa } = useUser();
+  const [selectedDifficulty, setSelectedDifficulty] = useState(initialDiff);
+  const [selectedTopicFilter, setSelectedTopicFilter] = useState(initialTopic);
   const [activeProblem, setActiveProblem] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);

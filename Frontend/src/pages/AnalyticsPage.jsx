@@ -8,6 +8,7 @@ import { useUser } from '../context/UserContext';
 
 export const AnalyticsPage = () => {
   const { user, preferences } = useUser();
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
 
   const productivityData = [
     { day: 'Mon', score: 75, studyHours: (preferences?.dailyHours || 4) * 1.1 },
@@ -23,7 +24,7 @@ export const AnalyticsPage = () => {
     <div className="space-y-8 pb-12">
       <SectionHeader
         badge={`Specialization: ${preferences?.targetRole || 'Full-Stack Web Developer'}`}
-        title={`Growth Velocity & Performance for ${user?.name || 'Manoj'} ⚡`}
+        title={`Growth Velocity & Performance for ${displayName} ⚡`}
         subtitle={`Data-driven insights into your daily commitment (${preferences?.dailyHours || 4}h/day), interview scores, and productivity velocity.`}
       />
 

@@ -26,20 +26,21 @@ export const Dashboard = () => {
     }
   }, [user, navigate]);
 
-  const metrics = [
-
+  const stats = [
     { title: "Target Specialization", value: 88, suffix: "%", icon: Code2, color: "cyan", change: preferences?.targetRole || "Full-Stack Web Dev" },
     { title: "Skill Readiness", value: 92, suffix: "%", icon: MessageSquareCode, color: "purple", change: `${preferences?.skillLevels?.dsa || 'Intermediate'} Level` },
     { title: "Daily Target Commitment", value: preferences?.dailyHours || 4, suffix: " hrs/day", icon: Server, color: "emerald", change: `${preferences?.careerLevel || 'Intermediate'}` },
     { title: "Habit & Fitness Streak", value: 14, suffix: " Days", icon: Flame, color: "rose", change: preferences?.fitnessGoal || "Build Muscle" },
   ];
 
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
+
   return (
     <div className="space-y-8 pb-12">
       {/* Top Section Header */}
       <SectionHeader
         badge="Personalized Command Center"
-        title={`Good Day, ${user?.name || 'Manoj'} ⚡`}
+        title={`Good Day, ${displayName} ⚡`}
         subtitle={`${preferences?.targetRole || 'Full-Stack Developer'} • ${preferences?.careerLevel || 'Intermediate'} • Focused on ${preferences?.focusAreas?.slice(0, 3).join(', ') || 'Coding, DevOps & Fitness'}`}
         actions={
           <div className="flex items-center gap-2">
@@ -53,13 +54,13 @@ export const Dashboard = () => {
         }
       />
 
-      {/* Laser Border Featured AI Morning Briefing */}
+      {/* Featured AI Morning Briefing */}
       <LaserBorder className="p-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
               <Sparkles className="w-4 h-4 animate-pulse" />
-              <span>AI Coach Tailored Strategy Ready</span>
+              <span>AI Coach Tailored Strategy Active</span>
             </div>
             <h2 className="text-2xl font-extrabold text-white tracking-tight leading-snug">
               "Custom roadmap active for {preferences?.targetRole || 'Full-Stack Web Developer'} & {preferences?.aiPersona || 'Motivational Tech Mentor'}."
@@ -77,10 +78,9 @@ export const Dashboard = () => {
         </div>
       </LaserBorder>
 
-
       {/* 3D Tilt Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {metrics.map((m, idx) => {
+        {stats.map((m, idx) => {
           const Icon = m.icon;
           return (
             <TiltCard key={idx} glowColor={m.color}>

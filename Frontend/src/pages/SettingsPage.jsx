@@ -68,15 +68,17 @@ export const SettingsPage = () => {
     { id: 'gemini15', name: 'Google Gemini 1.5 Pro', desc: 'Ultra long 1M token context for codebase analysis.', badge: 'Fast' },
   ];
 
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
+
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
-        badge="System Configuration"
-        title="Settings, AI Voice & PIN Security"
-        subtitle="Manage your profile, AI voice guider language (English/Marathi), PIN code, and notification rules."
+        badge="System Settings & Customization"
+        title="Settings & Autonomous Preferences"
+        subtitle="Manage your personal career goals, AI persona tone, daily target hours, and onboarding data."
       />
 
-      {/* User Onboarding & Career Profile Overview */}
+      {/* Dynamic Summary Card */}
       <GlassCard className="p-6 border-purple-500/40 bg-gradient-to-r from-slate-900 via-purple-950/40 to-slate-900">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
@@ -85,7 +87,7 @@ export const SettingsPage = () => {
               <span>Personalized Onboarding Active</span>
             </div>
             <h2 className="text-xl font-bold text-white tracking-tight">
-              {user?.name || 'Manoj Kumar'} • {preferences?.targetRole || 'Full-Stack Web Developer'}
+              {displayName} • {preferences?.targetRole || 'Full-Stack Web Developer'}
             </h2>
             <p className="text-xs text-gray-300 leading-relaxed">
               Level: <span className="text-purple-300 font-semibold">{preferences?.careerLevel}</span> • Daily Target: <span className="text-cyan-300 font-semibold">{preferences?.dailyHours} hrs/day</span> • Fitness: <span className="text-rose-300 font-semibold">{preferences?.fitnessGoal}</span> • AI Coach: <span className="text-amber-300 font-semibold">{preferences?.aiPersona}</span>

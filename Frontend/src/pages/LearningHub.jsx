@@ -650,7 +650,7 @@ export const LearningHub = () => {
               </div>
 
               <p className="text-xs text-gray-200 leading-relaxed font-sans">
-                "Hi Manoj! You are studying <strong>{currentLessonData?.title}</strong>. Choose an option below for customized guidance:"
+                "Hi {user?.name || user?.email?.split('@')[0] || 'Learner'}! You are studying <strong>{currentLessonData?.title}</strong>. Choose an option below for customized guidance:"
               </p>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">

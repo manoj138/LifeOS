@@ -26,7 +26,7 @@ export const InterviewPrep = () => {
   const [teleprompterSpeed, setTeleprompterSpeed] = useState('1x');
   const [aiEvaluation, setAiEvaluation] = useState(null);
 
-  const userName = user?.name || 'Manoj Kumar';
+  const userName = user?.name || user?.email?.split('@')[0] || 'Candidate';
   const targetRole = preferences?.targetRole || 'Full-Stack Web Developer';
   const careerLevel = preferences?.careerLevel || 'Intermediate (1-3 yrs experience)';
   const aiPersona = preferences?.aiPersona || 'Motivational Tech Mentor';
@@ -193,9 +193,9 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
 
     let feedbackMsg = '';
     if (language === 'mr') {
-      feedbackMsg = `उत्कृष्ट उत्तर मनोज! तुमचा AI Delivery Score १० पैकी ${rawScore} आहे. तुम्ही ${found.length} मुख्य संकल्पना अचूक स्पष्ट केल्या!`;
+      feedbackMsg = `उत्कृष्ट उत्तर ${userName}! तुमचा AI Delivery Score १० पैकी ${rawScore} आहे. तुम्ही ${found.length} मुख्य संकल्पना अचूक स्पष्ट केल्या!`;
     } else {
-      feedbackMsg = `Great explanation Manoj! Your AI Delivery Score is ${rawScore} out of 10. You successfully covered key technical concepts!`;
+      feedbackMsg = `Great explanation ${userName}! Your AI Delivery Score is ${rawScore} out of 10. You successfully covered key technical concepts!`;
     }
 
     setAiEvaluation({
@@ -212,7 +212,7 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
       <SectionHeader
         badge="AI Voice Mock Interviewer Active"
         title="AI Interview Studio & Delivery Rating"
-        subtitle="Customized for Manoj Mansing Chougule (CloudRegex Intern • E-Commerce & RoyalESeva Projects)."
+        subtitle={`Customized for ${userName} (${targetRole} • ${careerLevel}).`}
         actions={
           <Tabs
             tabs={[
