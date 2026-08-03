@@ -4,25 +4,29 @@ import { LineChart as ChartIcon, TrendingUp, Sparkles, Zap } from 'lucide-react'
 import { SectionHeader } from '../components/common/SectionHeader';
 import { GlassCard } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
+import { useUser } from '../context/UserContext';
 
 export const AnalyticsPage = () => {
+  const { user, preferences } = useUser();
+
   const productivityData = [
-    { day: 'Mon', score: 75, studyHours: 6.5 },
-    { day: 'Tue', score: 82, studyHours: 7.2 },
-    { day: 'Wed', score: 90, studyHours: 8.0 },
-    { day: 'Thu', score: 88, studyHours: 7.5 },
-    { day: 'Fri', score: 95, studyHours: 8.5 },
-    { day: 'Sat', score: 80, studyHours: 6.0 },
-    { day: 'Sun', score: 92, studyHours: 8.2 },
+    { day: 'Mon', score: 75, studyHours: (preferences?.dailyHours || 4) * 1.1 },
+    { day: 'Tue', score: 82, studyHours: (preferences?.dailyHours || 4) * 1.2 },
+    { day: 'Wed', score: 90, studyHours: (preferences?.dailyHours || 4) * 1.4 },
+    { day: 'Thu', score: 88, studyHours: (preferences?.dailyHours || 4) * 1.3 },
+    { day: 'Fri', score: 95, studyHours: (preferences?.dailyHours || 4) * 1.5 },
+    { day: 'Sat', score: 80, studyHours: (preferences?.dailyHours || 4) * 1.0 },
+    { day: 'Sun', score: 92, studyHours: (preferences?.dailyHours || 4) * 1.3 },
   ];
 
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
-        badge="Performance Intelligence"
-        title="Analytics & Growth Velocity"
-        subtitle="Data-driven insights into your study habits, interview scores, and productivity velocity."
+        badge={`Specialization: ${preferences?.targetRole || 'Full-Stack Web Developer'}`}
+        title={`Growth Velocity & Performance for ${user?.name || 'Manoj'} ⚡`}
+        subtitle={`Data-driven insights into your daily commitment (${preferences?.dailyHours || 4}h/day), interview scores, and productivity velocity.`}
       />
+
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Productivity Velocity Area Chart */}

@@ -97,4 +97,68 @@ export const apiService = {
       return { success: false, fallback: true };
     }
   },
+
+  // Daily Planner Tasks
+  async getPlannerTasks() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/planner/tasks`, { headers: getAuthHeader() });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createPlannerTask(data) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/planner/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Goals
+  async getGoals() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/goals`, { headers: getAuthHeader() });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Fitness
+  async getFitnessLogs() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/fitness/logs`, { headers: getAuthHeader() });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Habits
+  async getHabits() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/habits`, { headers: getAuthHeader() });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Journal
+  async getJournalEntries() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/journal/entries`, { headers: getAuthHeader() });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
 };
+

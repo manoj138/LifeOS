@@ -3,12 +3,24 @@ const router = express.Router();
 
 const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
+const plannerRoutes = require('./plannerRoutes');
+const goalsRoutes = require('./goalsRoutes');
 const learningRoutes = require('./learningRoutes');
+const projectsRoutes = require('./projectsRoutes');
+const fitnessRoutes = require('./fitnessRoutes');
+const habitsRoutes = require('./habitsRoutes');
+const journalRoutes = require('./journalRoutes');
 const adminRoutes = require('./adminRoutes');
 
 router.use('/auth', authRoutes);
 router.use('/user', userRoutes);
+router.use('/planner', plannerRoutes);
+router.use('/goals', goalsRoutes);
 router.use('/learning', learningRoutes);
+router.use('/projects', projectsRoutes);
+router.use('/fitness', fitnessRoutes);
+router.use('/habits', habitsRoutes);
+router.use('/journal', journalRoutes);
 router.use('/admin', adminRoutes);
 
 module.exports = router;

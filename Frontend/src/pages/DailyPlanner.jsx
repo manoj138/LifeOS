@@ -5,6 +5,7 @@ import { GlassCard } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Input } from '../components/ui/Input';
+import { useUser } from '../context/UserContext';
 
 const DEFAULT_TASKS = [
   { id: 't1', title: 'Deep Work: React 19 Server Actions & Compiler', start: '08:00 AM', end: '10:00 AM', category: 'Deep Work', energy: 'High', completed: true },
@@ -35,10 +36,13 @@ const playPomodoroChime = () => {
 };
 
 export const DailyPlanner = () => {
+  const { user, preferences } = useUser();
+
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem('lifeos_planner_tasks');
     return saved ? JSON.parse(saved) : DEFAULT_TASKS;
   });
+
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskCategory, setNewTaskCategory] = useState('Deep Work');
@@ -120,9 +124,10 @@ export const DailyPlanner = () => {
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
-        badge="Time-Blocking Matrix"
-        title="Daily Planner & Energy Optimizer"
-        subtitle="Notion Calendar inspired visual time-blocking timeline to maximize deep work focus."
+        badge={`Daily Goal: ${preferences?.dailyHours || 4} Hours Commitment`}
+        title={`Daily Timeline for ${user?.name || 'Manoj'} ⚡`}
+        subtitle={`Time-blocking schedule tailored for ${preferences?.targetRole || 'Full-Stack Developer'} • ${completionPercentage}% Daily Target Completed.`}
+
         actions={
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" leftIcon={<ChevronLeft className="w-4 h-4" />}>Prev</Button>

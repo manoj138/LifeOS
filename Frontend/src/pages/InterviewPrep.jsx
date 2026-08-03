@@ -13,9 +13,11 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Tabs } from '../components/ui/Tabs';
 import { useVoiceGuider } from '../context/VoiceGuiderContext';
+import { useUser } from '../context/UserContext';
 
 export const InterviewPrep = () => {
   const { speakText, language, startListening, stopListening, userTranscript } = useVoiceGuider();
+  const { user, preferences } = useUser();
 
   const [activeTab, setActiveTab] = useState('self-intro');
   const [selectedCategory, setSelectedCategory] = useState('js');
@@ -24,36 +26,40 @@ export const InterviewPrep = () => {
   const [teleprompterSpeed, setTeleprompterSpeed] = useState('1x');
   const [aiEvaluation, setAiEvaluation] = useState(null);
 
+  const userName = user?.name || 'Manoj Kumar';
+  const targetRole = preferences?.targetRole || 'Full-Stack Web Developer';
+  const careerLevel = preferences?.careerLevel || 'Intermediate (1-3 yrs experience)';
+  const aiPersona = preferences?.aiPersona || 'Motivational Tech Mentor';
+
   const selfIntroData = {
-    name: "Manoj Mansing Chougule",
-    location: "Mangle, Maharashtra",
-    education: "B.Tech in Computer Science Engineering — Dr. D. Y. Patil Agriculture and Technical University",
-    currentRole: "Junior Software Developer Intern @ CloudRegex Infotech",
-    skills: ["MongoDB", "Express.js", "React.js", "Node.js", "REST APIs", "SQL", "Git/GitHub", "Postman", "Tailwind CSS"],
+    name: userName,
+    location: "Maharashtra, India",
+    education: "B.Tech in Computer Science & Engineering",
+    currentRole: `${targetRole} Candidate (${careerLevel})`,
+    skills: preferences?.focusAreas || ["React.js", "Node.js", "System Architecture", "DevOps & Cloud", "DSA Algorithms"],
     projects: [
       {
-        name: "E-Commerce Platform",
-        panels: "User, Seller & Admin Panels",
-        features: "Product Management, Order Tracking, Inventory, Coupon Engine, Dynamic Shipping Fee Calculation"
+        name: "LifeOS AI Productivity Ecosystem",
+        panels: "Personalised Learning, Onboarding Wizard & Teleprompter Studio",
+        features: "Dynamic Routing, Voice Guider, Daily Time-blocking & Fitness Metrics"
       },
       {
-        name: "RoyalESeva — Document Portal Hub",
-        module: "Vendor Module & Processing Workflow",
-        features: "Customer Info Management, Digital Document Processing Workflow, Backend API & DB Integration"
+        name: "Full-Stack Enterprise Hub",
+        module: "RESTful API Integration & Database Management",
+        features: "Authentication Guard, SQLite/MongoDB Persistence & Responsive UI"
       }
     ],
-    fullScript: `Good morning, sir/madam. My name is Manoj Mansing Chougule, and I am from Mangle, Maharashtra. I am currently pursuing my B.Tech in Computer Science Engineering from Dr. D. Y. Patil Agriculture and Technical University.
+    fullScript: `Good morning, sir/madam. My name is ${userName}. I hold a Computer Science background and I am specializing as a ${targetRole}.
 
-I am a MERN Stack Developer with hands-on experience in developing full-stack web applications using MongoDB, Express.js, React.js, and Node.js. Currently, I am working as a Junior Software Developer Intern at CloudRegex Infotech, where I have been working on RESTful APIs, database integration, authentication, and dynamic user interfaces.
+I have hands-on experience in building scalable applications, system design optimization, and full-stack development. My experience level is ${careerLevel}.
 
-During my internship, I worked on two major projects:
-1. E-Commerce Platform (User, Seller, Admin panels, product/order management, coupons, dynamic shipping fee calculation).
-2. RoyalESeva Document Portal Hub (Vendor module, digital document processing workflow, customer info & document management).
+Key highlights of my recent work include:
+1. LifeOS AI Autonomous Platform featuring a 5-step interactive onboarding wizard, dynamic telemetry, and voice assistant integration.
+2. Full-stack RESTful web applications with robust authentication, clean database schemas, and responsive UI design.
 
-Through these projects, I have strengthened my skills in MERN Stack, REST APIs, database management, and authentication. I am also comfortable with JavaScript, SQL, Git, GitHub, Postman, and Tailwind CSS.
-
-My goal is to continuously improve my technical and problem-solving skills and contribute to building scalable and impactful software solutions. Thank you for giving me the opportunity to introduce myself.`
+My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, DevOps, and Communication'}. I am guided by my AI persona, ${aiPersona}, maintaining a daily commitment of ${preferences?.dailyHours || 4} hours. My objective is to deliver high-performance software engineering solutions. Thank you for giving me this opportunity to introduce myself.`
   };
+
 
   const masterQuestionBank = {
     js: [

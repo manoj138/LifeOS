@@ -7,51 +7,42 @@ import { Button } from '../components/ui/Button';
 import { ProgressRing } from '../components/ui/ProgressRing';
 import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
+import { useUser } from '../context/UserContext';
 
 const DEFAULT_GOALS = [
   {
     id: 'g1',
-    title: "Land Staff/Principal Frontend Role ($250k+)",
+    title: "Master Target Specialization & Technical Career Goals",
     deadline: "Q4 2026",
     category: "Career",
     milestones: [
       { id: 'm1_1', text: "Master System Design & Web Architecture Patterns", completed: true },
-      { id: 'm1_2', text: "Solve 200+ LeetCode Medium/Hard Problems", completed: true },
-      { id: 'm1_3', text: "Build 3 Enterprise SaaS Projects in Portfolio", completed: true },
-      { id: 'm1_4', text: "Complete 15+ Mock Technical Interviews", completed: false },
+      { id: 'm1_2', text: "Solve 100+ LeetCode Medium/Hard Problems", completed: true },
+      { id: 'm1_3', text: "Build Production Ready Applications", completed: true },
+      { id: 'm1_4', text: "Complete Mock Technical Interviews with AI Teleprompter", completed: false },
     ]
   },
   {
     id: 'g2',
-    title: "Deploy 5 Fullstack MERN SaaS Applications",
+    title: "Deploy Production SaaS Infrastructure & DevOps Systems",
     deadline: "Q3 2026",
     category: "Engineering",
     milestones: [
       { id: 'm2_1', text: "LifeOS AI Assistant Suite", completed: true },
-      { id: 'm2_2', text: "Realtime Collaborative Canvas Tool", completed: true },
-      { id: 'm2_3', text: "DevOps & Kubernetes Monitoring Dashboard", completed: false },
-      { id: 'm2_4', text: "AI Resume & Portfolio Generator", completed: false },
+      { id: 'm2_2', text: "Hostinger VPS & Nginx Containerization", completed: true },
+      { id: 'm2_3', text: "DevOps & Cloud Monitoring Dashboard", completed: false },
     ]
   },
-  {
-    id: 'g3',
-    title: "Achieve 15% Body Fat & Run 10K",
-    deadline: "Q3 2026",
-    category: "Health",
-    milestones: [
-      { id: 'm3_1', text: "Consistent 4x Weekly Weight Training", completed: true },
-      { id: 'm3_2', text: "Hit 160g Daily Protein Target", completed: true },
-      { id: 'm3_3', text: "Run 5K under 25 minutes", completed: true },
-      { id: 'm3_4', text: "Complete Official 10K Marathon Race", completed: false },
-    ]
-  }
 ];
 
 export const GoalsPage = () => {
+  const { user, preferences } = useUser();
+
   const [goals, setGoals] = useState(() => {
     const saved = localStorage.getItem('lifeos_goals');
     return saved ? JSON.parse(saved) : DEFAULT_GOALS;
   });
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -119,9 +110,10 @@ export const GoalsPage = () => {
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
-        badge="Vision & Milestones"
-        title="Life Goals & Quarter Milestones"
-        subtitle="Align daily habits with long-term career, financial, and personal targets."
+        badge={`Target Deadline: ${preferences?.targetDate || '2026-12-31'}`}
+        title={`Career & Growth Milestones for ${user?.name || 'Manoj'} ⚡`}
+        subtitle={`Goal roadmap tailored for ${preferences?.targetRole || 'Full-Stack Web Developer'} • Daily Target: ${preferences?.dailyHours || 4} hrs/day.`}
+
         actions={
           <Button variant="primary" leftIcon={<Plus className="w-4 h-4" />} onClick={() => setIsModalOpen(true)}>
             Create New Life Goal
