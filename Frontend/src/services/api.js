@@ -88,10 +88,22 @@ export const apiService = {
     }
   },
 
-  // Admin Telemetry
+  // Admin Telemetry & Candidate Management
   async getAdminMetrics() {
     try {
       const res = await fetch(`${API_BASE_URL}/admin/metrics`);
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteCandidate(id) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/candidates/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeader(),
+      });
       return await res.json();
     } catch (err) {
       return { success: false, fallback: true };

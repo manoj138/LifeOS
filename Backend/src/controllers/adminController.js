@@ -34,7 +34,20 @@ const getCandidates = async (req, res) => {
   }
 };
 
+const deleteCandidate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await UserPreference.destroy({ where: { userId: id } }).catch(() => {});
+    await User.destroy({ where: { id } });
+    return sendSuccess(res, 'Candidate deleted successfully', { id });
+  } catch (error) {
+    return sendError(res, 'Error deleting candidate', error, 500);
+  }
+};
+
 module.exports = {
   getAdminMetrics,
   getCandidates,
+  deleteCandidate,
 };
+

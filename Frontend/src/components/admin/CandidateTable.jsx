@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Eye, Award, CheckCircle2, X, Briefcase, Code2, Flame, Sparkles, Send } from 'lucide-react';
+import { Search, Filter, Eye, Award, CheckCircle2, X, Briefcase, Code2, Flame, Sparkles, Send, Trash2, AlertTriangle } from 'lucide-react';
 import { GlassCard } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -91,6 +91,7 @@ export const CandidateTable = () => {
   const [search, setSearch] = useState('');
   const [selectedRole, setSelectedRole] = useState('All');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [candidateToDelete, setCandidateToDelete] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -104,6 +105,27 @@ export const CandidateTable = () => {
     return () => { isMounted = false; };
   }, []);
 
+  const handleDeleteConfirm = async () => {
+    if (!candidateToDelete) return;
+    const targetId = candidateToDelete.id;
+
+    // Optimistically update state
+    setCandidates((prev) => prev.filter((c) => c.id !== targetId));
+
+    if (selectedCandidate?.id === targetId) {
+      setSelectedCandidate(null);
+    }
+
+    setCandidateToDelete(null);
+
+    // Sync with backend API
+    try {
+      await apiService.deleteCandidate(targetId);
+    } catch (e) {
+      console.log('Candidate deleted locally.');
+    }
+  };
+
   const filteredCandidates = candidates.filter((c) => {
     const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -111,7 +133,6 @@ export const CandidateTable = () => {
     const matchesRole = selectedRole === 'All' || c.targetRole === selectedRole;
     return matchesSearch && matchesRole;
   });
-
 
   return (
     <GlassCard className="p-6 space-y-6">
@@ -154,57 +175,76 @@ export const CandidateTable = () => {
               <th className="p-3.5">Level & Daily Target</th>
               <th className="p-3.5">Readiness Score</th>
               <th className="p-3.5">Streak & Topics</th>
-              <th className="p-3.5 text-right rounded-r-xl">Action</th>
+              <th className="p-3.5 text-right rounded-r-xl">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {filteredCandidates.map((c) => (
-              <tr key={c.id} className="hover:bg-white/5 transition-colors">
-                <td className="p-3.5">
-                  <div className="font-bold text-white">{c.name}</div>
-                  <div className="text-[11px] text-gray-400">{c.email}</div>
-                </td>
-                <td className="p-3.5">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-300 border border-purple-500/20 font-medium">
-                    {c.targetRole}
-                  </span>
-                </td>
-                <td className="p-3.5">
-                  <div className="text-gray-200">{c.skillLevel}</div>
-                  <div className="text-[10px] text-gray-400">{c.dailyHours} hrs / day</div>
-                </td>
-                <td className="p-3.5">
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          c.readinessScore >= 85 ? 'bg-emerald-400' : 'bg-purple-400'
-                        }`}
-                        style={{ width: `${c.readinessScore}%` }}
-                      />
-                    </div>
-                    <span className="font-extrabold text-white">{c.readinessScore}%</span>
-                  </div>
-                </td>
-                <td className="p-3.5">
-                  <div className="flex items-center gap-1.5 text-rose-400 font-bold">
-                    <Flame className="w-3.5 h-3.5" />
-                    <span>{c.streak} Days</span>
-                  </div>
-                  <div className="text-[10px] text-gray-400">{c.completedTopics} topics done</div>
-                </td>
-                <td className="p-3.5 text-right">
-                  <Button
-                    size="xs"
-                    variant="glass"
-                    onClick={() => setSelectedCandidate(c)}
-                    leftIcon={<Eye className="w-3.5 h-3.5 text-purple-400" />}
-                  >
-                    Inspect Profile
-                  </Button>
+            {filteredCandidates.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-gray-400 text-xs">
+                  No candidates found matching your filter criteria.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredCandidates.map((c) => (
+                <tr key={c.id} className="hover:bg-white/5 transition-colors">
+                  <td className="p-3.5">
+                    <div className="font-bold text-white">{c.name}</div>
+                    <div className="text-[11px] text-gray-400">{c.email}</div>
+                  </td>
+                  <td className="p-3.5">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-300 border border-purple-500/20 font-medium">
+                      {c.targetRole}
+                    </span>
+                  </td>
+                  <td className="p-3.5">
+                    <div className="text-gray-200">{c.skillLevel}</div>
+                    <div className="text-[10px] text-gray-400">{c.dailyHours} hrs / day</div>
+                  </td>
+                  <td className="p-3.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-2 rounded-full bg-white/10 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            c.readinessScore >= 85 ? 'bg-emerald-400' : 'bg-purple-400'
+                          }`}
+                          style={{ width: `${c.readinessScore}%` }}
+                        />
+                      </div>
+                      <span className="font-extrabold text-white">{c.readinessScore}%</span>
+                    </div>
+                  </td>
+                  <td className="p-3.5">
+                    <div className="flex items-center gap-1.5 text-rose-400 font-bold">
+                      <Flame className="w-3.5 h-3.5" />
+                      <span>{c.streak} Days</span>
+                    </div>
+                    <div className="text-[10px] text-gray-400">{c.completedTopics} topics done</div>
+                  </td>
+                  <td className="p-3.5 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        size="xs"
+                        variant="glass"
+                        onClick={() => setSelectedCandidate(c)}
+                        leftIcon={<Eye className="w-3.5 h-3.5 text-purple-400" />}
+                      >
+                        Inspect Profile
+                      </Button>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        className="text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20"
+                        onClick={() => setCandidateToDelete(c)}
+                        leftIcon={<Trash2 className="w-3.5 h-3.5" />}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -250,8 +290,52 @@ export const CandidateTable = () => {
             </div>
 
             <div className="pt-2 flex items-center gap-3">
-              <Button variant="primary" className="w-full py-2.5" leftIcon={<Send className="w-4 h-4" />}>
+              <Button variant="primary" className="flex-1 py-2.5" leftIcon={<Send className="w-4 h-4" />}>
                 Send Placement Referral
+              </Button>
+              <Button
+                variant="ghost"
+                className="py-2.5 text-rose-400 hover:bg-rose-500/10 border border-rose-500/20"
+                onClick={() => setCandidateToDelete(selectedCandidate)}
+                leftIcon={<Trash2 className="w-4 h-4" />}
+              >
+                Delete Candidate
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {candidateToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="bg-[#161722] border border-rose-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-6 relative shadow-2xl">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Delete Candidate Record</h3>
+                <p className="text-xs text-rose-400">Permanent Action</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-300 leading-relaxed">
+              Are you sure you want to delete candidate <strong className="text-white">{candidateToDelete.name}</strong> ({candidateToDelete.email})? This will remove their onboarding profile, preferences, and placement status from the platform.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button variant="glass" size="sm" onClick={() => setCandidateToDelete(null)}>
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                className="bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30"
+                onClick={handleDeleteConfirm}
+                leftIcon={<Trash2 className="w-4 h-4" />}
+              >
+                Confirm Delete
               </Button>
             </div>
           </div>
@@ -260,3 +344,4 @@ export const CandidateTable = () => {
     </GlassCard>
   );
 };
+
