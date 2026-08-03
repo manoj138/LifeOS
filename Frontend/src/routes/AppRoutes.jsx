@@ -54,7 +54,7 @@ export const AppRoutes = () => {
       </Route>
 
       {/* Legacy route redirects */}
-      <Route path="/customers*" element={<Navigate to="/app/dashboard" replace />} />
+      <Route path="/customers/*" element={<Navigate to="/app/dashboard" replace />} />
       <Route path="/app/jobs" element={<Navigate to="/app/dashboard" replace />} />
 
       {/* 404 Error Catch-All */}

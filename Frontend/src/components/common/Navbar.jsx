@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Bell, Sparkles, Command, Plus, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { VoiceGuiderWidget } from '../voice/VoiceGuiderWidget';
 import { cn } from '../../utils/cn';
 
 export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
@@ -59,10 +60,13 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
 
       {/* Right Action Icons & Status */}
       <div className="flex items-center gap-3">
+        {/* Voice Guider Widget (AI Voice & PIN Security) */}
+        <VoiceGuiderWidget />
+
         {/* AI Status Badge */}
-        <div className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-full text-xs font-medium text-purple-300">
+        <div className="hidden xl:flex items-center gap-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-full text-xs font-medium text-purple-300">
           <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-          <span>AI Coach Active</span>
+          <span>AI Active</span>
         </div>
 
         {/* Quick Action Button */}
