@@ -7,6 +7,7 @@ const saveOnboarding = async (req, res) => {
     const userId = req.user.id;
     const {
       name,
+      pin,
       targetRole,
       careerLevel,
       focusAreas,
@@ -18,8 +19,11 @@ const saveOnboarding = async (req, res) => {
       aiPersona,
     } = req.body;
 
-    if (name) {
-      await User.update({ name }, { where: { id: userId } });
+    if (name || pin) {
+      const userUpdates = {};
+      if (name) userUpdates.name = name;
+      if (pin) userUpdates.pin = pin;
+      await User.update(userUpdates, { where: { id: userId } });
     }
 
     let pref = await UserPreference.findOne({ where: { userId } });

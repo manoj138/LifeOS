@@ -7,8 +7,34 @@ export const VoiceGuiderProvider = ({ children }) => {
   const navigate = useNavigate();
 
   // App Security State
-  const [isLocked, setIsLocked] = useState(true);
-  const [pinCode, setPinCode] = useState('1234');
+  const [pinCode, setPinCode] = useState(() => {
+    try {
+      return localStorage.getItem('lifeos_user_pin') || '1234';
+    } catch (e) {
+      return '1234';
+    }
+  });
+
+  const [isLocked, setIsLocked] = useState(() => {
+    try {
+      const session = localStorage.getItem('lifeos_session');
+      if (session) {
+        const parsed = JSON.parse(session);
+        if (parsed.onboardingCompleted) return false;
+      }
+      return true;
+    } catch (e) {
+      return true;
+    }
+  });
+
+  const setupCustomPin = useCallback((newPin) => {
+    if (newPin && newPin.length === 4) {
+      setPinCode(newPin);
+      localStorage.setItem('lifeos_user_pin', newPin);
+      setIsLocked(false);
+    }
+  }, []);
   const [userName, setUserName] = useState('');
   const [aiName, setAiName] = useState('LifeOS');
 
@@ -393,6 +419,7 @@ export const VoiceGuiderProvider = ({ children }) => {
     stopListening: safeStopMic,
     processVoiceQuery,
     unlockWithPin,
+    setupCustomPin,
     lockApp,
     speakGreetingAndBriefing,
     speakText,

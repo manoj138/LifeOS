@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mic, Volume2, Sparkles, Bot, Shield, Zap, UserCheck, Play } from 'lucide-react';
+import { Mic, Volume2, Sparkles, Bot, Shield, Zap, UserCheck, Play, Lock } from 'lucide-react';
 
 const AI_PERSONAS = [
   {
@@ -109,6 +109,28 @@ export const StepVoiceAI = ({ formData, updateFormData }) => {
               </div>
             );
           })}
+        </div>
+
+        {/* Security PIN Setup Card */}
+        <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+          <div className="flex items-center gap-2">
+            <Lock className="w-4 h-4 text-cyan-400" />
+            <h4 className="text-sm font-bold text-white">Create Your 4-Digit Security PIN</h4>
+          </div>
+          <p className="text-xs text-gray-400">
+            Set a custom 4-digit PIN to unlock your LifeOS dashboard and voice coach interface.
+          </p>
+          <input
+            type="password"
+            maxLength={4}
+            placeholder="1234"
+            value={formData.pin || ''}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+              updateFormData({ pin: val });
+            }}
+            className="w-full sm:w-48 bg-slate-900 border border-white/15 rounded-xl px-4 py-2.5 text-center text-lg font-mono font-bold tracking-widest text-cyan-300 focus:outline-none focus:border-cyan-400 placeholder:text-gray-600"
+          />
         </div>
 
         <div className="p-4 rounded-2xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between">

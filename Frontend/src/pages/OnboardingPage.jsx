@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
+import { useVoiceGuider } from '../context/VoiceGuiderContext';
 import { StepProfile } from '../components/onboarding/StepProfile';
 import { StepFocusGoals } from '../components/onboarding/StepFocusGoals';
 import { StepSkillLevel } from '../components/onboarding/StepSkillLevel';
@@ -12,6 +13,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 export const OnboardingPage = () => {
   const navigate = useNavigate();
   const { user, preferences, onboardingCompleted, completeOnboarding } = useUser();
+  const { setupCustomPin, setIsLocked } = useVoiceGuider();
   const [currentStep, setCurrentStep] = useState(1);
 
   // If onboarding is already completed and user manually visits /onboarding, redirect to dashboard
@@ -33,6 +35,7 @@ export const OnboardingPage = () => {
     fitnessGoal: preferences?.fitnessGoal || 'Build Muscle & Increase Energy',
     workoutType: preferences?.workoutType || 'Gym Weightlifting & Strength',
     aiPersona: preferences?.aiPersona || 'Motivational Tech Mentor',
+    pin: '1234',
   });
 
   const updateFormData = (fields) => {
@@ -43,10 +46,14 @@ export const OnboardingPage = () => {
     if (currentStep < 5) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      // Submit & Finish Onboarding
+      // Submit & Finish Onboarding with Custom PIN Setup
+      const userPin = (formData.pin && formData.pin.length === 4) ? formData.pin : '1234';
+      setupCustomPin(userPin);
+      setIsLocked(false);
+
       completeOnboarding({
         user: { name: formData.name },
-        preferences: formData,
+        preferences: { ...formData, pin: userPin },
       });
       navigate('/app/dashboard');
     }
