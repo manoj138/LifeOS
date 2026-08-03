@@ -1,30 +1,27 @@
-// middleware/authMiddleware.js
-const { verifyToken } = require('../helper/authHelper');
-const { handle401 } = require('../helper/errorHandler');
+const jwt = require('jsonwebtoken');
+const { sendError } = require('../helper/responseHelper');
+const User = require('../modals/User');
 
-/**
- * Authentication Middleware
- * Checks for JWT token in Authorization header
- */
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+const authMiddleware = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return sendError(res, 'Authentication token missing or invalid', null, 401);
+    }
 
-  if (!token) {
-    return handle401(res, "No token provided, access denied");
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key');
+    
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      return sendError(res, 'User no longer exists', null, 401);
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    return sendError(res, 'Unauthorized access', error, 401);
   }
-
-  const decoded = verifyToken(token);
-
-  if (!decoded) {
-    return handle401(res, "Invalid or expired token");
-  }
-
-  // Attach user data to request object
-  req.user = decoded;
-  next();
 };
 
-module.exports = {
-  authenticateToken,
-};
+module.exports = authMiddleware;

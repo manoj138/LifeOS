@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiService } from '../services/api';
 
 const UserContext = createContext(null);
+
 
 const DEFAULT_PROFILE = {
   name: 'Manoj Kumar',
@@ -61,7 +63,14 @@ export const UserProvider = ({ children }) => {
     }
     setOnboardingCompleted(true);
     localStorage.setItem('lifeos_onboarding_completed', 'true');
+
+    // Asynchronously sync with Backend API
+    apiService.saveOnboarding({
+      name: data.user?.name,
+      ...data.preferences,
+    }).catch((err) => console.log('Backend sync offline fallback active.'));
   };
+
 
   const updatePreferences = (newPrefs) => {
     setPreferences((prev) => ({ ...prev, ...newPrefs }));
