@@ -21,11 +21,16 @@ import {
   isLevelUnlocked
 } from '../utils/learningProgress';
 
+import { useUser } from '../context/UserContext';
+
 export const LearningHub = () => {
+  const { preferences } = useUser();
+
   // Load saved progress state from localStorage on mount
   const initialProgress = loadLearningProgress();
 
   const [activeModule, setActiveModule] = useState(initialProgress.lastActiveModule || 'js');
+
   const [activeLessonIdx, setActiveLessonIdx] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [completedLessons, setCompletedLessons] = useState(initialProgress.completedLessons || ['js-0']);

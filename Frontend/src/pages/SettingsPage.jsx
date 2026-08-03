@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
-import { Settings, Cpu, User, Bell, Key, Sparkles, Check, Volume2, ShieldCheck, Globe, Play, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Settings, Cpu, User, Bell, Key, Sparkles, Check, Volume2, ShieldCheck, Globe, Play, Lock, Target, RefreshCw, Briefcase, Award } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { GlassCard } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { useVoiceGuider } from '../context/VoiceGuiderContext';
+import { useUser } from '../context/UserContext';
 import { AudioSpectrum } from '../components/ui/AudioSpectrum';
 
 export const SettingsPage = () => {
+  const navigate = useNavigate();
+  const { user, preferences, resetOnboarding } = useUser();
   const [selectedModel, setSelectedModel] = useState('gpt4o');
+
+  const handleReRunOnboarding = () => {
+    resetOnboarding();
+    navigate('/onboarding');
+  };
+
 
   // Voice Context
   const {
@@ -59,6 +69,34 @@ export const SettingsPage = () => {
         title="Settings, AI Voice & PIN Security"
         subtitle="Manage your profile, AI voice guider language (English/Marathi), PIN code, and notification rules."
       />
+
+      {/* User Onboarding & Career Profile Overview */}
+      <GlassCard className="p-6 border-purple-500/40 bg-gradient-to-r from-slate-900 via-purple-950/40 to-slate-900">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-xs font-semibold text-purple-300">
+              <Target className="w-3.5 h-3.5 text-purple-400" />
+              <span>Personalized Onboarding Active</span>
+            </div>
+            <h2 className="text-xl font-bold text-white tracking-tight">
+              {user?.name || 'Manoj Kumar'} • {preferences?.targetRole || 'Full-Stack Web Developer'}
+            </h2>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              Level: <span className="text-purple-300 font-semibold">{preferences?.careerLevel}</span> • Daily Target: <span className="text-cyan-300 font-semibold">{preferences?.dailyHours} hrs/day</span> • Fitness: <span className="text-rose-300 font-semibold">{preferences?.fitnessGoal}</span> • AI Coach: <span className="text-amber-300 font-semibold">{preferences?.aiPersona}</span>
+            </p>
+          </div>
+
+          <Button
+            variant="primary"
+            onClick={handleReRunOnboarding}
+            leftIcon={<RefreshCw className="w-4 h-4" />}
+            className="shrink-0 bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-600/30"
+          >
+            Re-run Onboarding Wizard
+          </Button>
+        </div>
+      </GlassCard>
+
 
       {/* Top Banner: AI Voice Guider Overview */}
       <GlassCard className="p-6 border-purple-500/30 bg-gradient-to-r from-purple-900/20 via-indigo-900/20 to-cyan-900/20 relative overflow-hidden">

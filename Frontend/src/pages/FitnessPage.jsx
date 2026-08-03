@@ -1,24 +1,28 @@
 import React from 'react';
-import { Dumbbell, Flame, Heart, Zap, Plus } from 'lucide-react';
+import { Dumbbell, Flame, Heart, Zap, Plus, Target } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { GlassCard } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { ProgressRing } from '../components/ui/ProgressRing';
+import { useUser } from '../context/UserContext';
 
 export const FitnessPage = () => {
+  const { preferences } = useUser();
+
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
-        badge="Physical Optimization"
+        badge={`Fitness Objective: ${preferences?.fitnessGoal || 'Build Muscle'}`}
         title="Fitness & Recovery Tracker"
-        subtitle="Log workouts, track daily macro calories, hydration, and sleep recovery scores."
+        subtitle={`Routine Tailored for ${preferences?.workoutType || 'Gym Weightlifting'} • Track daily macro calories, hydration, and sleep recovery scores.`}
         actions={
           <Button variant="primary" leftIcon={<Plus className="w-4 h-4" />}>
             Log Workout Session
           </Button>
         }
       />
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <GlassCard className="p-6 flex items-center justify-between">

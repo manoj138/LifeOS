@@ -4,6 +4,7 @@ import { Mail, Lock, User, ArrowRight, Github, Chrome } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Tabs } from '../components/ui/Tabs';
+import { useUser } from '../context/UserContext';
 
 export const AuthPage = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -12,15 +13,27 @@ export const AuthPage = () => {
   const [name, setName] = useState('Manoj Kumar');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { onboardingCompleted, resetOnboarding, updateUserProfile } = useUser();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      navigate('/app/dashboard');
+      if (activeTab === 'register') {
+        updateUserProfile({ name, email });
+        resetOnboarding();
+        navigate('/onboarding');
+      } else {
+        if (!onboardingCompleted) {
+          navigate('/onboarding');
+        } else {
+          navigate('/app/dashboard');
+        }
+      }
     }, 800);
   };
+
 
   return (
     <div className="space-y-6">
