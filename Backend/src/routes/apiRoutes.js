@@ -11,6 +11,8 @@ const fitnessRoutes = require('./fitnessRoutes');
 const habitsRoutes = require('./habitsRoutes');
 const journalRoutes = require('./journalRoutes');
 const adminRoutes = require('./adminRoutes');
+const curriculumRoutes = require('./curriculumRoutes');
+const jobRoutes = require('./jobRoutes');
 
 router.use('/auth', authRoutes);
 router.use('/user', userRoutes);
@@ -22,5 +24,9 @@ router.use('/fitness', fitnessRoutes);
 router.use('/habits', habitsRoutes);
 router.use('/journal', journalRoutes);
 router.use('/admin', adminRoutes);
+router.use('/curriculum', curriculumRoutes);
+router.use('/jobs', jobRoutes);
+
+
 
 module.exports = router;

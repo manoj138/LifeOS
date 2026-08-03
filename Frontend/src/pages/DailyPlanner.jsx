@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Input } from '../components/ui/Input';
 import { useUser } from '../context/UserContext';
+import { apiService } from '../services/api';
 
 const DEFAULT_TASKS = [
   { id: 't1', title: 'Deep Work: React 19 Server Actions & Compiler', start: '08:00 AM', end: '10:00 AM', category: 'Deep Work', energy: 'High', completed: true },
@@ -31,7 +32,7 @@ const playPomodoroChime = () => {
     osc.start();
     osc.stop(audioCtx.currentTime + 1.2);
   } catch (e) {
-    console.log('Web Audio Error:', e);
+    console.warn('Audio chime notice:', e);
   }
 };
 
@@ -43,6 +44,17 @@ export const DailyPlanner = () => {
     return saved ? JSON.parse(saved) : DEFAULT_TASKS;
   });
 
+  useEffect(() => {
+    let isMounted = true;
+    const fetchTasks = async () => {
+      const res = await apiService.getPlannerTasks();
+      if (isMounted && res?.success && res.data && res.data.length > 0) {
+        setTasks(res.data);
+      }
+    };
+    fetchTasks();
+    return () => { isMounted = false; };
+  }, []);
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskCategory, setNewTaskCategory] = useState('Deep Work');

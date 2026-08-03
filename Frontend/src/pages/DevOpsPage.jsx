@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Server, Activity, ShieldCheck, Cpu, HardDrive, RefreshCw, Terminal, CheckCircle2, BookOpen, ExternalLink } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { TiltCard } from '../components/ui/TiltCard';
@@ -6,9 +6,24 @@ import { LiveTerminal } from '../components/ui/LiveTerminal';
 import { CodeEditor } from '../components/ui/CodeEditor';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { apiService } from '../services/api';
 
 export const DevOpsPage = () => {
   const [activeTab, setActiveTab] = useState('tutorial');
+  const [dynamicDevOpsTopics, setDynamicDevOpsTopics] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDevOpsTopics = async () => {
+      const res = await apiService.getCurriculumTopics('devops');
+      if (isMounted && res?.success && res.data && res.data.length > 0) {
+        setDynamicDevOpsTopics(res.data);
+      }
+    };
+    fetchDevOpsTopics();
+    return () => { isMounted = false; };
+  }, []);
+
 
   const setupSteps = [
     {

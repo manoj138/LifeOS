@@ -7,6 +7,7 @@ import { AdminMetrics } from '../components/admin/AdminMetrics';
 import { OnboardingAnalyticsChart } from '../components/admin/OnboardingAnalyticsChart';
 import { CandidateTable } from '../components/admin/CandidateTable';
 import { PlacementQueue } from '../components/admin/PlacementQueue';
+import { AdminCurriculumEditor } from '../components/admin/AdminCurriculumEditor';
 import { LiveTerminal } from '../components/ui/LiveTerminal';
 
 export const AdminPage = () => {
@@ -38,7 +39,8 @@ export const AdminPage = () => {
             { id: 'analytics', label: '1. Onboarding Analytics' },
             { id: 'candidates', label: '2. Candidate Directory' },
             { id: 'placement', label: '3. Placement Queue' },
-            { id: 'telemetry', label: '4. VPS System Health' },
+            { id: 'curriculum', label: '4. Curriculum Content Editor' },
+            { id: 'telemetry', label: '5. VPS System Health' },
           ]}
           activeTab={activeTab}
           onChange={setActiveTab}
@@ -67,7 +69,14 @@ export const AdminPage = () => {
         </div>
       )}
 
-      {/* Tab 4: VPS & AI Telemetry */}
+      {/* Tab 4: Curriculum Content Editor */}
+      {activeTab === 'curriculum' && (
+        <div className="animate-fadeIn">
+          <AdminCurriculumEditor />
+        </div>
+      )}
+
+      {/* Tab 5: VPS & AI Telemetry */}
       {activeTab === 'telemetry' && (
         <div className="space-y-6 animate-fadeIn">
           <LiveTerminal title="Hostinger VPS Production Server (185.220.101.42)" />
@@ -76,3 +85,4 @@ export const AdminPage = () => {
     </div>
   );
 };
+

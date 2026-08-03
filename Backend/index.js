@@ -14,6 +14,10 @@ require('./src/modals/Project');
 require('./src/modals/FitnessLog');
 require('./src/modals/HabitLog');
 require('./src/modals/JournalEntry');
+require('./src/modals/CurriculumTopic');
+require('./src/modals/JobApplication');
+
+
 
 
 const app = express();
@@ -39,10 +43,20 @@ app.get('/', (req, res) => {
   });
 });
 
+const smartCurriculumSeeder = require('./src/helper/smartCurriculumSeeder');
+
 // Database Sync & Server Start
 sequelize.sync({ alter: true })
-  .then(() => {
+  .then(async () => {
     console.log('✅ SQLite Database Models synced successfully.');
+    
+    // Auto-run Incremental Smart Seeder (only inserts missing topics, leaves existing untouched)
+    try {
+      await smartCurriculumSeeder();
+    } catch (e) {
+      console.warn('Smart seeder background notice:', e.message);
+    }
+
     app.listen(port, () => {
       console.log(`🚀 LifeOS Backend Server listening on http://localhost:${port}`);
     });
@@ -50,4 +64,5 @@ sequelize.sync({ alter: true })
   .catch((err) => {
     console.error('❌ Failed to sync SQLite database models:', err.message);
   });
+
 

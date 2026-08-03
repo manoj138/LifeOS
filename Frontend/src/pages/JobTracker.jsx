@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Briefcase, Building, DollarSign, MapPin, Plus, ExternalLink } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { GlassCard } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { apiService } from '../services/api';
+import { useUser } from '../context/UserContext';
+
+const DEFAULT_JOBS = [
+  { company: "Vercel", role: "Senior Staff Frontend Engineer", location: "Remote (US)", salary: "$220k - $260k", stage: "Interviewing", date: "Applied 3d ago" },
+  { company: "Linear", role: "Lead UI/UX Product Engineer", location: "San Francisco, CA", salary: "$240k + Equity", stage: "Offer Received", date: "Applied 1w ago" },
+  { company: "Stripe", role: "Principal Frontend Architect", location: "Remote", salary: "$280k", stage: "Applied", date: "Applied 1d ago" },
+  { company: "Raycast", role: "Fullstack MERN Engineer", location: "Remote (EU)", salary: "€160k", stage: "Applied", date: "Applied 5d ago" }
+];
 
 export const JobTracker = () => {
-  const jobs = [
-    { company: "Vercel", role: "Senior Staff Frontend Engineer", location: "Remote (US)", salary: "$220k - $260k", stage: "Interviewing", date: "Applied 3d ago" },
-    { company: "Linear", role: "Lead UI/UX Product Engineer", location: "San Francisco, CA", salary: "$240k + Equity", stage: "Offer Received", date: "Applied 1w ago" },
-    { company: "Stripe", role: "Principal Frontend Architect", location: "Remote", salary: "$280k", stage: "Applied", date: "Applied 1d ago" },
-    { company: "Raycast", role: "Fullstack MERN Engineer", location: "Remote (EU)", salary: "€160k", stage: "Applied", date: "Applied 5d ago" }
-  ];
+  const { user, preferences } = useUser();
+  const [jobs, setJobs] = useState(DEFAULT_JOBS);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchJobs = async () => {
+      const res = await apiService.getJobApplications();
+      if (isMounted && res?.success && res.data && res.data.length > 0) {
+        setJobs(res.data);
+      }
+    };
+    fetchJobs();
+    return () => { isMounted = false; };
+  }, []);
+
 
   return (
     <div className="space-y-8 pb-12">

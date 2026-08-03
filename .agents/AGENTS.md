@@ -13,3 +13,15 @@
 
 3. **Fallback Graceful Handling**:
    - When API / Context data is loading or empty, components must display dynamic fallback placeholders computed from user props or state defaults, never static dummy hardcoded user strings.
+
+
+## ⚡ Incremental Smart Seeder & Data Preservation Rule
+
+1. **Zero Overwrite of Existing Records**:
+   - Backend database seeders MUST NOT clear, truncate, or overwrite existing database records that have been modified or edited by users or admins.
+   - Seeders MUST use `findOrCreate` or selective upsert logic matching on primary keys (e.g. `id`).
+
+2. **Incremental Missing Data Insertion Only**:
+   - When server boots or seeding is invoked, the seeder MUST check if each topic/record exists.
+   - If a record exists -> LEAVE UNTOUCHED.
+   - If a record is missing -> INSERT ONLY MISSING RECORD.

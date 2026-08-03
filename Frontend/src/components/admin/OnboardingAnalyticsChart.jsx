@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Target, Code2, Server, Layout, Database, Clock, BarChart3, CheckCircle2 } from 'lucide-react';
 import { GlassCard } from '../ui/Card';
 import { ProgressRing } from '../ui/ProgressRing';
+import { apiService } from '../../services/api';
 
 export const OnboardingAnalyticsChart = () => {
-  const roleDistribution = [
+  const [analyticsData, setAnalyticsData] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchMetrics = async () => {
+      const res = await apiService.getAdminMetrics();
+      if (isMounted && res?.success && res.data) {
+        setAnalyticsData(res.data);
+      }
+    };
+    fetchMetrics();
+    return () => { isMounted = false; };
+  }, []);
+
+  const roleDistribution = analyticsData?.roleDistribution || [
     { role: 'Full-Stack Web Developer', percentage: 45, count: 578, color: 'bg-purple-500', icon: Code2 },
     { role: 'DevOps & Cloud Engineer', percentage: 25, count: 321, color: 'bg-cyan-500', icon: Server },
     { role: 'Frontend Architect', percentage: 18, count: 231, color: 'bg-emerald-500', icon: Layout },
@@ -23,6 +38,7 @@ export const OnboardingAnalyticsChart = () => {
     { hours: '4 Hours / day', percentage: 45, label: 'Intensive (Popular)' },
     { hours: '6+ Hours / day', percentage: 15, label: 'Bootcamp Pace' },
   ];
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

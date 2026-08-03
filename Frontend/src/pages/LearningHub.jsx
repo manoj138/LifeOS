@@ -22,6 +22,7 @@ import {
 } from '../utils/learningProgress';
 
 import { useUser } from '../context/UserContext';
+import { apiService } from '../services/api';
 
 export const LearningHub = () => {
   const { preferences } = useUser();
@@ -30,6 +31,19 @@ export const LearningHub = () => {
   const initialProgress = loadLearningProgress();
 
   const [activeModule, setActiveModule] = useState(initialProgress.lastActiveModule || 'js');
+  const [dynamicTopics, setDynamicTopics] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchTopics = async () => {
+      const res = await apiService.getCurriculumTopics(activeModule);
+      if (isMounted && res?.success && res.data && res.data.length > 0) {
+        setDynamicTopics(res.data);
+      }
+    };
+    fetchTopics();
+    return () => { isMounted = false; };
+  }, [activeModule]);
 
   const [activeLessonIdx, setActiveLessonIdx] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,6 +57,7 @@ export const LearningHub = () => {
   const [quizErrorMessage, setQuizErrorMessage] = useState(null);
   const [activeLevelFilter, setActiveLevelFilter] = useState('all'); // 'all', 'Beginner', 'Intermediate', 'Advanced'
   const [showLevelMasterModal, setShowLevelMasterModal] = useState(false);
+
 
   // Decoupled, Distinct Roadmap Modules
   const roadmapModules = [

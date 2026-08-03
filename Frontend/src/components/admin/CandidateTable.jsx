@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Eye, Award, CheckCircle2, X, Briefcase, Code2, Flame, Sparkles, Send } from 'lucide-react';
 import { GlassCard } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { apiService } from '../../services/api';
 
-const MOCK_CANDIDATES = [
+const DEFAULT_CANDIDATES = [
   {
     id: 1,
     name: 'Manoj Kumar Chougule',

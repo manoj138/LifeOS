@@ -151,14 +151,63 @@ export const apiService = {
     }
   },
 
-  // Journal
-  async getJournalEntries() {
+  // Curriculum Management
+  async getCurriculumTopics(moduleId) {
     try {
-      const res = await fetch(`${API_BASE_URL}/journal/entries`, { headers: getAuthHeader() });
+      const url = moduleId ? `${API_BASE_URL}/curriculum/topics?moduleId=${moduleId}` : `${API_BASE_URL}/curriculum/topics`;
+      const res = await fetch(url);
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async updateCurriculumTopic(id, data) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/curriculum/topics/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async seedCurriculum() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/curriculum/seed`, { method: 'POST' });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Job Applications
+  async getJobApplications() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/jobs`, { headers: getAuthHeader() });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createJobApplication(data) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/jobs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify(data),
+      });
       return await res.json();
     } catch (err) {
       return { success: false, fallback: true };
     }
   },
 };
+
+
+
 
