@@ -53,11 +53,12 @@ export const CandidateTable = () => {
   };
 
   const filteredCandidates = candidates.filter((c) => {
+    const isNotAdmin = c.role !== 'admin' && !c.email?.toLowerCase().includes('admin') && c.name !== 'System Admin';
     const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.email.toLowerCase().includes(search.toLowerCase());
     const matchesRole = selectedRole === 'All' || c.targetRole === selectedRole;
-    return matchesSearch && matchesRole;
+    return isNotAdmin && matchesSearch && matchesRole;
   });
 
   return (

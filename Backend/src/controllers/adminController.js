@@ -5,9 +5,19 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getAdminMetrics = async (req, res) => {
   try {
-    const totalCandidates = await User.count();
-    const onboardedCount = await UserPreference.count({ where: { onboardingCompleted: true } });
-    const allPreferences = await UserPreference.findAll();
+    const allUsers = await User.findAll({
+      attributes: { exclude: ['password'] },
+      include: [{ model: UserPreference, as: 'preferences' }],
+    });
+
+    // Exclude Admin self-account from candidate metrics
+    const candidateUsers = allUsers.filter(
+      (u) => u.role !== 'admin' && !u.email?.toLowerCase().includes('admin') && u.name !== 'System Admin'
+    );
+
+    const totalCandidates = candidateUsers.length;
+    const onboardedCount = candidateUsers.filter((u) => u.preferences?.onboardingCompleted).length;
+    const allPreferences = candidateUsers.map((u) => u.preferences).filter(Boolean);
 
     const onboardingRate = totalCandidates > 0
       ? Number(((onboardedCount / totalCandidates) * 100).toFixed(1))
@@ -88,7 +98,12 @@ const getCandidates = async (req, res) => {
       ],
     });
 
-    const candidates = users.map((u) => {
+    // Exclude Admin self-account from candidate directory
+    const candidateOnlyUsers = users.filter(
+      (u) => u.role !== 'admin' && !u.email?.toLowerCase().includes('admin') && u.name !== 'System Admin'
+    );
+
+    const candidates = candidateOnlyUsers.map((u) => {
       const pref = u.preferences || {};
       const prog = u.learningProgress || {};
       const completedLessons = Array.isArray(prog.completedLessons) ? prog.completedLessons : [];
@@ -107,6 +122,7 @@ const getCandidates = async (req, res) => {
         id: u.id,
         name: u.name,
         email: u.email,
+        role: u.role,
         targetRole: pref.targetRole || 'Full-Stack Web Developer',
         skillLevel: pref.careerLevel ? pref.careerLevel.split(' ')[0] : 'Intermediate',
         dailyHours: pref.dailyHours || 4,

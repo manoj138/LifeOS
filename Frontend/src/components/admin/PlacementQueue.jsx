@@ -27,7 +27,9 @@ export const PlacementQueue = () => {
     return () => { isMounted = false; };
   }, []);
 
-  const readyCandidates = candidates.filter((c) => (c.readinessScore || 0) >= 80);
+  const readyCandidates = candidates.filter((c) =>
+    c.role !== 'admin' && !c.email?.toLowerCase().includes('admin') && c.name !== 'System Admin' && (c.readinessScore || 0) >= 80
+  );
 
   return (
     <GlassCard className="p-6 space-y-6">
