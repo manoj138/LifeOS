@@ -15,7 +15,7 @@ import { Tabs } from '../components/ui/Tabs';
 import { useVoiceGuider } from '../context/VoiceGuiderContext';
 
 export const InterviewPrep = () => {
-  const { speakText, language, startListening, stopListening, userTranscript, setVoiceMode } = useVoiceGuider();
+  const { speakText, language, startListening, stopListening, userTranscript } = useVoiceGuider();
 
   const [activeTab, setActiveTab] = useState('self-intro');
   const [selectedCategory, setSelectedCategory] = useState('js');
@@ -23,13 +23,6 @@ export const InterviewPrep = () => {
   const [activeQuestionIdx, setActiveQuestionIdx] = useState(0);
   const [teleprompterSpeed, setTeleprompterSpeed] = useState('1x');
   const [aiEvaluation, setAiEvaluation] = useState(null);
-
-  // Clean up voice mode on unmount
-  useEffect(() => {
-    return () => {
-      setVoiceMode('GLOBAL_HANDS_FREE');
-    };
-  }, [setVoiceMode]);
 
   const selfIntroData = {
     name: "Manoj Mansing Chougule",
@@ -167,7 +160,6 @@ My goal is to continuously improve my technical and problem-solving skills and c
   const currentActiveQ = currentQuestions[activeQuestionIdx] || currentQuestions[0];
 
   const handleReadQuestion = () => {
-    setVoiceMode('INTERVIEW_DRILL');
     const textToRead = language === 'mr'
       ? `इंटरव्ह्यू प्रश्न: ${currentActiveQ.q}`
       : `Interview Question: ${currentActiveQ.q}`;
@@ -180,7 +172,6 @@ My goal is to continuously improve my technical and problem-solving skills and c
       setIsRecording(false);
       evaluateAnswer();
     } else {
-      setVoiceMode('INTERVIEW_DRILL');
       setAiEvaluation(null);
       setIsRecording(true);
       startListening();
@@ -208,11 +199,6 @@ My goal is to continuously improve my technical and problem-solving skills and c
     });
 
     speakText(feedbackMsg, language);
-
-    // Release interview drill lock back to global hands-free after feedback
-    setTimeout(() => {
-      setVoiceMode('GLOBAL_HANDS_FREE');
-    }, 4500);
   };
 
   return (
