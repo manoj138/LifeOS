@@ -19,17 +19,23 @@ export const OnboardingAnalyticsChart = () => {
     return () => { isMounted = false; };
   }, []);
 
-  const roleDistribution = analyticsData?.roleDistribution || [
-    { role: 'Full-Stack Web Developer', percentage: 45, count: 578, color: 'bg-purple-500', icon: Code2 },
-    { role: 'DevOps & Cloud Engineer', percentage: 25, count: 321, color: 'bg-cyan-500', icon: Server },
-    { role: 'Frontend Architect', percentage: 18, count: 231, color: 'bg-emerald-500', icon: Layout },
-    { role: 'Backend & Data Engineer', percentage: 12, count: 154, color: 'bg-amber-500', icon: Database },
-  ];
+  const roleDistribution = (analyticsData?.roleDistribution && analyticsData.roleDistribution.length > 0)
+    ? analyticsData.roleDistribution.map((item, idx) => ({
+        ...item,
+        icon: [Code2, Server, Layout, Database][idx % 4],
+        color: ['bg-purple-500', 'bg-cyan-500', 'bg-emerald-500', 'bg-amber-500'][idx % 4],
+      }))
+    : [
+        { role: 'Full-Stack Web Developer', percentage: 0, count: 0, color: 'bg-purple-500', icon: Code2 },
+        { role: 'DevOps & Cloud Engineer', percentage: 0, count: 0, color: 'bg-cyan-500', icon: Server },
+        { role: 'Frontend Architect', percentage: 0, count: 0, color: 'bg-emerald-500', icon: Layout },
+        { role: 'Backend & Data Engineer', percentage: 0, count: 0, color: 'bg-amber-500', icon: Database },
+      ];
 
   const skillLevelBreakdown = [
-    { level: 'Beginner', count: '256 Candidates (20%)', color: 'from-blue-500 to-indigo-600', width: 'w-1/5' },
-    { level: 'Intermediate', count: '745 Candidates (58%)', color: 'from-purple-500 to-pink-600', width: 'w-7/12' },
-    { level: 'Advanced', count: '283 Candidates (22%)', color: 'from-emerald-500 to-teal-600', width: 'w-1/4' },
+    { level: 'Beginner', count: `${analyticsData?.totalCandidates ? Math.round(analyticsData.totalCandidates * 0.2) : 0} Candidates`, color: 'from-blue-500 to-indigo-600', width: 'w-1/5' },
+    { level: 'Intermediate', count: `${analyticsData?.totalCandidates ? Math.round(analyticsData.totalCandidates * 0.6) : 0} Candidates`, color: 'from-purple-500 to-pink-600', width: 'w-7/12' },
+    { level: 'Advanced', count: `${analyticsData?.totalCandidates ? Math.round(analyticsData.totalCandidates * 0.2) : 0} Candidates`, color: 'from-emerald-500 to-teal-600', width: 'w-1/4' },
   ];
 
   const dailyCommitment = [
@@ -38,7 +44,6 @@ export const OnboardingAnalyticsChart = () => {
     { hours: '4 Hours / day', percentage: 45, label: 'Intensive (Popular)' },
     { hours: '6+ Hours / day', percentage: 15, label: 'Bootcamp Pace' },
   ];
-
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -49,7 +54,7 @@ export const OnboardingAnalyticsChart = () => {
             <Target className="w-5 h-5 text-purple-400" />
             <h3 className="text-base font-bold text-white tracking-tight">Target Role Distribution</h3>
           </div>
-          <span className="text-xs text-gray-400">1,284 Total</span>
+          <span className="text-xs text-gray-400">{analyticsData?.totalCandidates ?? 0} Total</span>
         </div>
 
         <div className="space-y-3.5 pt-2">

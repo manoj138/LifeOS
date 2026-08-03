@@ -5,89 +5,9 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { apiService } from '../../services/api';
 
-const DEFAULT_CANDIDATES = [
-  {
-    id: 1,
-    name: 'Manoj Kumar Chougule',
-    email: 'manoj@lifeos.ai',
-    targetRole: 'Full-Stack Web Developer',
-    skillLevel: 'Intermediate',
-    dailyHours: 4,
-    readinessScore: 92,
-    streak: 14,
-    completedTopics: 48,
-    status: 'Placement Ready',
-    aiPersona: 'Motivational Tech Mentor',
-  },
-  {
-    id: 2,
-    name: 'Priya Sharma',
-    email: 'priya.s@devnet.io',
-    targetRole: 'DevOps & Cloud Engineer',
-    skillLevel: 'Advanced',
-    dailyHours: 6,
-    readinessScore: 96,
-    streak: 28,
-    completedTopics: 62,
-    status: 'Placement Ready',
-    aiPersona: 'Analytical System Specialist',
-  },
-  {
-    id: 3,
-    name: 'Rohan Deshmukh',
-    email: 'rohan.d@techstudio.in',
-    targetRole: 'Full-Stack Web Developer',
-    skillLevel: 'Beginner',
-    dailyHours: 2,
-    readinessScore: 68,
-    streak: 7,
-    completedTopics: 18,
-    status: 'In Learning Phase',
-    aiPersona: 'Motivational Tech Mentor',
-  },
-  {
-    id: 4,
-    name: 'Ananya Verma',
-    email: 'ananya.v@codex.org',
-    targetRole: 'Frontend Architect',
-    skillLevel: 'Intermediate',
-    dailyHours: 4,
-    readinessScore: 88,
-    streak: 19,
-    completedTopics: 51,
-    status: 'Placement Ready',
-    aiPersona: 'Tactical Coach',
-  },
-  {
-    id: 5,
-    name: 'Vikramaditya Patil',
-    email: 'vikram.p@cloudlabs.dev',
-    targetRole: 'Backend & Data Engineer',
-    skillLevel: 'Advanced',
-    dailyHours: 4,
-    readinessScore: 91,
-    streak: 22,
-    completedTopics: 55,
-    status: 'Placement Ready',
-    aiPersona: 'Analytical System Specialist',
-  },
-  {
-    id: 6,
-    name: 'Siddharth Jadhav',
-    email: 'siddharth@lifeos.ai',
-    targetRole: 'DevOps & Cloud Engineer',
-    skillLevel: 'Intermediate',
-    dailyHours: 4,
-    readinessScore: 78,
-    streak: 12,
-    completedTopics: 34,
-    status: 'In Learning Phase',
-    aiPersona: 'Tactical Coach',
-  },
-];
-
 export const CandidateTable = () => {
-  const [candidates, setCandidates] = useState(DEFAULT_CANDIDATES);
+  const [candidates, setCandidates] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedRole, setSelectedRole] = useState('All');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -96,9 +16,15 @@ export const CandidateTable = () => {
   useEffect(() => {
     let isMounted = true;
     const fetchCandidates = async () => {
-      const res = await apiService.getAdminMetrics();
-      if (isMounted && res?.success && res.data?.candidates && res.data.candidates.length > 0) {
-        setCandidates(res.data.candidates);
+      setLoading(true);
+      const res = await apiService.getCandidates();
+      if (isMounted) {
+        if (res?.success && Array.isArray(res.data)) {
+          setCandidates(res.data);
+        } else {
+          setCandidates([]);
+        }
+        setLoading(false);
       }
     };
     fetchCandidates();

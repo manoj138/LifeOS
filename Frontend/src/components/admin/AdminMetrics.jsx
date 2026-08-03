@@ -7,35 +7,35 @@ export const AdminMetrics = ({ stats }) => {
   const metricsList = [
     {
       title: 'Total Candidates',
-      value: stats?.totalCandidates || 1284,
+      value: stats?.totalCandidates ?? 0,
       suffix: '',
       icon: Users,
       color: 'purple',
-      subtext: '+48 candidates this week',
+      subtext: 'Active registered accounts',
     },
     {
       title: 'Onboarding Completion',
-      value: stats?.onboardingRate || 94.2,
+      value: stats?.onboardingRate ?? 0,
       suffix: '%',
       icon: UserCheck,
       color: 'cyan',
-      subtext: 'High engagement conversion',
+      subtext: 'Onboarding completion rate',
     },
     {
       title: 'Avg Learning Velocity',
-      value: stats?.avgVelocity || 4.2,
+      value: stats?.avgVelocity ?? 0,
       suffix: ' hrs/day',
       icon: Clock,
       color: 'emerald',
-      subtext: 'Daily target commitment',
+      subtext: 'Target study hours average',
     },
     {
       title: 'Placement Ready Candidates',
-      value: stats?.placementReady || 142,
+      value: stats?.placementReady ?? 0,
       suffix: ' Candidates',
       icon: Award,
       color: 'rose',
-      subtext: 'Score >= 85% readiness',
+      subtext: 'Placement ready users',
     },
   ];
 

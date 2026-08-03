@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Users, BarChart3, Award, Server, RefreshCw, Download, Sparkles } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { Button } from '../components/ui/Button';
@@ -9,9 +9,23 @@ import { CandidateTable } from '../components/admin/CandidateTable';
 import { PlacementQueue } from '../components/admin/PlacementQueue';
 import { AdminCurriculumEditor } from '../components/admin/AdminCurriculumEditor';
 import { LiveTerminal } from '../components/ui/LiveTerminal';
+import { apiService } from '../services/api';
 
 export const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('analytics');
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchStats = async () => {
+      const res = await apiService.getAdminMetrics();
+      if (isMounted && res?.success && res.data) {
+        setStats(res.data);
+      }
+    };
+    fetchStats();
+    return () => { isMounted = false; };
+  }, []);
 
   return (
     <div className="space-y-8 pb-12">
@@ -30,7 +44,7 @@ export const AdminPage = () => {
       />
 
       {/* KPI Top Cards */}
-      <AdminMetrics />
+      <AdminMetrics stats={stats} />
 
       {/* Admin Navigation Tabs */}
       <div className="flex justify-center sm:justify-start border-b border-white/10 pb-4">
