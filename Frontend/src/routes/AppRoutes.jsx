@@ -21,6 +21,7 @@ import { HabitTracker } from '../pages/HabitTracker';
 import { JournalPage } from '../pages/JournalPage';
 import { AnalyticsPage } from '../pages/AnalyticsPage';
 import { SettingsPage } from '../pages/SettingsPage';
+import { AdminPage } from '../pages/AdminPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { LoadingStatePage } from '../pages/LoadingStatePage';
 
@@ -43,6 +44,7 @@ export const AppRoutes = () => {
         <Route path="/app" element={<MainLayout />}>
           <Route index element={<Navigate to="/app/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="admin" element={<AdminPage />} />
           <Route path="planner" element={<DailyPlanner />} />
           <Route path="goals" element={<GoalsPage />} />
           <Route path="learning" element={<LearningHub />} />
@@ -58,6 +60,7 @@ export const AppRoutes = () => {
           <Route path="settings" element={<SettingsPage />} />
           <Route path="loading-preview" element={<LoadingStatePage />} />
         </Route>
+
       </Route>
 
       {/* Legacy route redirects */}

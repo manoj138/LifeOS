@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Calendar, Target, BookOpen, MessageSquareCode,
   Mic, Code2, Server, FolderKanban, Dumbbell, Flame, LineChart,
   Briefcase, BookMarked, Settings, ChevronLeft, ChevronRight,
-  Sparkles, Zap, Bot
+  Sparkles, Zap, Bot, ShieldCheck
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
@@ -17,10 +17,12 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
       title: "Core",
       items: [
         { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
+        { path: '/app/admin', label: 'Admin Console', icon: ShieldCheck, badge: 'Network' },
         { path: '/app/planner', label: 'Daily Planner', icon: Calendar, badge: 'Today' },
         { path: '/app/goals', label: 'Goals', icon: Target, badge: null }
       ]
     },
+
     {
       title: "Skills & Career",
       items: [
