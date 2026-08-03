@@ -20,7 +20,6 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
       '/app/dsa': 'DSA Practice & Visualizer',
       '/app/devops': 'DevOps & Hostinger VPS',
       '/app/projects': 'Project Manager',
-      '/app/jobs': 'Job Application Pipeline',
       '/app/fitness': 'Fitness & Recovery',
       '/app/habits': 'Habit Tracker Matrix',
       '/app/journal': 'AI Reflection Journal',

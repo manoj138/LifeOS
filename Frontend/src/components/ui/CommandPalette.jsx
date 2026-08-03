@@ -22,7 +22,6 @@ export const CommandPalette = ({ isOpen, onClose }) => {
     { id: 'dsa', label: 'DSA Algorithmic Visualizer & Problem Solver', group: 'Skills', icon: <Code2 className="w-4 h-4 text-amber-400" />, path: '/app/dsa' },
     { id: 'devops', label: 'Hostinger VPS & CloudPanel Manager', group: 'Infrastructure', icon: <Server className="w-4 h-4 text-sky-400" />, path: '/app/devops' },
     { id: 'project', label: 'Project Manager & Kanban Sprint Board', group: 'Work', icon: <FolderKanban className="w-4 h-4 text-purple-400" />, path: '/app/projects' },
-    { id: 'job', label: 'Job Tracker & Application Pipeline', group: 'Work', icon: <Briefcase className="w-4 h-4 text-blue-400" />, path: '/app/jobs' },
     { id: 'fitness', label: 'Fitness & Workout Tracker', group: 'Health', icon: <Dumbbell className="w-4 h-4 text-emerald-400" />, path: '/app/fitness' },
     { id: 'habit', label: 'Habit Matrix & Streak Grid', group: 'Health', icon: <Flame className="w-4 h-4 text-orange-400" />, path: '/app/habits' },
     { id: 'analytics', label: 'Analytics & Growth Velocity Insights', group: 'Insights', icon: <LineChart className="w-4 h-4 text-purple-400" />, path: '/app/analytics' },

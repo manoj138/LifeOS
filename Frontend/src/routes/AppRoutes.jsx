@@ -14,7 +14,6 @@ import { EnglishPage } from '../pages/EnglishPage';
 import { DSAPage } from '../pages/DSAPage';
 import { DevOpsPage } from '../pages/DevOpsPage';
 import { ProjectManager } from '../pages/ProjectManager';
-import { JobTracker } from '../pages/JobTracker';
 import { FitnessPage } from '../pages/FitnessPage';
 import { HabitTracker } from '../pages/HabitTracker';
 import { JournalPage } from '../pages/JournalPage';
@@ -46,7 +45,6 @@ export const AppRoutes = () => {
         <Route path="dsa" element={<DSAPage />} />
         <Route path="devops" element={<DevOpsPage />} />
         <Route path="projects" element={<ProjectManager />} />
-        <Route path="jobs" element={<JobTracker />} />
         <Route path="fitness" element={<FitnessPage />} />
         <Route path="habits" element={<HabitTracker />} />
         <Route path="journal" element={<JournalPage />} />
@@ -57,9 +55,11 @@ export const AppRoutes = () => {
 
       {/* Legacy route redirects */}
       <Route path="/customers*" element={<Navigate to="/app/dashboard" replace />} />
+      <Route path="/app/jobs" element={<Navigate to="/app/dashboard" replace />} />
 
       {/* 404 Error Catch-All */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };
+

@@ -34,8 +34,7 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
     {
       title: "Projects & Work",
       items: [
-        { path: '/app/projects', label: 'Project Manager', icon: FolderKanban, badge: null },
-        { path: '/app/jobs', label: 'Job Tracker', icon: Briefcase, badge: '3 active' }
+        { path: '/app/projects', label: 'Project Manager', icon: FolderKanban, badge: null }
       ]
     },
     {
