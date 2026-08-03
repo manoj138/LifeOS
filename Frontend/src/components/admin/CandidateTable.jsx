@@ -87,17 +87,31 @@ const DEFAULT_CANDIDATES = [
 ];
 
 export const CandidateTable = () => {
+  const [candidates, setCandidates] = useState(DEFAULT_CANDIDATES);
   const [search, setSearch] = useState('');
   const [selectedRole, setSelectedRole] = useState('All');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
 
-  const filteredCandidates = MOCK_CANDIDATES.filter((c) => {
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCandidates = async () => {
+      const res = await apiService.getAdminMetrics();
+      if (isMounted && res?.success && res.data?.candidates && res.data.candidates.length > 0) {
+        setCandidates(res.data.candidates);
+      }
+    };
+    fetchCandidates();
+    return () => { isMounted = false; };
+  }, []);
+
+  const filteredCandidates = candidates.filter((c) => {
     const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.email.toLowerCase().includes(search.toLowerCase());
     const matchesRole = selectedRole === 'All' || c.targetRole === selectedRole;
     return matchesSearch && matchesRole;
   });
+
 
   return (
     <GlassCard className="p-6 space-y-6">

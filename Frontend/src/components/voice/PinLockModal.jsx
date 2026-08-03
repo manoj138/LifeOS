@@ -252,7 +252,7 @@ export const PinLockModal = () => {
             </div>
 
             {/* Unlock Action Button */}
-            <div className="space-y-2">
+            <div>
               <button
                 type="button"
                 onClick={handleUnlock}
@@ -261,13 +261,10 @@ export const PinLockModal = () => {
                 <span>{language === 'mr' ? 'अनलॉक करा (Unlock & Play)' : 'Unlock & Play Briefing'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
-
-              <div className="text-[11px] text-gray-500 text-center">
-                Default PIN: <code className="text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded font-mono font-bold">1234</code> (Press Enter or Click Unlock)
-              </div>
             </div>
           </div>
         </motion.div>
+
       </motion.div>
     </AnimatePresence>
   );

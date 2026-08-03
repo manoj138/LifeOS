@@ -13,28 +13,40 @@ export const AuthPage = () => {
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { onboardingCompleted, resetOnboarding, updateUserProfile, clearAllLocalState } = useUser();
+  const { onboardingCompleted, completeOnboarding, resetOnboarding, updateUserProfile, clearAllLocalState } = useUser();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      const userProfileName = name.trim() || email.split('@')[0] || 'Member';
-      updateUserProfile({ name: userProfileName, email: email || 'user@lifeos.ai' });
+      const inputEmail = email.trim().toLowerCase();
+      const isAdminUser = inputEmail === 'admin@lifeos.ai' || inputEmail.startsWith('admin');
 
-      if (activeTab === 'register') {
-        resetOnboarding();
-        navigate('/onboarding');
+      if (isAdminUser) {
+        completeOnboarding({
+          user: { name: 'System Admin', email: 'admin@lifeos.ai', role: 'admin' },
+          preferences: { targetRole: 'System Administrator', careerLevel: 'Admin Console' }
+        });
+        navigate('/app/admin');
       } else {
-        if (!onboardingCompleted) {
+        const userProfileName = name.trim() || email.split('@')[0] || 'Member';
+        updateUserProfile({ name: userProfileName, email: email || 'user@lifeos.ai' });
+
+        if (activeTab === 'register') {
+          resetOnboarding();
           navigate('/onboarding');
         } else {
-          navigate('/app/dashboard');
+          if (!onboardingCompleted) {
+            navigate('/onboarding');
+          } else {
+            navigate('/app/dashboard');
+          }
         }
       }
     }, 600);
   };
+
 
 
 
@@ -147,22 +159,8 @@ export const AuthPage = () => {
           Google
         </Button>
       </div>
-
-      {/* 1-Click Clear State & Test Fresh Registration Helper */}
-      <div className="pt-2 text-center border-t border-white/10">
-        <button
-          type="button"
-          onClick={() => {
-            clearAllLocalState();
-            setActiveTab('register');
-            navigate('/onboarding');
-          }}
-          className="text-xs text-purple-400 hover:text-purple-300 font-semibold underline underline-offset-4 flex items-center justify-center gap-1.5 mx-auto"
-        >
-          <span>⚡ Clear State & Test Fresh Registration (Step 1 Onboarding)</span>
-        </button>
-      </div>
     </div>
   );
 };
+
 
