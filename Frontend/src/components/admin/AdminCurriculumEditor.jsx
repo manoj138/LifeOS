@@ -170,6 +170,38 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
+  const handleRegenerateSingleTopic = async () => {
+    if (!selectedTopicId) return;
+    setIsAiGenerating(true);
+    const res = await apiService.generateSingleTopicWithAI({
+      topicId: selectedTopicId,
+      moduleId: selectedModule,
+      topicTitle: formData.title || selectedTopicId,
+      level: formData.level || 'Beginner',
+      saveToDb: true
+    });
+    setIsAiGenerating(false);
+
+    if (res?.success && res?.data) {
+      setFormData({
+        title: res.data.title || res.data.topicName || '',
+        level: res.data.level || 'Beginner',
+        conceptExplanation: res.data.conceptExplanation || '',
+        codeSnippet: res.data.codeSnippet || '',
+        projectApplication: res.data.projectApplication || '',
+        taskTitle: res.data.taskTitle || '',
+        taskDescription: res.data.taskDescription || '',
+        starterCode: res.data.starterCode || '',
+        solutionCriteria: res.data.solutionCriteria || '',
+      });
+      setIsSaved(true);
+      await fetchTopics();
+      setTimeout(() => setIsSaved(false), 2500);
+    } else {
+      alert('Error regenerating topic content with AI');
+    }
+  };
+
   const handleDeleteTopic = async (id, title) => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
       await apiService.deleteCurriculumTopic(id);
@@ -364,7 +396,6 @@ export const AdminCurriculumEditor = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Existing Topics ({filteredTopics.length})</label>
-              <Badge variant="purple">{selectedModule.toUpperCase()}</Badge>
             </div>
             <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
               {isLoadingTopics ? (
@@ -498,8 +529,20 @@ export const AdminCurriculumEditor = () => {
           <div className="lg:col-span-3 space-y-6 animate-fadeIn">
             <form onSubmit={handleSave} className="space-y-5">
               <GlassCard className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <Badge variant="purple">Topic ID: {selectedTopicId}</Badge>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    {selectedTopicId && (
+                      <button
+                        type="button"
+                        onClick={handleRegenerateSingleTopic}
+                        disabled={isAiGenerating}
+                        className="px-2.5 py-1 text-xs font-semibold text-purple-300 bg-purple-950/60 border border-purple-500/40 hover:border-purple-400 hover:bg-purple-900/60 rounded-lg transition-all flex items-center gap-1.5"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                        <span>{isAiGenerating ? 'Re-generating...' : '⚡ Re-generate AI Content'}</span>
+                      </button>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400">Difficulty Level:</span>
                     <select

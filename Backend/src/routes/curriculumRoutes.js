@@ -7,6 +7,7 @@ const {
   generateSingleTopicWithAI,
   bulkGenerateSequence,
   deleteTopic,
+  repairAllOutdatedTopics,
 } = require('../controllers/curriculumController');
 
 const {
@@ -28,6 +29,7 @@ router.get('/topics/:id', getTopicById);
 router.put('/topics/:id', updateTopic);
 router.post('/topics/generate-ai', generateSingleTopicWithAI);
 router.post('/topics/bulk-generate-sequence', bulkGenerateSequence);
+router.post('/topics/repair-outdated', repairAllOutdatedTopics);
 router.delete('/topics/:id', deleteTopic);
 
 module.exports = router;

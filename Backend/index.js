@@ -122,6 +122,8 @@ const ensureTablesExist = async () => {
 };
 
 // Database Sync & Server Start
+const { repairOutdatedTopics } = require('./src/scripts/repairOutdatedTopics');
+
 const startServer = async () => {
   try {
     await sequelize.authenticate();
@@ -129,6 +131,9 @@ const startServer = async () => {
     await ensureModuleColumns();
     await ensureTopicColumns();
     console.log('✅ SQLite Database Models synced successfully.');
+    
+    // Auto-repair any outdated AI topics in database.sqlite
+    repairOutdatedTopics().catch(err => console.warn('Background repair notice:', err.message));
   } catch (err) {
     console.error('❌ Database sync notice:', err.message);
   }

@@ -6,7 +6,49 @@ const fetch = globalThis.fetch || require('node-fetch');
 function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginner') {
   const titleLower = topicTitle.toLowerCase();
 
+  // 0. Introduction to JavaScript / JS Fundamentals
+  if (titleLower.includes('introduction to javascript') || titleLower.includes('intro to javascript') || titleLower.includes('js basics') || titleLower.includes('what is javascript') || titleLower === 'javascript' || titleLower.includes('javascript intro')) {
+    return {
+      title: topicTitle,
+      level: level,
+      conceptExplanation: `### 📘 Concept Deep-Dive: Introduction to JavaScript\n\n` +
+        `**Core Principles & Mechanics:**\n` +
+        `JavaScript is a lightweight, interpreted (or JIT-compiled) programming language with first-class functions. It is the primary scripting language of the web, responsible for adding dynamic behavior, interactivity, and logic to web pages alongside HTML and CSS.\n\n` +
+        `**Key Concepts to Master:**\n` +
+        `• **Client-Side & Server-Side Execution:** Runs directly in web browsers (V8 engine, SpiderMonkey) and on servers via Node.js.\n` +
+        `• **Dynamic Typing:** Variables can hold values of any data type without explicit type declarations.\n` +
+        `• **Event-Driven Architecture:** Listens to user actions (clicks, keypresses, network responses) and updates the web page dynamically without page reloads.\n\n` +
+        `💡 **Pro Tip:** Focus on fundamental programming logic (variables, functions, conditionals) first before diving into frameworks like React or Vue.`,
+      codeSnippet: `// ===============================================\n` +
+        `// Practical Example: Introduction to JavaScript\n` +
+        `// ===============================================\n\n` +
+        `// 1. Displaying messages\n` +
+        `const welcomeMessage = "Hello World from JavaScript!";\n` +
+        `console.log("Welcome Message:", welcomeMessage);\n\n` +
+        `// 2. Simple interactive greeting logic\n` +
+        `function greetUser(userName) {\n` +
+        `  if (!userName) {\n` +
+        `    return "Hello, Guest!";\n` +
+        `  }\n` +
+        `  return \`Welcome to LifeOS, \${userName}!\`;\n` +
+        `}\n\n` +
+        `// 3. Execution & Verification\n` +
+        `const greeting = greetUser("Manoj");\n` +
+        `console.log("Output:", greeting);`,
+      projectApplication: `JavaScript powers 98% of all websites on the internet. It is used to handle form submit validations, build interactive single-page web applications (React, Vue), and power backend REST APIs (Node.js/Express).`,
+      quizQuestions: [
+        { q: `What role does JavaScript play in modern web development?`, a: `It provides dynamic behavior, user interaction, and application logic to web pages.` },
+        { q: `Where can JavaScript code be executed?`, a: `In web browsers and on backend servers via the Node.js runtime.` }
+      ],
+      taskTitle: `Chapter Challenge: Write Your First JS Greeting Function`,
+      taskDescription: `Implement a function \`solutionTask(name)\` that returns a greeting string \`"Welcome to JavaScript, " + name\` when a valid name string is passed, or \`"Hello Guest"\` if no name is provided.`,
+      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(name) {\n  // TODO: Return "Welcome to JavaScript, " + name or "Hello Guest"\n  if (!name) return "Hello Guest";\n  return "Welcome to JavaScript, " + name;\n}`,
+      solutionCriteria: `Function must return correct formatted greeting string.`
+    };
+  }
+
   // 1. Variables (var, let, const)
+
   if (titleLower.includes('variable') || titleLower.includes('var') || titleLower.includes('let') || titleLower.includes('const')) {
     return {
       title: topicTitle,

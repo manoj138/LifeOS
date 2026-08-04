@@ -43,45 +43,47 @@ export const getFallbackTopicContent = (lesson) => {
     title: lesson.title,
     difficulty: difficulty,
     estimatedTime: "15 mins",
-    summary: `Complete beginner-to-advanced technical guide explaining ${name} in modern ${moduleDomain}.`,
-    analogy: `🏠 Real-World Analogy (मराठीत/In Simple Terms):\nThink of ${name} like a specialized, automated rulebook in everyday life. Just like traffic signals maintain smooth road movement without requiring a traffic police officer at every intersection, ${name} structures execution flow and isolates data in ${moduleDomain}.`,
-    howItWorks: `1. Core Architectural Goal:
-   - ${name} resolves critical operational bottlenecks by providing a standardized, predictable contract for writing maintainable software.
+    summary: `Complete beginner-friendly practical guide explaining ${name} in ${moduleDomain}.`,
+    analogy: `🏠 Real-World Analogy (मराठीत / In Simple Terms):\nThink of ${name} like a tool in your everyday toolbox. Just like a screwdriver is designed for turning screws without damaging the material, ${name} provides clear rules and logic to make your web application interactive, predictable, and easy to understand.`,
+    howItWorks: `1. Purpose & Core Logic:
+   - ${name} allows you to write clean, organized, and reusable code for building modern web applications.
 
-2. Step-by-Step Runtime Execution:
-   - In execution memory, the environment allocates scope boundaries for ${name}.
-   - Requests or state transitions are validated against runtime type checks and execution contexts.
-   - Operations complete cleanly, freeing unused memory references via Garbage Collection.
+2. Step-by-Step Learning Breakdown:
+   - Understand the basic syntax and rules of ${name}.
+   - Practice writing small functions or components to test how inputs turn into outputs.
+   - Use browser console or developer tools to inspect and verify the behavior step by step.
 
-3. Enterprise Production Standard:
-   - High-scale production applications implement ${name} to guarantee high availability, low latency, and zero memory bleeding across user sessions.`,
-    badCode: `// ❌ INCORRECT / UNOPTIMIZED PATTERN:
-// Legacy, unhandled implementation of ${name}
+3. Real-World Web Standard:
+   - Practical web applications (like user dashboards, shopping carts, and login screens) rely on ${name} to deliver smooth user experiences.`,
+    badCode: `// ❌ UNOPTIMIZED PATTERN:
+// Example of writing unorganized code without clean structure
 
-function unoptimized${name.replace(/[^a-zA-Z0-9]/g, '')}() {
-  // 💥 Direct global scope leakage or unhandled exception stream
-  console.log("Unvalidated execution of ${name}");
-  let rawData = "Unsafe input payload";
-  return rawData;
+function basicHandler() {
+  // Hardcoded or unvalidated values
+  let data = "Raw input data";
+  console.log("Processing:", data);
+  return data;
 }`,
-    goodCode: `// ✅ RECOMMENDED PRODUCTION PATTERN:
-// Encapsulated, production-grade pattern for ${name}
+    goodCode: `// ✅ RECOMMENDED CLEAN PATTERN:
+// Clean, structured implementation for ${name}
 
-function optimized${name.replace(/[^a-zA-Z0-9]/g, '')}() {
-  try {
-    const validatedData = "Encapsulated ${name} Data";
-    console.log("✅ Successfully executed ${name} with safety guards");
-    return { success: true, payload: validatedData };
-  } catch (error) {
-    console.error("Error handling ${name}:", error.message);
-    throw error;
+function solutionTask(inputData) {
+  if (!inputData) {
+    return { success: false, message: "Please provide valid input data." };
   }
+
+  console.log("✅ Processing ${name} with valid state:", inputData);
+  return {
+    success: true,
+    topic: "${name}",
+    result: inputData
+  };
 }`,
-    realWorldUse: `Extensively utilized in enterprise MERN full-stack web applications, microservices, and host deployment pipelines to ensure high performance, maintainability, and clean code standards.`,
+    realWorldUse: `Used across modern frontend and backend web applications (like React dashboards, e-commerce stores, and REST APIs) to manage user input, application state, and dynamic UI updates.`,
     keyTakeaways: [
-      `${name} is essential core knowledge for modern MERN Full-Stack Engineers.`,
-      "Enforces clean architecture, preventing unexpected runtime crashes and memory leaks.",
-      "Frequently tested in senior technical interview rounds for Full Stack & DevOps roles."
+      `${name} is a fundamental concept for every web developer to master.`,
+      "Writing clean, predictable code prevents bugs and makes your application easy to maintain.",
+      "Practice building small working examples to strengthen your understanding."
     ],
     quiz: [
       {

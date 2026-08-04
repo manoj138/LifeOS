@@ -60,13 +60,54 @@ const updateTopic = async (req, res) => {
 
 const generateSingleTopicWithAI = async (req, res) => {
   try {
-    const { topicTitle, moduleId = 'js', level = 'Beginner' } = req.body;
-    if (!topicTitle) {
-      return sendError(res, 'topicTitle is required', null, 400);
+    const { topicTitle, topicId, moduleId = 'js', level = 'Beginner', saveToDb = false } = req.body;
+    if (!topicTitle && !topicId) {
+      return sendError(res, 'topicTitle or topicId is required', null, 400);
     }
 
-    const aiContent = await generateTopicContent(topicTitle, moduleId, level);
-    return sendSuccess(res, 'Topic content generated via AI', aiContent);
+    let titleToGenerate = topicTitle;
+    let existingTopic = null;
+
+    if (topicId) {
+      existingTopic = await CurriculumTopic.findByPk(topicId);
+      if (existingTopic) {
+        titleToGenerate = existingTopic.topicName || existingTopic.title;
+      }
+    }
+
+    if (!titleToGenerate) {
+      return sendError(res, 'Could not determine topic title', null, 400);
+    }
+
+    const content = await generateTopicContent(titleToGenerate, moduleId, level);
+
+    if (saveToDb || existingTopic) {
+      const payload = {
+        moduleId: moduleId,
+        title: content.title || titleToGenerate,
+        topicName: titleToGenerate,
+        level: level,
+        conceptExplanation: content.conceptExplanation || '',
+        codeSnippet: content.codeSnippet || '',
+        projectApplication: content.projectApplication || '',
+        quizQuestions: content.quizQuestions || [],
+        taskTitle: content.taskTitle || `Task: ${titleToGenerate}`,
+        taskDescription: content.taskDescription || `Complete the practical coding exercise for ${titleToGenerate}`,
+        starterCode: content.starterCode || `// Write your code for ${titleToGenerate}\n`,
+        solutionCriteria: content.solutionCriteria || `Return valid result object.`,
+      };
+
+      if (existingTopic) {
+        await existingTopic.update(payload);
+        return sendSuccess(res, 'Topic re-generated & updated in database', existingTopic);
+      } else {
+        const newId = `${moduleId}-${Date.now()}`;
+        const newTopic = await CurriculumTopic.create({ id: newId, ...payload });
+        return sendSuccess(res, 'Topic generated & created in database', newTopic);
+      }
+    }
+
+    return sendSuccess(res, 'Topic content generated via AI', content);
   } catch (error) {
     return sendError(res, 'Error generating topic content via AI', error, 500);
   }
@@ -98,8 +139,18 @@ const bulkGenerateSequence = async (req, res) => {
           const topicId = `${moduleId}-${Date.now()}-${globalIdx}`;
           try {
             const content = await generateTopicContent(title, moduleId, level);
-            return await CurriculumTopic.create({
-              id: topicId,
+
+            // Upsert: Check if topic already exists for this module & title
+            let existingTopic = await CurriculumTopic.findOne({
+              where: { moduleId: moduleId, topicName: title }
+            });
+            if (!existingTopic) {
+              existingTopic = await CurriculumTopic.findOne({
+                where: { moduleId: moduleId, title: title }
+              });
+            }
+
+            const payload = {
               moduleId: moduleId,
               title: content.title || title,
               topicName: title,
@@ -112,7 +163,17 @@ const bulkGenerateSequence = async (req, res) => {
               taskDescription: content.taskDescription || `Complete the practical coding exercise for ${title}`,
               starterCode: content.starterCode || `// Write your code for ${title}\n`,
               solutionCriteria: content.solutionCriteria || `Return valid result object.`,
-            });
+            };
+
+            if (existingTopic) {
+              await existingTopic.update(payload);
+              return existingTopic;
+            } else {
+              return await CurriculumTopic.create({
+                id: topicId,
+                ...payload
+              });
+            }
           } catch (err) {
             console.error(`Error generating topic ${title}:`, err);
             return null;
@@ -143,6 +204,16 @@ const deleteTopic = async (req, res) => {
   }
 };
 
+const repairAllOutdatedTopics = async (req, res) => {
+  try {
+    const { repairOutdatedTopics } = require('../scripts/repairOutdatedTopics');
+    const count = await repairOutdatedTopics();
+    return sendSuccess(res, `Successfully scanned and repaired ${count} outdated topics`, { count });
+  } catch (error) {
+    return sendError(res, 'Error repairing outdated topics', error, 500);
+  }
+};
+
 module.exports = {
   getAllTopics,
   getTopicById,
@@ -150,4 +221,5 @@ module.exports = {
   generateSingleTopicWithAI,
   bulkGenerateSequence,
   deleteTopic,
+  repairAllOutdatedTopics,
 };

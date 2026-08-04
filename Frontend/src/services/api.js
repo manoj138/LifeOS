@@ -230,6 +230,18 @@ export const apiService = {
     }
   },
 
+  async repairOutdatedTopics() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/curriculum/topics/repair-outdated`, {
+        method: 'POST',
+        headers: getAuthHeader(),
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
   async deleteCurriculumTopic(id) {
     try {
       const res = await fetch(`${API_BASE_URL}/curriculum/topics/${id}`, {
