@@ -25,9 +25,18 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
   // 100% Isolated Navigation Sections for System Administrators
   const ADMIN_NAV_SECTIONS = [
     {
-      title: "Admin Controls",
+      title: "Admin Console",
       items: [
-        { path: '/app/admin', label: 'Admin Console', icon: ShieldCheck, badge: 'Live Network' },
+        { path: '/app/admin?tab=analytics', label: 'Onboarding Analytics', icon: LineChart, badge: 'Live' },
+        { path: '/app/admin?tab=candidates', label: 'Candidate Directory', icon: Users, badge: null },
+        { path: '/app/admin?tab=placements', label: 'Placement Queue', icon: Award, badge: null },
+        { path: '/app/admin?tab=curriculum', label: 'Curriculum Editor', icon: BookOpen, badge: 'AI' },
+        { path: '/app/admin?tab=vps', label: 'VPS System Health', icon: Server, badge: null },
+      ]
+    },
+    {
+      title: "System Control",
+      items: [
         { path: '/app/settings', label: 'System Settings', icon: Settings, badge: null }
       ]
     }
@@ -98,8 +107,8 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
                 <span className="font-bold text-white text-base tracking-tight leading-none group-hover:text-cyan-300 transition-colors">
                   LifeOS <span className="text-cyan-400 text-xs">AI</span>
                 </span>
-                <span className="text-[10px] text-gray-400 font-medium tracking-wider uppercase mt-1">
-                  {isAdmin ? 'System Admin' : 'Personal Coach'}
+                <span className="text-[10px] text-gray-400 font-medium">
+                  {isAdmin ? 'System Administrator' : 'Personal Growth Engine'}
                 </span>
               </motion.div>
             )}
@@ -107,16 +116,16 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
 
           <button
             onClick={onToggle}
-            className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+            className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white transition-colors"
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         </div>
 
         {/* Navigation Sections */}
-        <div className="px-3 py-4 space-y-6 overflow-y-auto max-h-[calc(100vh-140px)] scrollbar-thin scrollbar-thumb-white/10">
+        <div className="p-3 space-y-6 overflow-y-auto max-h-[calc(100vh-140px)] custom-scrollbar">
           {navSections.map((section, idx) => (
-            <div key={idx} className="space-y-1.5">
+            <div key={idx} className="space-y-2">
               {!isCollapsed && (
                 <div className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                   {section.title}
@@ -126,22 +135,24 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
               <div className="space-y-1">
                 {section.items.map((item) => {
                   const Icon = item.icon;
-                  const isActive = location.pathname === item.path;
+                  const currentFullPath = location.pathname + location.search;
+                  const isSelected = currentFullPath === item.path ||
+                    (location.pathname === '/app/admin' && !location.search && item.path === '/app/admin?tab=analytics');
 
                   return (
                     <NavLink
                       key={item.path}
                       to={item.path}
-                      className={({ isActive }) =>
+                      className={() =>
                         cn(
                           "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 group relative",
-                          isActive
+                          isSelected
                             ? "bg-gradient-to-r from-purple-600/30 to-cyan-500/20 text-white border border-purple-500/30 shadow-md shadow-purple-500/10"
                             : "text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent"
                         )
                       }
                     >
-                      <Icon className={cn("w-4 h-4 shrink-0 transition-transform group-hover:scale-110", isActive ? "text-cyan-400" : "text-gray-400 group-hover:text-gray-200")} />
+                      <Icon className={cn("w-4 h-4 shrink-0 transition-transform group-hover:scale-110", isSelected ? "text-cyan-400" : "text-gray-400 group-hover:text-gray-200")} />
 
                       {!isCollapsed && (
                         <div className="flex items-center justify-between flex-1 truncate">
@@ -149,7 +160,7 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
                           {item.badge && (
                             <span className={cn(
                               "text-[9px] px-1.5 py-0.5 rounded-full font-bold tracking-wide",
-                              isActive
+                              isSelected
                                 ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
                                 : "bg-white/5 text-gray-400 group-hover:bg-white/10"
                             )}>
@@ -160,7 +171,7 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
                       )}
 
                       {/* Active Indicator Glow */}
-                      {isActive && (
+                      {isSelected && (
                         <motion.div
                           layoutId="activeGlow"
                           className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-r-full"
