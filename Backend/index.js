@@ -55,6 +55,25 @@ const ensureTopicColumns = async () => {
   }
 };
 
+const ensureModuleColumns = async () => {
+  const cols = [
+    { name: 'title', def: 'TEXT' },
+    { name: 'iconName', def: "TEXT DEFAULT 'Code2'" },
+    { name: '"order"', def: 'INTEGER DEFAULT 1' },
+    { name: 'description', def: 'TEXT' },
+    { name: 'createdAt', def: 'DATETIME' },
+    { name: 'updatedAt', def: 'DATETIME' }
+  ];
+  for (const col of cols) {
+    try {
+      await sequelize.query(`ALTER TABLE RoadmapModules ADD COLUMN ${col.name} ${col.def};`);
+      console.log(`✅ Added missing column ${col.name} to RoadmapModules table.`);
+    } catch (err) {
+      // Ignore if column already exists
+    }
+  }
+};
+
 // Helper: Ensure missing SQLite tables exist reliably
 const ensureTablesExist = async () => {
   for (let attempt = 1; attempt <= 5; attempt++) {
@@ -107,6 +126,7 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     await ensureTablesExist();
+    await ensureModuleColumns();
     await ensureTopicColumns();
     console.log('✅ SQLite Database Models synced successfully.');
   } catch (err) {
