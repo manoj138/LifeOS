@@ -140,10 +140,34 @@ export const AdminCurriculumEditor = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    setIsSaved(true);
-    await apiService.updateCurriculumTopic(selectedTopicId, formData);
-    await fetchTopics();
-    setTimeout(() => setIsSaved(false), 2500);
+    if (!selectedTopicId) {
+      if (!formData.title.trim()) {
+        alert('Please enter a topic title before saving.');
+        return;
+      }
+      const res = await apiService.generateSingleTopicWithAI({
+        moduleId: selectedModule,
+        topicName: formData.title.trim(),
+        level: formData.level || 'Beginner',
+      });
+      if (res?.success) {
+        setIsSaved(true);
+        await fetchTopics();
+        setTimeout(() => setIsSaved(false), 2500);
+      } else {
+        alert(res?.message || 'Error saving new topic');
+      }
+      return;
+    }
+
+    const res = await apiService.updateCurriculumTopic(selectedTopicId, formData);
+    if (res?.success) {
+      setIsSaved(true);
+      await fetchTopics();
+      setTimeout(() => setIsSaved(false), 2500);
+    } else {
+      alert(res?.message || 'Error updating topic');
+    }
   };
 
   const handleDeleteTopic = async (id, title) => {
