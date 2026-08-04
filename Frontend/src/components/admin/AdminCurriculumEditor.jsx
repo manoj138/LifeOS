@@ -6,22 +6,30 @@ import { Badge } from '../ui/Badge';
 import { Input } from '../ui/Input';
 import { apiService } from '../../services/api';
 
-const MODULES = [
-  { id: 'js', label: '1. JavaScript (ES6+)', icon: Code2 },
-  { id: 'react', label: '2. React.js', icon: Layers },
-  { id: 'node', label: '3. Node.js', icon: Terminal },
-  { id: 'devops', label: '4. DevOps & Cloud VPS', icon: Server },
-  { id: 'dsa', label: '5. DSA Master Studio', icon: Binary },
-];
+const ICON_MAP = {
+  Code2,
+  Layers,
+  Terminal,
+  Server,
+  Binary,
+  BookOpen,
+  Sparkles,
+};
 
 export const AdminCurriculumEditor = () => {
   const [editorMode, setEditorMode] = useState('bulk_ai'); // 'editor' | 'bulk_ai'
   const [selectedModule, setSelectedModule] = useState('js');
+  const [modulesList, setModulesList] = useState([]);
   const [topics, setTopics] = useState([]);
   const [selectedTopicId, setSelectedTopicId] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [isLoadingTopics, setIsLoadingTopics] = useState(false);
+
+  // Add Module Modal State
+  const [isAddingModule, setIsAddingModule] = useState(false);
+  const [newModuleTitle, setNewModuleTitle] = useState('');
+  const [newModuleId, setNewModuleId] = useState('');
 
   // Bulk Generator State
   const [bulkInput, setBulkInput] = useState(
@@ -30,6 +38,47 @@ export const AdminCurriculumEditor = () => {
   const [targetLevel, setTargetLevel] = useState('Beginner');
   const [bulkStatusMessage, setBulkStatusMessage] = useState('');
   const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0, percent: 0 });
+
+  const fetchModules = async () => {
+    const res = await apiService.getRoadmapModules();
+    if (res?.success && Array.isArray(res.data)) {
+      setModulesList(res.data);
+      if (res.data.length > 0 && !res.data.find(m => m.id === selectedModule)) {
+        setSelectedModule(res.data[0].id);
+      }
+    } else {
+      setModulesList([]);
+    }
+  };
+
+  const handleCreateModule = async (e) => {
+    e.preventDefault();
+    if (!newModuleTitle.trim()) return;
+    const res = await apiService.createRoadmapModule({
+      id: newModuleId.trim() || undefined,
+      title: newModuleTitle.trim(),
+      order: modulesList.length + 1,
+    });
+    if (res?.success) {
+      setNewModuleTitle('');
+      setNewModuleId('');
+      setIsAddingModule(false);
+      await fetchModules();
+      if (res.data?.id) setSelectedModule(res.data.id);
+    }
+  };
+
+  const handleDeleteModule = async (id, title) => {
+    if (window.confirm(`Are you sure you want to delete module "${title}" and all its topics?`)) {
+      await apiService.deleteRoadmapModule(id);
+      await fetchModules();
+      if (selectedModule === id) setSelectedModule('js');
+    }
+  };
+
+  useEffect(() => {
+    fetchModules();
+  }, []);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -200,25 +249,83 @@ export const AdminCurriculumEditor = () => {
         {/* Module Selector & Topic List Sidebar */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Roadmap Module</label>
-            <div className="space-y-1">
-              {MODULES.map((m) => {
-                const Icon = m.icon;
-                const isSelected = selectedModule === m.id;
-                return (
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Roadmap Module</label>
+              <button
+                type="button"
+                onClick={() => setIsAddingModule(!isAddingModule)}
+                className="text-xs text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-1 transition-all"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>Add Module</span>
+              </button>
+            </div>
+
+            {/* Add New Module Form Modal/Inline */}
+            {isAddingModule && (
+              <form onSubmit={handleCreateModule} className="p-3 rounded-xl bg-purple-950/40 border border-purple-500/40 space-y-2 animate-fadeIn">
+                <h5 className="text-xs font-bold text-purple-300">New Roadmap Module</h5>
+                <input
+                  type="text"
+                  placeholder="Module Title (e.g. 6. Python & AI)"
+                  value={newModuleTitle}
+                  onChange={(e) => setNewModuleTitle(e.target.value)}
+                  className="w-full bg-slate-900 border border-white/15 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-purple-400"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Module ID (optional, e.g. python)"
+                  value={newModuleId}
+                  onChange={(e) => setNewModuleId(e.target.value)}
+                  className="w-full bg-slate-950 border border-white/10 rounded-lg p-2 text-xs text-gray-300 focus:outline-none focus:border-purple-400"
+                />
+                <div className="flex items-center justify-end gap-2 pt-1">
                   <button
-                    key={m.id}
                     type="button"
-                    onClick={() => setSelectedModule(m.id)}
-                    className={`w-full p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all ${
-                      isSelected
-                        ? 'bg-purple-900/40 border-purple-500 text-white shadow-md'
-                        : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
-                    }`}
+                    onClick={() => setIsAddingModule(false)}
+                    className="text-xs text-gray-400 hover:text-white px-2 py-1"
                   >
-                    <Icon className="w-4 h-4 text-purple-400" />
-                    <span>{m.label}</span>
+                    Cancel
                   </button>
+                  <Button type="submit" variant="glow" size="sm" className="px-3 py-1 text-xs">
+                    Save Module
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            <div className="space-y-1">
+              {modulesList.map((m) => {
+                const IconComponent = ICON_MAP[m.iconName] || Code2;
+                const isSelected = selectedModule === m.id;
+                const isDefault = ['js', 'react', 'node', 'devops', 'dsa'].includes(m.id);
+
+                return (
+                  <div key={m.id} className="flex items-center gap-1 group">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedModule(m.id)}
+                      className={`w-full p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-between transition-all ${
+                        isSelected
+                          ? 'bg-purple-900/40 border-purple-500 text-white shadow-md'
+                          : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate pr-1">
+                        <IconComponent className="w-4 h-4 text-purple-400 shrink-0" />
+                        <span className="truncate">{m.title}</span>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteModule(m.id, m.title)}
+                      className="p-2 rounded-xl text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                      title="Delete module"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 );
               })}
             </div>

@@ -16,10 +16,8 @@ require('./src/modals/FitnessLog');
 require('./src/modals/HabitLog');
 require('./src/modals/JournalEntry');
 require('./src/modals/CurriculumTopic');
+require('./src/modals/RoadmapModule');
 require('./src/modals/JobApplication');
-
-
-
 
 const app = express();
 const port = process.env.PORT || 1235;
@@ -44,15 +42,37 @@ app.get('/', (req, res) => {
   });
 });
 
-// Seeders
-const { seedCurriculumTopics } = require('./src/seeders/curriculumSeeder');
+// Helper: Safely add missing columns to SQLite table without altering entire database
+const ensureTopicColumns = async () => {
+  try {
+    const [columns] = await sequelize.query("PRAGMA table_info('CurriculumTopics');");
+    if (!columns || columns.length === 0) return;
+    const colNames = columns.map(c => c.name);
+
+    const missingCols = [
+      { name: 'taskTitle', type: 'TEXT' },
+      { name: 'taskDescription', type: 'TEXT' },
+      { name: 'starterCode', type: 'TEXT' },
+      { name: 'solutionCriteria', type: 'TEXT' },
+    ];
+
+    for (const col of missingCols) {
+      if (!colNames.includes(col.name)) {
+        await sequelize.query(`ALTER TABLE CurriculumTopics ADD COLUMN ${col.name} ${col.type};`);
+        console.log(`✅ Added missing column ${col.name} to CurriculumTopics table.`);
+      }
+    }
+  } catch (err) {
+    // Ignore migration error if table is brand new
+  }
+};
 
 // Database Sync & Server Start
 const startServer = async () => {
   try {
     await sequelize.sync();
+    await ensureTopicColumns();
     console.log('✅ SQLite Database Models synced successfully.');
-    await seedCurriculumTopics();
   } catch (err) {
     console.error('❌ Database sync notice:', err.message);
   }

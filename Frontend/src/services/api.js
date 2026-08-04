@@ -242,6 +242,41 @@ export const apiService = {
     }
   },
 
+  // Roadmap Modules
+  async getRoadmapModules() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/curriculum/modules`, { headers: getAuthHeader() });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createRoadmapModule(data) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/curriculum/modules`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteRoadmapModule(id) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/curriculum/modules/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeader(),
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
   // Job Applications
   async getJobApplications() {
     try {
