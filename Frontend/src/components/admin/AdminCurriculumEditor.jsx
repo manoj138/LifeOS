@@ -296,38 +296,44 @@ export const AdminCurriculumEditor = () => {
             )}
 
             <div className="space-y-1">
-              {modulesList.map((m) => {
-                const IconComponent = ICON_MAP[m.iconName] || Code2;
-                const isSelected = selectedModule === m.id;
-                const isDefault = ['js', 'react', 'node', 'devops', 'dsa'].includes(m.id);
+              {modulesList.length === 0 ? (
+                <div className="p-3.5 rounded-xl border border-dashed border-purple-500/30 bg-purple-950/20 text-xs text-purple-300 text-center space-y-1">
+                  <p className="font-semibold">No Roadmap Modules created yet.</p>
+                  <p className="text-[10px] text-gray-400">Click <strong className="text-purple-300">+ Add Module</strong> above to start!</p>
+                </div>
+              ) : (
+                modulesList.map((m) => {
+                  const IconComponent = ICON_MAP[m.iconName] || Code2;
+                  const isSelected = selectedModule === m.id;
 
-                return (
-                  <div key={m.id} className="flex items-center gap-1 group">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedModule(m.id)}
-                      className={`w-full p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-between transition-all ${
-                        isSelected
-                          ? 'bg-purple-900/40 border-purple-500 text-white shadow-md'
-                          : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 truncate pr-1">
-                        <IconComponent className="w-4 h-4 text-purple-400 shrink-0" />
-                        <span className="truncate">{m.title}</span>
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteModule(m.id, m.title)}
-                      className="p-2 rounded-xl text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                      title="Delete module"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                );
-              })}
+                  return (
+                    <div key={m.id} className="flex items-center gap-1 group">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedModule(m.id)}
+                        className={`w-full p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-between transition-all ${
+                          isSelected
+                            ? 'bg-purple-900/40 border-purple-500 text-white shadow-md'
+                            : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 truncate pr-1">
+                          <IconComponent className="w-4 h-4 text-purple-400 shrink-0" />
+                          <span className="truncate">{m.title}</span>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteModule(m.id, m.title)}
+                        className="p-2 rounded-xl text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                        title="Delete module"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 
