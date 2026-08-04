@@ -12,13 +12,17 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
       title: topicTitle,
       level: level,
       conceptExplanation: `### 📘 Concept Deep-Dive: Introduction to JavaScript\n\n` +
-        `**Core Principles & Mechanics:**\n` +
+        `**1. 🎯 Overview & Fundamental Purpose:**\n` +
         `JavaScript is a lightweight, interpreted (or JIT-compiled) programming language with first-class functions. It is the primary scripting language of the web, responsible for adding dynamic behavior, interactivity, and logic to web pages alongside HTML and CSS.\n\n` +
-        `**Key Concepts to Master:**\n` +
-        `• **Client-Side & Server-Side Execution:** Runs directly in web browsers (V8 engine, SpiderMonkey) and on servers via Node.js.\n` +
-        `• **Dynamic Typing:** Variables can hold values of any data type without explicit type declarations.\n` +
-        `• **Event-Driven Architecture:** Listens to user actions (clicks, keypresses, network responses) and updates the web page dynamically without page reloads.\n\n` +
-        `💡 **Pro Tip:** Focus on fundamental programming logic (variables, functions, conditionals) first before diving into frameworks like React or Vue.`,
+        `**2. ⚙️ Step-by-Step Execution Mechanics:**\n` +
+        `• **Step 1: Parsing & Compilation:** The JavaScript engine (e.g. V8) parses source code into an Abstract Syntax Tree (AST) and compiles it to bytecode.\n` +
+        `• **Step 2: Execution Context Creation:** Global memory space is allocated for variables and functions before code executes.\n` +
+        `• **Step 3: Event Loop Dispatch:** Asynchronous tasks (timers, fetch calls, click listeners) are queued and executed on the single-threaded call stack.\n\n` +
+        `**3. 📐 Core Mechanics to Master:**\n` +
+        `• **Client & Server Execution:** Runs in browsers and backend runtimes (Node.js).\n` +
+        `• **Dynamic Typing:** Variables hold values of any data type without strict declarations.\n` +
+        `• **Event-Driven Architecture:** Listens to user interactions and updates UI seamlessly.\n\n` +
+        `💡 **Pro Tip:** Master pure JavaScript concepts (variables, arrays, functions, promises) before learning UI frameworks like React.`,
       codeSnippet: `// ===============================================\n` +
         `// Practical Example: Introduction to JavaScript\n` +
         `// ===============================================\n\n` +
@@ -35,7 +39,7 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
         `// 3. Execution & Verification\n` +
         `const greeting = greetUser("Manoj");\n` +
         `console.log("Output:", greeting);`,
-      projectApplication: `JavaScript powers 98% of all websites on the internet. It is used to handle form submit validations, build interactive single-page web applications (React, Vue), and power backend REST APIs (Node.js/Express).`,
+      projectApplication: `JavaScript powers 98% of all websites on the internet. It handles form validations, powers interactive web applications (React, Vue), and builds backend REST APIs (Node.js/Express).`,
       quizQuestions: [
         { q: `What role does JavaScript play in modern web development?`, a: `It provides dynamic behavior, user interaction, and application logic to web pages.` },
         { q: `Where can JavaScript code be executed?`, a: `In web browsers and on backend servers via the Node.js runtime.` }
@@ -48,19 +52,22 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
   }
 
   // 1. Variables (var, let, const)
-
   if (titleLower.includes('variable') || titleLower.includes('var') || titleLower.includes('let') || titleLower.includes('const')) {
     return {
       title: topicTitle,
       level: level,
       conceptExplanation: `### 📘 Concept Deep-Dive: ${topicTitle}\n\n` +
-        `**Core Principles & Mechanics:**\n` +
-        `In programming, a variable is a named container used to store data values in memory. In modern JavaScript, we declare variables using three keywords: \`var\`, \`let\`, and \`const\`.\n\n` +
-        `**Key Differences & Rules:**\n` +
-        `• **\`const\` (Constant):** Declares a block-scoped variable that **cannot be re-assigned**. Use this by default for values that shouldn't change (e.g., configurations, element references, API endpoints).\n` +
-        `• **\`let\` (Re-assignable):** Declares a block-scoped variable that **can be updated/re-assigned** later. Perfect for counters, loop indices, or state that changes.\n` +
-        `• **\`var\` (Legacy Function-scoped):** The older JavaScript variable keyword. It is function-scoped (or globally scoped) and suffers from hoisting issues. Avoid using \`var\` in modern code.\n\n` +
-        `💡 **Pro Tip:** Always default to \`const\`. If you know the variable value needs to change later, use \`let\`. Avoid using \`var\` in modern applications.`,
+        `**1. 🎯 Overview & Fundamental Purpose:**\n` +
+        `In programming, a variable is a named container in memory used to hold data values. Modern JavaScript uses three declaration keywords: \`const\`, \`let\`, and \`var\`.\n\n` +
+        `**2. ⚙️ Step-by-Step Scoping Mechanics:**\n` +
+        `• **Step 1: Allocation & Hoisting:** \`const\` and \`let\` are hoisted into the Temporal Dead Zone (TDZ) and cannot be accessed before declaration. \`var\` is initialized as \`undefined\`.\n` +
+        `• **Step 2: Assignment:** \`const\` requires initialization upon declaration and prevents re-assignment. \`let\` allows re-assignment over time.\n` +
+        `• **Step 3: Block Scope Lifetime:** \`const\` and \`let\` exist only inside the nearest curly braces \`{}\`. \`var\` ignores block scope and leaks to function/global scope.\n\n` +
+        `**3. 📐 Usage Rules:**\n` +
+        `• **\`const\` (Default):** Use for configurations, imports, DOM elements, and fixed references.\n` +
+        `• **\`let\` (State):** Use for counters, loop indices, and values that mutate.\n` +
+        `• **\`var\` (Legacy):** Avoid using \`var\` in modern codebase to prevent scope leakage.\n\n` +
+        `💡 **Pro Tip:** Always default to \`const\`. Only change to \`let\` when you know the variable value needs to be re-assigned.`,
       codeSnippet: `// ===============================================\n` +
         `// Practical Example: Variables (var, let, const)\n` +
         `// ===============================================\n\n` +
@@ -79,7 +86,7 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
         `  const insideBlock = "Scoped to IF block only";\n` +
         `  console.log(insideBlock);\n` +
         `}`,
-      projectApplication: `In real-world web applications (like user authentication or e-commerce carts), 'const' is used for user ID, database handles, and API URLs, while 'let' is used for shopping cart counters, form input values, and pagination state.`,
+      projectApplication: `In real-world applications (like e-commerce carts), 'const' is used for user IDs, database connection strings, and API URLs, while 'let' is used for cart totals, input values, and pagination state.`,
       quizQuestions: [
         { q: `What is the primary difference between 'let' and 'const'?`, a: `'const' cannot be re-assigned after initialization, whereas 'let' allows re-assignment.` },
         { q: `Why should you avoid using 'var' in modern JavaScript?`, a: `'var' is function-scoped instead of block-scoped and is subject to hoisting bugs.` }
@@ -91,19 +98,131 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
     };
   }
 
-  // 2. Functions / Arrow Functions
+  // 2. Conditional Statements (if, else, switch)
+  if (titleLower.includes('conditional') || titleLower.includes('if') || titleLower.includes('switch') || titleLower.includes('condition')) {
+    return {
+      title: topicTitle,
+      level: level,
+      conceptExplanation: `### 📘 Concept Deep-Dive: Conditional Statements (if, else, switch)\n\n` +
+        `**1. 🎯 Overview & Fundamental Purpose:**\n` +
+        `Conditional statements enable software programs to make dynamic decisions based on data evaluated at runtime. They direct the flow of execution by evaluating expressions into boolean values (\`true\` or \`false\`).\n\n` +
+        `**2. ⚙️ Step-by-Step Execution Mechanics:**\n` +
+        `• **Step 1: Expression Evaluation:** The engine evaluates the condition inside \`if (condition)\` into a boolean. Truthy values execute the block; falsy values (\`false\`, \`0\`, \`""\`, \`null\`, \`undefined\`, \`NaN\`) bypass it.\n` +
+        `• **Step 2: Sequential Branch Selection (\`if...else if...else\`):** The JavaScript engine evaluates conditions sequentially top-to-bottom. As soon as it encounters a \`true\` condition, it executes that specific block and skips all remaining branches.\n` +
+        `• **Step 3: Multi-Value Direct Equality (\`switch\`):** When comparing a single variable against fixed target values, \`switch(val)\` performs strict equality (\`===\`) matching against each \`case\`. Use \`break\` to prevent falling through to subsequent cases.\n\n` +
+        `**3. 📐 Syntax Patterns & Rules:**\n` +
+        `• **Ternary Operator (\`condition ? a : b\`):** Ideal for concise inline assignment.\n` +
+        `• **Guard Clauses:** Return early at the top of functions for invalid inputs to eliminate deeply nested code blocks.\n` +
+        `• **Strict Equality (\`===\`):** Always use \`===\` instead of \`==\` to prevent unexpected implicit type conversion.\n\n` +
+        `**4. ⚠️ Common Pitfalls to Avoid:**\n` +
+        `• Forgetting the \`break\` statement in \`switch\` blocks, causing unexpected cascading code execution.\n` +
+        `• Accidentally writing assignment (\`if (x = 5)\`) instead of comparison (\`if (x === 5)\`).\n` +
+        `• Creating deep nested \`if\` blocks ("arrow anti-pattern") that hurt code readability.\n\n` +
+        `💡 **Real-World Pro Tip:** Use guard clauses to exit early on error conditions, keeping your main function logic flat and clean!`,
+      codeSnippet: `// ===============================================\n` +
+        `// Practical Example: Conditional Statements (if, else, switch)\n` +
+        `// ===============================================\n\n` +
+        `// 1. Guard Clause Pattern & if/else logic\n` +
+        `function checkUserAccess(user) {\n` +
+        `  if (!user) {\n` +
+        `    return "Access Denied: No user record found.";\n` +
+        `  }\n\n` +
+        `  if (user.role === "admin") {\n` +
+        `    return "Full Admin Portal Granted";\n` +
+        `  } else if (user.role === "editor") {\n` +
+        `    return "Editor Dashboard Granted";\n` +
+        `  } else {\n` +
+        `    return "Standard Student Access";\n` +
+        `  }\n` +
+        `}\n\n` +
+        `// 2. Switch Statement Pattern for Status Codes\n` +
+        `function getOrderStatusLabel(statusCode) {\n` +
+        `  switch (statusCode) {\n` +
+        `    case "PENDING":\n` +
+        `      return "Order is awaiting processing.";\n` +
+        `    case "SHIPPED":\n` +
+        `      return "Package is out for delivery!";\n` +
+        `    case "DELIVERED":\n` +
+        `      return "Order has arrived safely.";\n` +
+        `    default:\n` +
+        `      return "Unknown order status.";\n` +
+        `  }\n` +
+        `}\n\n` +
+        `// Execution & Verification\n` +
+        `console.log(checkUserAccess({ role: "admin" }));\n` +
+        `console.log(getOrderStatusLabel("SHIPPED"));`,
+      projectApplication: `Conditional statements power user authentication checks, UI theme toggles, form validation warnings, and authorization routing in web applications.`,
+      quizQuestions: [
+        { q: `What happens in a 'switch' statement if you omit the 'break' keyword at the end of a matching case?`, a: `Execution continues into the next case block regardless of whether its condition matches (known as fall-through behavior).` },
+        { q: `Why are Guard Clauses preferred over deep nested 'if' statements?`, a: `Guard clauses handle early returns at the start of a function, keeping the main happy-path code clean and readable.` }
+      ],
+      taskTitle: `Chapter Challenge: User Authorization Decision Matrix`,
+      taskDescription: `Write a function \`solutionTask(user)\` that evaluates a user object. If \`user.isBanned\` is true, return \`"Banned"\`. Else if \`user.age\` is under 18, return \`"Minor"\`. Otherwise, return \`"Authorized"\`.`,
+      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(user) {\n  // TODO: Use conditionals to evaluate user status\n  if (!user) return "Invalid User";\n  if (user.isBanned) return "Banned";\n  if (user.age < 18) return "Minor";\n  return "Authorized";\n}`,
+      solutionCriteria: `Function must return 'Banned' if isBanned is true, 'Minor' if age < 18, and 'Authorized' otherwise.`
+    };
+  }
+
+  // 3. Loops (for, while, forEach)
+  if (titleLower.includes('loop') || titleLower.includes('for') || titleLower.includes('while') || titleLower.includes('iteration')) {
+    return {
+      title: topicTitle,
+      level: level,
+      conceptExplanation: `### 📘 Concept Deep-Dive: Loops & Iteration (${topicTitle})\n\n` +
+        `**1. 🎯 Overview & Fundamental Purpose:**\n` +
+        `Loops repeat a block of code multiple times until a specified termination condition evaluates to \`false\`. They automate repetitive operations over datasets without repeating code.\n\n` +
+        `**2. ⚙️ Step-by-Step Loop Mechanics:**\n` +
+        `• **Step 1: Initialization:** The counter or iterator variable is declared (e.g. \`let i = 0\`).\n` +
+        `• **Step 2: Condition Check:** Before each iteration, the engine verifies if the expression (\`i < length\`) is \`true\`. If \`false\`, the loop breaks immediately.\n` +
+        `• **Step 3: Body Execution & Increment:** The loop body runs, followed by updating the iterator (\`i++\`). Control returns to Step 2.\n\n` +
+        `**3. 📐 Loop Types & Best Practices:**\n` +
+        `• **Standard \`for\` Loop:** Best when exact iteration count or index control is required.\n` +
+        `• **\`for...of\` Loop:** Ideal for iterating over iterable items (Arrays, Strings, Maps) directly.\n` +
+        `• **\`while\` Loop:** Used when the number of iterations depends on dynamic conditions (e.g. queue processing).\n\n` +
+        `💡 **Pro Tip:** Always verify loop exit conditions to avoid accidental infinite loops that freeze browser threads!`,
+      codeSnippet: `// ===============================================\n` +
+        `// Practical Example: Loops & Iteration\n` +
+        `// ===============================================\n\n` +
+        `const userScores = [85, 92, 78, 90, 88];\n` +
+        `let totalScore = 0;\n\n` +
+        `// 1. Using for...of for clean array iteration\n` +
+        `for (const score of userScores) {\n` +
+        `  totalScore += score;\n` +
+        `}\n` +
+        `const average = totalScore / userScores.length;\n` +
+        `console.log("Average Score:", average);\n\n` +
+        `// 2. Standard for loop with index control\n` +
+        `for (let i = 0; i < userScores.length; i++) {\n` +
+        `  console.log(\`Student #\${i + 1} Score: \${userScores[i]}\`);\n` +
+        `}`,
+      projectApplication: `Loops process API response payloads, render lists of posts in UI feeds, and calculate summary stats in dashboards.`,
+      quizQuestions: [
+        { q: `What causes an infinite loop in JavaScript?`, a: `A loop whose termination condition never becomes false (or lacks an increment step).` },
+        { q: `Which loop construct directly iterates over values in an array without manual index counters?`, a: `The 'for...of' loop.` }
+      ],
+      taskTitle: `Chapter Challenge: Calculate Total Cart Value`,
+      taskDescription: `Write a function \`solutionTask(prices)\` that iterates over an array of numbers using a loop and returns the total sum.`,
+      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(prices) {\n  let total = 0;\n  // TODO: Add loop to calculate total sum\n  for (const price of prices) {\n    total += price;\n  }\n  return total;\n}`,
+      solutionCriteria: `Function must return the correct numerical sum of array elements.`
+    };
+  }
+
+  // 4. Functions / Arrow Functions
   if (titleLower.includes('function') || titleLower.includes('arrow') || titleLower.includes('parameter')) {
     return {
       title: topicTitle,
       level: level,
       conceptExplanation: `### 📘 Concept Deep-Dive: ${topicTitle}\n\n` +
-        `**Core Principles & Mechanics:**\n` +
-        `Functions are reusable blocks of code designed to perform a specific task. They accept inputs (parameters), process logic, and return an output value.\n\n` +
-        `**Key Concepts:**\n` +
-        `• **Function Declarations:** Traditional functions declared with the \`function\` keyword.\n` +
-        `• **Arrow Functions (\`() => {}\`):** A concise ES6 syntax ideal for short functions and callbacks.\n` +
-        `• **Parameters & Return Values:** Inputs passed into the function and explicit output returned using the \`return\` statement.\n\n` +
-        `💡 **Pro Tip:** Keep functions small and focused on a single responsibility (Single Responsibility Principle).`,
+        `**1. 🎯 Overview & Fundamental Purpose:**\n` +
+        `Functions are reusable building blocks of code designed to perform single, well-defined tasks. They accept parameters (inputs), perform computations, and return results.\n\n` +
+        `**2. ⚙️ Step-by-Step Invocation Mechanics:**\n` +
+        `• **Step 1: Declaration & Scope Binding:** The function signature is defined with parameters. Arrow functions lexically bind \`this\` from their enclosing scope.\n` +
+        `• **Step 2: Argument Passing & Stack Frame Creation:** When invoked, arguments are passed into local memory space allocated on the call stack.\n` +
+        `• **Step 3: Return Value Resolution:** The function executes its logic and returns an output via \`return\`. Stack frame is popped upon return.\n\n` +
+        `**3. 📐 Key Guidelines:**\n` +
+        `• **Single Responsibility:** Keep functions small and focused on one clear task.\n` +
+        `• **Pure Functions:** Prefer functions that return output based solely on inputs without mutating outside global state.\n\n` +
+        `💡 **Pro Tip:** Use ES6 arrow syntax (\`const fn = (a, b) => a + b;\`) for clean short callbacks.`,
       codeSnippet: `// ===============================================\n` +
         `// Practical Example: Functions & Arrow Functions\n` +
         `// ===============================================\n\n` +
@@ -120,31 +239,35 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
         `const greeting = formatUserGreeting("Manoj");\n` +
         `console.log(greeting);\n` +
         `console.log("Total Price:", total);`,
-      projectApplication: `Functions are the core building blocks of web APIs, event listeners, utility modules, and React component handlers.`,
+      projectApplication: `Functions handle event listeners, make HTTP requests, calculate totals, and represent React functional UI components.`,
       quizQuestions: [
         { q: `What keyword is used to output a value from a function?`, a: `The 'return' keyword.` },
         { q: `What is a key feature of ES6 Arrow Functions?`, a: `Shorter syntax and lexical binding of 'this'.` }
       ],
       taskTitle: `Chapter Challenge: Build a Calculation Function`,
-      taskDescription: `Implement a function \`solutionTask(num1, num2)\` that multiplies the two numbers together and returns the result.`,
-      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(num1, num2) {\n  // TODO: Calculate product of num1 and num2 and return it\n  return null;\n}`,
+      taskDescription: `Implement a function \`solutionTask(num1, num2)\` that multiplies two numbers together and returns the product.`,
+      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(num1, num2) {\n  // TODO: Calculate product of num1 and num2 and return it\n  return num1 * num2;\n}`,
       solutionCriteria: `Function must return num1 * num2.`
     };
   }
 
-  // 3. Arrays / List Methods
+  // 5. Arrays / List Methods
   if (titleLower.includes('array') || titleLower.includes('map') || titleLower.includes('filter') || titleLower.includes('list')) {
     return {
       title: topicTitle,
       level: level,
       conceptExplanation: `### 📘 Concept Deep-Dive: ${topicTitle}\n\n` +
-        `**Core Principles & Mechanics:**\n` +
-        `Arrays store collections of data in an ordered sequence. Modern JavaScript provides powerful built-in higher-order array methods to transform, filter, and iterate through data.\n\n` +
-        `**Key Array Operations:**\n` +
-        `• **\`.map()\`: ** Creates a new array by applying a transformation function to every item.\n` +
-        `• **\`.filter()\`: ** Returns a new array containing only items that satisfy a specific condition.\n` +
-        `• **\`.push()\` / \`.pop()\`: ** Add or remove elements from an array.\n\n` +
-        `💡 **Pro Tip:** Prefer immutable array methods (\`.map()\`, \`.filter()\`, \`.slice()\`) over mutating methods when working with UI state.`,
+        `**1. 🎯 Overview & Fundamental Purpose:**\n` +
+        `Arrays store collections of values in ordered sequences. Modern JavaScript provides powerful higher-order methods (\`.map()\`, \`.filter()\`, \`.reduce()\`) to process data immutably.\n\n` +
+        `**2. ⚙️ Step-by-Step Array Processing:**\n` +
+        `• **Step 1: Iteration Setup:** Method iterates over each array element zero-indexed.\n` +
+        `• **Step 2: Callback Transformation:** For each item, your callback function runs, returning a transformed item (\`.map()\`) or a boolean test result (\`.filter()\`).\n` +
+        `• **Step 3: New Array Creation:** A brand new array containing transformed items is returned without mutating the original source array.\n\n` +
+        `**3. 📐 Essential Methods:**\n` +
+        `• **\`.map()\`: ** Transforms every element into a new representation.\n` +
+        `• **\`.filter()\`: ** Selects elements matching a boolean predicate.\n` +
+        `• **\`.reduce()\`: ** Aggregates elements into a single accumulated summary.\n\n` +
+        `💡 **Pro Tip:** Always prefer immutable methods (\`.map()\`, \`.filter()\`) over mutating methods (\`.splice()\`) for predictable state handling.`,
       codeSnippet: `// ===============================================\n` +
         `// Practical Example: Arrays & Transformations\n` +
         `// ===============================================\n\n` +
@@ -159,55 +282,64 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
         `// 2. Map titles to uppercase\n` +
         `const titles = items.map(item => item.title.toUpperCase());\n` +
         `console.log("All Titles:", titles);`,
-      projectApplication: `Arrays are used to render lists in UI dashboards, manage feed items in social apps, and process API payloads.`,
+      projectApplication: `Array methods render lists of components in React, filter data search results in real time, and format backend JSON outputs.`,
       quizQuestions: [
         { q: `Which array method creates a new array with elements that pass a test condition?`, a: `The .filter() method.` },
         { q: `Does .map() mutate the original array?`, a: `No, .map() returns a brand new array.` }
       ],
       taskTitle: `Chapter Challenge: Filter Active Users`,
       taskDescription: `Write a function \`solutionTask(userList)\` that filters an array of user objects and returns only users with \`active: true\`.`,
-      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(userList) {\n  // TODO: Use userList.filter() to return active users\n  return [];\n}`,
+      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(userList) {\n  // TODO: Use userList.filter() to return active users\n  return userList.filter(user => user.active === true);\n}`,
       solutionCriteria: `Returns an array containing only objects where active === true.`
     };
   }
 
-  // 4. Default / Generic Topic Fallback (Student-friendly, level-aware, NO corporate buzzwords!)
+  // 6. Upgraded Smart Generic Fallback (Detailed 5-Section Markdown Breakdown for any other topic)
   return {
     title: topicTitle,
     level: level,
     conceptExplanation: `### 📘 Concept Deep-Dive: ${topicTitle}\n\n` +
-      `**Core Principles & Mechanics:**\n` +
-      `Welcome to **${topicTitle}**! This topic is an essential foundation in modern development (${level} Level).\n\n` +
-      `**Key Concepts to Understand:**\n` +
-      `• **Definition & Core Purpose:** Understanding how ${topicTitle} fits into building clean software applications.\n` +
-      `• **Practical Rules:** Syntax patterns, standard conventions, and avoiding common student pitfalls.\n` +
-      `• **Real-World Relevance:** Why developers use ${topicTitle} to write readable and maintainable code.\n\n` +
-      `💡 **Pro Tip:** Practice writing the code examples yourself to build muscle memory!`,
+      `**1. 🎯 Overview & Fundamental Purpose:**\n` +
+      `Welcome to **${topicTitle}**! This topic forms an essential pillar in software development (${level} Level). It provides key rules and patterns necessary to write clear, reliable, and scalable application logic.\n\n` +
+      `**2. ⚙️ Step-by-Step Execution Mechanics:**\n` +
+      `• **Step 1: Setup & Context Initialization:** The runtime environment allocates scope, memory references, and parameters required for **${topicTitle}** before execution begins.\n` +
+      `• **Step 2: Core Processing & Logic Flow:** Logic statements execute sequentially, evaluating expressions, processing input state, and directing execution branches.\n` +
+      `• **Step 3: Output & State Resolution:** The operation completes by returning explicit data outputs, updating component state, or triggering UI updates.\n\n` +
+      `**3. 📐 Syntax Patterns & Standard Rules:**\n` +
+      `• Structure code cleanly with explicit parameter names and consistent formatting.\n` +
+      `• Keep function responsibilities modular and single-purpose.\n` +
+      `• Gracefully handle edge cases such as empty data payload, null references, or network timeouts.\n\n` +
+      `**4. ⚠️ Common Student Pitfalls:**\n` +
+      `• Accidentally mutating global state from inside local execution functions.\n` +
+      `• Omitting error validation on external input data.\n` +
+      `• Misinterpreting execution order between synchronous and asynchronous code.\n\n` +
+      `💡 **Real-World Pro Tip:** Build small, isolated practice examples for **${topicTitle}** to solidify code mental models before combining them into full application features!`,
     codeSnippet: `// ===============================================\n` +
       `// Practical Example: ${topicTitle}\n` +
       `// ===============================================\n\n` +
       `function demonstrateConcept(inputData) {\n` +
-      `  console.log("🚀 Executing demo for ${topicTitle}...");\n` +
+      `  console.log("🚀 Executing demonstration for ${topicTitle}...");\n` +
       `  \n` +
       `  if (!inputData) {\n` +
-      `    return { status: "ERROR", message: "Please provide valid input." };\n` +
+      `    return { status: "ERROR", message: "Please provide valid input data." };\n` +
       `  }\n` +
       `  \n` +
       `  return {\n` +
       `    topic: "${topicTitle}",\n` +
-      `    inputReceived: inputData,\n` +
-      `    status: "SUCCESS"\n` +
+      `    processedData: inputData,\n` +
+      `    status: "SUCCESS",\n` +
+      `    timestamp: new Date().toISOString()\n` +
       `  };\n` +
       `}\n\n` +
       `// Execution & Verification\n` +
       `const result = demonstrateConcept({ sample: "Testing ${topicTitle}" });\n` +
-      `console.log("Result:", result);`,
-    projectApplication: `In practical web development, ${topicTitle} is used for organizing application logic, processing user input, and building interactive web features.`,
+      `console.log("Execution Result:", result);`,
+    projectApplication: `In production web development, ${topicTitle} is applied when organizing application modules, managing user interaction flow, and building maintainable web features.`,
     quizQuestions: [
-      { q: `What is the main goal of understanding ${topicTitle}?`, a: `To write clear, predictable, and functional code.` },
-      { q: `What should you check first when debugging ${topicTitle}?`, a: `Verify parameter inputs, console logs, and syntax errors.` }
+      { q: `What is the primary goal of mastering ${topicTitle}?`, a: `To write clear, predictable, and maintainable software application code.` },
+      { q: `What is the recommended first step when debugging ${topicTitle}?`, a: `Inspect parameter inputs, console logs, and syntax execution flow.` }
     ],
-    taskTitle: `Chapter Challenge: ${topicTitle} Practice Task`,
+    taskTitle: `Chapter Challenge: ${topicTitle} Implementation Task`,
     taskDescription: `Implement the function \`solutionTask(data)\` to process input data for ${topicTitle} and return a valid result object.`,
     starterCode: `// Chapter Task Starter Code\nfunction solutionTask(data) {\n  // TODO: Implement logic for ${topicTitle}\n  if (!data) return { success: false };\n  return { success: true, topic: "${topicTitle}", data };\n}`,
     solutionCriteria: `Function must return an object with success: true.`
@@ -223,33 +355,39 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
 async function generateTopicContent(topicTitle, moduleId = 'js', level = 'Beginner') {
   const apiKey = process.env.GEMINI_API_KEY;
 
-  const prompt = `You are a expert Computer Science Instructor.
-Generate a student-friendly, clear, and comprehensive curriculum module for software engineering students.
+  const prompt = `You are an expert Senior Computer Science Instructor.
+Generate a student-friendly, highly structured, and detailed curriculum topic module for software engineering students.
 
 Topic Name: "${topicTitle}"
 Module Category: "${moduleId}"
 Target Skill Level: "${level}"
 
-IMPORTANT GUIDELINES:
-- DO NOT use overly complicated enterprise microservice jargon for beginner topics.
-- Keep explanations clear, clear visual analogies, step-by-step breakdowns, and practical real-world student context.
-- Ensure code snippets are runnable JavaScript/HTML/React with clear inline comments.
+IMPORTANT CONTENT REQUIREMENTS:
+1. conceptExplanation MUST be a comprehensive markdown deep-dive containing:
+   - "### 📘 Concept Deep-Dive: ${topicTitle}" as heading.
+   - "1. 🎯 Overview & Fundamental Purpose" (What it is and why we use it).
+   - "2. ⚙️ Step-by-Step Execution Mechanics" (Step 1, Step 2, Step 3 breakdown of how it works under the hood).
+   - "3. 📐 Syntax & Core Mechanics" (Key rules, structural patterns, code examples).
+   - "4. ⚠️ Common Student Pitfalls" (Frequently made mistakes and how to avoid them).
+   - "5. 💡 Real-World Pro Tip" (Industry best practice or mental model).
+2. codeSnippet MUST be 20-30 lines of well-commented, clean JavaScript/React/HTML code demonstrating practical usage.
+3. Keep explanation clear, educational, and engaging without vague corporate buzzwords.
 
 Respond strictly with valid JSON only in the following format without any markdown backticks:
 {
   "title": "${topicTitle}",
   "level": "${level}",
-  "conceptExplanation": "Provide a step-by-step breakdown with visual analogies, core mechanics, and key takeaways.",
-  "codeSnippet": "15-25 lines of runnable code with inline comments.",
-  "projectApplication": "Explain how modern applications (e.g., e-commerce, social apps, web dashboards) use this specific topic.",
+  "conceptExplanation": "Detailed step-by-step markdown deep-dive with numbered steps, bullet points, and code rules...",
+  "codeSnippet": "// Practical runnable code snippet\\n...",
+  "projectApplication": "Real-world production usage explanation...",
   "quizQuestions": [
-    { "q": "Sample practice question 1", "a": "Detailed explanation answer" },
-    { "q": "Sample practice question 2", "a": "Detailed explanation answer" }
+    { "q": "Question 1", "a": "Detailed answer" },
+    { "q": "Question 2", "a": "Detailed answer" }
   ],
   "taskTitle": "Chapter Challenge: Practical Implementation Task",
-  "taskDescription": "Clear step-by-step assignment instructions for the student.",
+  "taskDescription": "Clear step-by-step assignment instructions.",
   "starterCode": "// Starter code for student to complete\\nfunction solutionTask(data) {\\n  // TODO: Implement logic\\n}",
-  "solutionCriteria": "Expected output or assertion criteria."
+  "solutionCriteria": "Assertion criteria."
 }`;
 
   if (apiKey) {
@@ -288,4 +426,5 @@ Respond strictly with valid JSON only in the following format without any markdo
 module.exports = {
   generateTopicContent
 };
+
 

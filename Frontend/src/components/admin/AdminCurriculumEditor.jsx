@@ -171,20 +171,23 @@ export const AdminCurriculumEditor = () => {
   };
 
   const handleRegenerateSingleTopic = async () => {
-    if (!selectedTopicId) return;
+    if (!formData.title.trim()) {
+      alert('Please enter a Topic Title & Header first.');
+      return;
+    }
     setIsAiGenerating(true);
     const res = await apiService.generateSingleTopicWithAI({
-      topicId: selectedTopicId,
+      topicId: selectedTopicId || null,
       moduleId: selectedModule,
-      topicTitle: formData.title || selectedTopicId,
+      topicTitle: formData.title.trim(),
       level: formData.level || 'Beginner',
-      saveToDb: true
+      saveToDb: !!selectedTopicId
     });
     setIsAiGenerating(false);
 
     if (res?.success && res?.data) {
       setFormData({
-        title: res.data.title || res.data.topicName || '',
+        title: res.data.title || res.data.topicName || formData.title.trim(),
         level: res.data.level || 'Beginner',
         conceptExplanation: res.data.conceptExplanation || '',
         codeSnippet: res.data.codeSnippet || '',
@@ -198,7 +201,7 @@ export const AdminCurriculumEditor = () => {
       await fetchTopics();
       setTimeout(() => setIsSaved(false), 2500);
     } else {
-      alert('Error regenerating topic content with AI');
+      alert(res?.message || 'Error auto-generating topic content with AI');
     }
   };
 
@@ -557,11 +560,29 @@ export const AdminCurriculumEditor = () => {
                   </div>
                 </div>
 
-                <Input
-                  label="Topic Title & Header"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                />
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-medium text-gray-300">Topic Title & Header</label>
+                    <button
+                      type="button"
+                      onClick={handleRegenerateSingleTopic}
+                      disabled={isAiGenerating || !formData.title.trim()}
+                      className="px-2.5 py-1 text-xs font-bold text-purple-300 bg-purple-950/80 border border-purple-500/50 hover:border-purple-400 hover:bg-purple-900 rounded-lg transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                      title="Auto-fill theory explanation, code snippet, and tasks matching this topic title"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+                      <span>{isAiGenerating ? 'Generating matching content...' : '⚡ Auto-Fill Fields with AI'}</span>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="e.g. Variables (var, let, const) or Introduction to JavaScript"
+                    className="w-full bg-slate-900 border border-white/15 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-purple-500"
+                    required
+                  />
+                </div>
 
                 <div className="space-y-1.5">
                   <label className="block text-xs font-medium text-gray-300">

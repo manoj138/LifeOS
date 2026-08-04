@@ -65,15 +65,15 @@ const generateSingleTopicWithAI = async (req, res) => {
       return sendError(res, 'topicTitle or topicId is required', null, 400);
     }
 
-    let titleToGenerate = topicTitle;
     let existingTopic = null;
-
     if (topicId) {
       existingTopic = await CurriculumTopic.findByPk(topicId);
-      if (existingTopic) {
-        titleToGenerate = existingTopic.topicName || existingTopic.title;
-      }
     }
+
+    // Strictly prioritize topicTitle typed in the input box if provided by user
+    const titleToGenerate = (topicTitle && typeof topicTitle === 'string' && topicTitle.trim().length > 0)
+      ? topicTitle.trim()
+      : (existingTopic ? (existingTopic.topicName || existingTopic.title) : null);
 
     if (!titleToGenerate) {
       return sendError(res, 'Could not determine topic title', null, 400);

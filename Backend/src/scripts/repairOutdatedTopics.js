@@ -18,7 +18,8 @@ async function repairOutdatedTopics() {
       const isOutdated = 
         code.includes('executeCoreLogic') || 
         explanation.includes('decoupling microservices') ||
-        app.includes('high-throughput event queues');
+        app.includes('high-throughput event queues') ||
+        explanation.includes('Definition & Core Purpose:');
 
       if (isOutdated) {
         console.log(`🧹 Repairing outdated AI topic: "${topic.title || topic.topicName}" (ID: ${topic.id})...`);
