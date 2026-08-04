@@ -44,11 +44,15 @@ app.get('/', (req, res) => {
   });
 });
 
+// Seeders
+const { seedCurriculumTopics } = require('./src/seeders/curriculumSeeder');
+
 // Database Sync & Server Start
 const startServer = async () => {
   try {
     await sequelize.sync();
     console.log('✅ SQLite Database Models synced successfully.');
+    await seedCurriculumTopics();
   } catch (err) {
     console.error('❌ Database sync notice:', err.message);
   }

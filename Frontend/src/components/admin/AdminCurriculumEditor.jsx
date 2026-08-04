@@ -14,28 +14,14 @@ const MODULES = [
   { id: 'dsa', label: '5. DSA Master Studio', icon: Binary },
 ];
 
-const DEFAULT_TOPIC = {
-  id: 'js-0',
-  moduleId: 'js',
-  title: '1.1 Variables, Scope & Temporal Dead Zone (TDZ)',
-  topicName: 'Variables & TDZ',
-  level: 'Beginner',
-  conceptExplanation: 'In JavaScript, var, let, and const handle scope differently. let and const exist in the Temporal Dead Zone (TDZ) before declaration.',
-  codeSnippet: '// Temporal Dead Zone Example\nconsole.log(a); // ReferenceError: Cannot access "a" before initialization\nlet a = 10;',
-  projectApplication: 'Used across all React component state declarations and immutability controls.',
-  taskTitle: 'Chapter Task: Fix Temporal Dead Zone Bug',
-  taskDescription: 'Refactor the given variable declarations to prevent TDZ reference errors.',
-  starterCode: 'console.log(myVar);\nlet myVar = "Hello World";',
-  solutionCriteria: 'Declare variable before console logging.',
-};
-
 export const AdminCurriculumEditor = () => {
   const [editorMode, setEditorMode] = useState('bulk_ai'); // 'editor' | 'bulk_ai'
   const [selectedModule, setSelectedModule] = useState('js');
-  const [topics, setTopics] = useState([DEFAULT_TOPIC]);
-  const [selectedTopicId, setSelectedTopicId] = useState('js-0');
+  const [topics, setTopics] = useState([]);
+  const [selectedTopicId, setSelectedTopicId] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
+  const [isLoadingTopics, setIsLoadingTopics] = useState(false);
 
   // Bulk Generator State
   const [bulkInput, setBulkInput] = useState(
@@ -43,39 +29,22 @@ export const AdminCurriculumEditor = () => {
   );
   const [targetLevel, setTargetLevel] = useState('Beginner');
   const [bulkStatusMessage, setBulkStatusMessage] = useState('');
-
-  const fetchTopics = async () => {
-    const res = await apiService.getCurriculumTopics(selectedModule);
-    if (res?.success && res.data && res.data.length > 0) {
-      setTopics(res.data);
-      if (!res.data.find(t => t.id === selectedTopicId)) {
-        setSelectedTopicId(res.data[0].id);
-        handleSelectTopic(res.data[0]);
-      }
-    } else {
-      setTopics([DEFAULT_TOPIC]);
-    }
-  };
-
-  useEffect(() => {
-    fetchTopics();
-  }, [selectedModule]);
-
-  const currentTopic = topics.find((t) => t.id === selectedTopicId) || topics[0] || DEFAULT_TOPIC;
+  const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0, percent: 0 });
 
   const [formData, setFormData] = useState({
-    title: currentTopic.title,
-    level: currentTopic.level,
-    conceptExplanation: currentTopic.conceptExplanation,
-    codeSnippet: currentTopic.codeSnippet,
-    projectApplication: currentTopic.projectApplication,
-    taskTitle: currentTopic.taskTitle || '',
-    taskDescription: currentTopic.taskDescription || '',
-    starterCode: currentTopic.starterCode || '',
-    solutionCriteria: currentTopic.solutionCriteria || '',
+    title: '',
+    level: 'Beginner',
+    conceptExplanation: '',
+    codeSnippet: '',
+    projectApplication: '',
+    taskTitle: '',
+    taskDescription: '',
+    starterCode: '',
+    solutionCriteria: '',
   });
 
   const handleSelectTopic = (topic) => {
+    if (!topic) return;
     setSelectedTopicId(topic.id);
     setFormData({
       title: topic.title || '',
@@ -89,6 +58,36 @@ export const AdminCurriculumEditor = () => {
       solutionCriteria: topic.solutionCriteria || '',
     });
   };
+
+  const fetchTopics = async () => {
+    setIsLoadingTopics(true);
+    const res = await apiService.getCurriculumTopics(selectedModule);
+    setIsLoadingTopics(false);
+    if (res?.success && Array.isArray(res.data) && res.data.length > 0) {
+      setTopics(res.data);
+      const match = res.data.find(t => t.id === selectedTopicId) || res.data[0];
+      setSelectedTopicId(match.id);
+      handleSelectTopic(match);
+    } else {
+      setTopics([]);
+      setSelectedTopicId(null);
+      setFormData({
+        title: '',
+        level: 'Beginner',
+        conceptExplanation: '',
+        codeSnippet: '',
+        projectApplication: '',
+        taskTitle: '',
+        taskDescription: '',
+        starterCode: '',
+        solutionCriteria: '',
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchTopics();
+  }, [selectedModule]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -107,25 +106,55 @@ export const AdminCurriculumEditor = () => {
 
   const handleBulkGenerate = async () => {
     if (!bulkInput.trim()) return;
-    setIsAiGenerating(true);
-    setBulkStatusMessage('Generating sequenced topics with deep theory, code examples & chapter tasks...');
 
     const topicLines = bulkInput
       .split('\n')
       .map((line) => line.replace(/^\d+[\.\)]\s*/, '').trim())
       .filter(Boolean);
 
-    const res = await apiService.bulkGenerateSequence({
-      moduleId: selectedModule,
-      level: targetLevel,
-      topicTitles: topicLines,
-    });
+    if (topicLines.length === 0) return;
+
+    setIsAiGenerating(true);
+    setGenerationProgress({ current: 0, total: topicLines.length, percent: 0 });
+
+    const BATCH_SIZE = 10;
+    const totalBatches = Math.ceil(topicLines.length / BATCH_SIZE);
+    let successfullyGenerated = 0;
+
+    for (let b = 0; b < totalBatches; b++) {
+      const batchTopics = topicLines.slice(b * BATCH_SIZE, (b + 1) * BATCH_SIZE);
+      const batchNum = b + 1;
+
+      setBulkStatusMessage(
+        `⚡ Processing Batch ${batchNum} of ${totalBatches} (${successfullyGenerated}/${topicLines.length} topics ready)...`
+      );
+
+      const res = await apiService.bulkGenerateSequence({
+        moduleId: selectedModule,
+        level: targetLevel,
+        topicTitles: batchTopics,
+      });
+
+      if (res?.success) {
+        successfullyGenerated += res.data?.length || batchTopics.length;
+        const currentPercent = Math.min(100, Math.round((successfullyGenerated / topicLines.length) * 100));
+        setGenerationProgress({
+          current: successfullyGenerated,
+          total: topicLines.length,
+          percent: currentPercent,
+        });
+        await fetchTopics();
+      } else {
+        console.warn(`Batch ${batchNum} failed to generate cleanly, continuing with next batch...`);
+      }
+    }
 
     setIsAiGenerating(false);
 
-    if (res?.success) {
-      setBulkStatusMessage(`✅ Successfully generated & published ${res.data?.length || topicLines.length} topics directly to database!`);
-      await fetchTopics();
+    if (successfullyGenerated > 0) {
+      setBulkStatusMessage(
+        `✅ Successfully generated & published ${successfullyGenerated} / ${topicLines.length} topics directly to database!`
+      );
     } else {
       setBulkStatusMessage('⚠️ Error generating topics. Please check backend connection.');
     }
@@ -201,33 +230,44 @@ export const AdminCurriculumEditor = () => {
               <Badge variant="purple">{selectedModule.toUpperCase()}</Badge>
             </div>
             <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
-              {filteredTopics.map((t, idx) => (
-                <div key={t.id} className="flex items-center gap-1 group">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditorMode('editor');
-                      handleSelectTopic(t);
-                    }}
-                    className={`w-full p-2 rounded-xl text-left border text-xs transition-all flex items-center justify-between ${
-                      selectedTopicId === t.id && editorMode === 'editor'
-                        ? 'bg-purple-600/30 border-purple-500 text-white font-bold'
-                        : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    <span className="truncate">{idx + 1}. {t.title}</span>
-                    {t.taskTitle && <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteTopic(t.id, t.title)}
-                    className="p-1.5 rounded-lg text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all"
-                    title="Delete topic"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+              {isLoadingTopics ? (
+                <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-xs text-gray-400 text-center flex items-center justify-center gap-2">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-purple-400" />
+                  <span>Loading DB topics...</span>
                 </div>
-              ))}
+              ) : filteredTopics.length === 0 ? (
+                <div className="p-3 rounded-xl border border-white/10 bg-white/5 text-xs text-gray-400 text-center">
+                  No topics in database yet for this module.
+                </div>
+              ) : (
+                filteredTopics.map((t, idx) => (
+                  <div key={t.id} className="flex items-center gap-1 group">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditorMode('editor');
+                        handleSelectTopic(t);
+                      }}
+                      className={`w-full p-2 rounded-xl text-left border text-xs transition-all flex items-center justify-between ${
+                        selectedTopicId === t.id && editorMode === 'editor'
+                          ? 'bg-purple-600/30 border-purple-500 text-white font-bold'
+                          : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <span className="truncate">{idx + 1}. {t.title}</span>
+                      {t.taskTitle && <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteTopic(t.id, t.title)}
+                      className="p-1.5 rounded-lg text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                      title="Delete topic"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -275,9 +315,24 @@ export const AdminCurriculumEditor = () => {
               </div>
 
               {bulkStatusMessage && (
-                <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30 text-xs font-medium text-purple-200 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>{bulkStatusMessage}</span>
+                <div className="space-y-2">
+                  <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30 text-xs font-medium text-purple-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>{bulkStatusMessage}</span>
+                    </div>
+                    {isAiGenerating && (
+                      <span className="font-bold text-cyan-300">{generationProgress.percent}%</span>
+                    )}
+                  </div>
+                  {isAiGenerating && (
+                    <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-white/10">
+                      <div
+                        className="bg-gradient-to-r from-cyan-500 to-purple-500 h-full transition-all duration-300 ease-out"
+                        style={{ width: `${Math.max(5, generationProgress.percent)}%` }}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 

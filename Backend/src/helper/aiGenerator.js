@@ -35,14 +35,18 @@ Respond strictly with valid JSON only in the following format without any markdo
 
   if (apiKey) {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4500); // 4.5s max timeout per topic
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: { responseMimeType: 'application/json' }
-        })
+        }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
 
       const json = await response.json();
       const rawText = json?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -54,7 +58,7 @@ Respond strictly with valid JSON only in the following format without any markdo
         }
       }
     } catch (err) {
-      console.warn('Gemini API call failed or rate limited, falling back to structured generator:', err.message);
+      console.warn('Gemini API call failed, timed out, or rate limited, falling back to structured generator:', err.message);
     }
   }
 

@@ -88,33 +88,39 @@ const bulkGenerateSequence = async (req, res) => {
     }
 
     const generatedTopics = [];
+    const BATCH_SIZE = 4;
 
-    for (let i = 0; i < titlesList.length; i++) {
-      const title = titlesList[i];
-      const topicId = `${moduleId}-${Date.now()}-${i}`;
-      
-      const content = await generateTopicContent(title, moduleId, level);
+    for (let i = 0; i < titlesList.length; i += BATCH_SIZE) {
+      const batchTitles = titlesList.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.all(
+        batchTitles.map(async (title, idx) => {
+          const globalIdx = i + idx;
+          const topicId = `${moduleId}-${Date.now()}-${globalIdx}`;
+          try {
+            const content = await generateTopicContent(title, moduleId, level);
+            return await CurriculumTopic.create({
+              id: topicId,
+              moduleId: moduleId,
+              title: content.title || title,
+              topicName: title,
+              level: level,
+              conceptExplanation: content.conceptExplanation || '',
+              codeSnippet: content.codeSnippet || '',
+              projectApplication: content.projectApplication || '',
+              quizQuestions: content.quizQuestions || [],
+              taskTitle: content.taskTitle || `Task: ${title}`,
+              taskDescription: content.taskDescription || `Complete the practical coding exercise for ${title}`,
+              starterCode: content.starterCode || `// Write your code for ${title}\n`,
+              solutionCriteria: content.solutionCriteria || `Return valid result object.`,
+            });
+          } catch (err) {
+            console.error(`Error generating topic ${title}:`, err);
+            return null;
+          }
+        })
+      );
 
-      const createdTopic = await CurriculumTopic.create({
-        id: topicId,
-        moduleId: moduleId,
-        title: content.title || title,
-        topicName: title,
-        level: level,
-        conceptExplanation: content.conceptExplanation || '',
-        codeSnippet: content.codeSnippet || '',
-        projectApplication: content.projectApplication || '',
-        quizQuestions: content.quizQuestions || [],
-        taskTitle: content.taskTitle || `Task: ${title}`,
-        taskDescription: content.taskDescription || `Complete the practical coding exercise for ${title}`,
-        starterCode: content.starterCode || `// Write your code for ${title}\n`,
-        solutionCriteria: content.solutionCriteria || `Return valid result object.`,
-      });
-
-      generatedTopics.push(createdTopic);
-
-      // Brief delay to prevent rate limits
-      await new Promise(resolve => setTimeout(resolve, 300));
+      generatedTopics.push(...batchResults.filter(Boolean));
     }
 
     return sendSuccess(res, `Successfully generated ${generatedTopics.length} topics in sequence`, generatedTopics);
