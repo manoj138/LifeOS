@@ -204,9 +204,38 @@ export const apiService = {
     }
   },
 
-  async seedCurriculum() {
+  async generateSingleTopicWithAI(data) {
     try {
-      const res = await fetch(`${API_BASE_URL}/curriculum/seed`, { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/curriculum/topics/generate-ai`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async bulkGenerateSequence(data) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/curriculum/topics/bulk-generate-sequence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteCurriculumTopic(id) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/curriculum/topics/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeader(),
+      });
       return await res.json();
     } catch (err) {
       return { success: false, fallback: true };

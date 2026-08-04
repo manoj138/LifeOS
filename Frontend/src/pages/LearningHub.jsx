@@ -302,36 +302,59 @@ export const LearningHub = () => {
     });
   }, [completedLessons, passedQuizzes, activeModule, activeLessonIdx]);
 
-  // Hydration Engine: Retrives handcrafted detailed topic content or fallback engine
+  // Hydration Engine: Retrieves handcrafted detailed topic content, backend dynamic topics, or fallback engine
   const getRichLessonDetail = (lesson) => {
     if (!lesson) return null;
+    const dynamicTopic = dynamicTopics?.find(dt => dt.id === lesson.id || dt.title === lesson.title);
     const customContent = learningContent[lesson.id];
-    if (customContent) {
-      return {
-        id: lesson.id,
-        title: lesson.title,
-        difficulty: lesson.level || customContent.difficulty || "Beginner",
-        ...customContent,
-        notes: customContent.howItWorks,
-        useCases: customContent.realWorldUse,
-        beginnerPitfalls: customContent.keyTakeaways,
-        code: customContent.practiceCode
-      };
-    }
     const fallback = getFallbackTopicContent(lesson);
+
     return {
       id: lesson.id,
       title: lesson.title,
-      difficulty: lesson.level || fallback.difficulty || "Beginner",
-      ...fallback,
-      notes: fallback.howItWorks,
-      useCases: fallback.realWorldUse,
-      beginnerPitfalls: fallback.keyTakeaways,
-      code: fallback.practiceCode
+      difficulty: lesson.level || dynamicTopic?.level || customContent?.difficulty || "Beginner",
+      summary: dynamicTopic?.conceptExplanation 
+        ? dynamicTopic.conceptExplanation.split('\n')[0] 
+        : customContent?.summary || fallback.summary,
+      notes: dynamicTopic?.conceptExplanation || customContent?.howItWorks || fallback.howItWorks,
+      useCases: dynamicTopic?.projectApplication || customContent?.realWorldUse || fallback.realWorldUse,
+      keyTakeaways: customContent?.keyTakeaways || fallback.keyTakeaways,
+      code: dynamicTopic?.codeSnippet || customContent?.practiceCode || fallback.practiceCode,
+      goodCode: dynamicTopic?.codeSnippet || customContent?.goodCode,
+      badCode: customContent?.badCode,
+      quiz: (dynamicTopic?.quizQuestions && dynamicTopic.quizQuestions.length > 0)
+        ? dynamicTopic.quizQuestions.map(q => ({
+            question: q.q || q.question,
+            options: q.options || [q.a || "Correct Answer", "Option B", "Option C", "Option D"],
+            correctIndex: 0,
+            explanation: q.a || "Correct implementation"
+          }))
+        : customContent?.quiz || fallback.quiz,
+      taskTitle: dynamicTopic?.taskTitle || `Chapter Challenge: ${lesson.title}`,
+      taskDescription: dynamicTopic?.taskDescription || `Solve the practical challenge for ${lesson.title} to unlock progression!`,
+      starterCode: dynamicTopic?.starterCode || `// Starter Code for ${lesson.title}\nfunction solveTask() {\n  return "SUCCESS";\n}`,
+      solutionCriteria: dynamicTopic?.solutionCriteria || `Return object containing status: SUCCESS.`
     };
   };
 
-  const currentModuleData = masterSyllabus[activeModule] || masterSyllabus.js;
+  const rawModuleSyllabus = masterSyllabus[activeModule] || masterSyllabus.js;
+  
+  const activeLessonsList = dynamicTopics && dynamicTopics.length > 0
+    ? [
+        ...dynamicTopics.map(dt => ({
+          id: dt.id,
+          title: dt.title,
+          topicName: dt.topicName || dt.title,
+          level: dt.level || 'Beginner',
+        })),
+        ...rawModuleSyllabus.lessons.filter(bl => !dynamicTopics.some(dt => dt.id === bl.id))
+      ]
+    : rawModuleSyllabus.lessons;
+
+  const currentModuleData = {
+    ...rawModuleSyllabus,
+    lessons: activeLessonsList
+  };
 
   // Dual Filtering: By Search Query AND Active Difficulty Level Filter
   const filteredLessons = currentModuleData.lessons.filter(l => {
@@ -767,6 +790,17 @@ export const LearningHub = () => {
                 </button>
 
                 <button
+                  onClick={() => setActiveTab('task')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                    activeTab === 'task'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <CheckSquare className="w-3.5 h-3.5 text-emerald-400" /> 🎯 Chapter Task & Challenge
+                </button>
+
+                <button
                   onClick={() => setActiveTab('quiz')}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                     activeTab === 'quiz'
@@ -936,6 +970,56 @@ export const LearningHub = () => {
                   ) : (
                     <p className="text-xs text-gray-400">No quiz questions generated for this topic yet.</p>
                   )}
+                </div>
+              )}
+
+              {/* TAB: CHAPTER TASK & CODING CHALLENGE */}
+              {activeTab === 'task' && (
+                <div className="space-y-4 font-sans">
+                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-200 space-y-2">
+                    <h3 className="text-sm font-bold text-emerald-300 flex items-center gap-2">
+                      <CheckSquare className="w-4 h-4 text-emerald-400" />
+                      {currentLessonData.taskTitle || `Chapter Task: ${currentLessonData.title}`}
+                    </h3>
+                    <p className="text-xs text-gray-300 leading-relaxed">
+                      {currentLessonData.taskDescription}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      Task Solution Criteria:
+                    </span>
+                    <p className="text-xs font-mono text-cyan-300 bg-black/40 p-3 rounded-xl border border-cyan-500/30">
+                      {currentLessonData.solutionCriteria}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      Starter Code Boilerplate:
+                    </span>
+                    <CodeEditor
+                      initialFiles={[
+                        { name: "task_solution.js", lang: "javascript", code: currentLessonData.starterCode || currentLessonData.code || `// Complete task code here\n` }
+                      ]}
+                    />
+                  </div>
+
+                  <div className="pt-2 flex justify-end">
+                    <Button
+                      variant="glow"
+                      size="sm"
+                      onClick={markCompleteWithQuizCheck}
+                      disabled={!isCurrentTopicUnlocked}
+                      leftIcon={<CheckCircle2 className="w-4 h-4 text-emerald-300" />}
+                      className="bg-gradient-to-r from-emerald-600 to-teal-600"
+                    >
+                      {completedLessons.includes(currentLessonData.id) 
+                        ? "Chapter Task Mastered ✓" 
+                        : "Submit Task & Unlock Next Chapter 🔓"}
+                    </Button>
+                  </div>
                 </div>
               )}
 

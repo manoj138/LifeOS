@@ -20,7 +20,7 @@ const CurriculumTopic = sequelize.define('CurriculumTopic', {
     allowNull: false,
   },
   level: {
-    type: DataTypes.ENUM('Beginner', 'Intermediate', 'Advanced'),
+    type: DataTypes.STRING,
     defaultValue: 'Beginner',
   },
   conceptExplanation: {
@@ -38,6 +38,22 @@ const CurriculumTopic = sequelize.define('CurriculumTopic', {
   quizQuestions: {
     type: DataTypes.JSON,
     defaultValue: [],
+  },
+  taskTitle: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  taskDescription: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  starterCode: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  solutionCriteria: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
 }, {
   timestamps: true,

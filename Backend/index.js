@@ -44,21 +44,11 @@ app.get('/', (req, res) => {
   });
 });
 
-const smartCurriculumSeeder = require('./src/helper/smartCurriculumSeeder');
-const smartUserSeeder = require('./src/helper/smartUserSeeder');
-
 // Database Sync & Server Start
 const startServer = async () => {
   try {
     await sequelize.sync();
     console.log('✅ SQLite Database Models synced successfully.');
-    
-    try {
-      await smartCurriculumSeeder();
-      await smartUserSeeder();
-    } catch (e) {
-      console.warn('Smart seeder background notice:', e.message);
-    }
   } catch (err) {
     console.error('❌ Database sync notice:', err.message);
   }

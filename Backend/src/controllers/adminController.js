@@ -1,6 +1,14 @@
+const sequelize = require('../config/sqliteDB');
 const User = require('../modals/User');
 const UserPreference = require('../modals/UserPreference');
 const LearningProgress = require('../modals/LearningProgress');
+const Goal = require('../modals/Goal');
+const PlannerTask = require('../modals/PlannerTask');
+const Project = require('../modals/Project');
+const FitnessLog = require('../modals/FitnessLog');
+const HabitLog = require('../modals/HabitLog');
+const JournalEntry = require('../modals/JournalEntry');
+const JobApplication = require('../modals/JobApplication');
 const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getAdminMetrics = async (req, res) => {
@@ -143,12 +151,36 @@ const getCandidates = async (req, res) => {
 const deleteCandidate = async (req, res) => {
   try {
     const { id } = req.params;
-    await UserPreference.destroy({ where: { userId: id } }).catch(() => {});
-    await LearningProgress.destroy({ where: { userId: id } }).catch(() => {});
-    await User.destroy({ where: { id } });
-    return sendSuccess(res, 'Candidate deleted successfully', { id });
+    const targetId = Number(id) || id;
+
+    // Delete child records sequentially to prevent SQLITE_BUSY and foreign key constraint errors
+    const models = [
+      UserPreference,
+      LearningProgress,
+      Goal,
+      PlannerTask,
+      Project,
+      FitnessLog,
+      HabitLog,
+      JournalEntry,
+      JobApplication
+    ];
+
+    for (const model of models) {
+      if (model && model.destroy) {
+        try {
+          await model.destroy({ where: { userId: targetId } });
+        } catch (err) {
+          // ignore if table/record absent
+        }
+      }
+    }
+
+    const deletedRows = await User.destroy({ where: { id: targetId } });
+
+    return sendSuccess(res, 'Candidate deleted successfully', { id: targetId, deletedRows });
   } catch (error) {
-    return sendError(res, 'Error deleting candidate', error, 500);
+    return sendError(res, 'Error deleting candidate', error.message || error, 500);
   }
 };
 

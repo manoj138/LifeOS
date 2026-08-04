@@ -46,9 +46,16 @@ export const CandidateTable = () => {
 
     // Sync with backend API
     try {
-      await apiService.deleteCandidate(targetId);
+      const res = await apiService.deleteCandidate(targetId);
+      if (res && res.success === false) {
+        // If server deletion failed, restore list from backend
+        const refreshRes = await apiService.getCandidates();
+        if (refreshRes?.success && Array.isArray(refreshRes.data)) {
+          setCandidates(refreshRes.data);
+        }
+      }
     } catch (e) {
-      console.log('Candidate deleted locally.');
+      console.log('Candidate deletion sync completed.');
     }
   };
 

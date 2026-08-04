@@ -24,7 +24,7 @@ const JobApplication = sequelize.define('JobApplication', {
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM('Applied', 'Interviewing', 'Offer', 'Rejected'),
+    type: DataTypes.STRING,
     defaultValue: 'Applied',
   },
   salary: {
