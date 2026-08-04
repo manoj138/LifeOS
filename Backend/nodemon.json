@@ -1,5 +1,5 @@
 {
   "watch": ["index.js", "src"],
   "ext": "js,json",
-  "ignore": ["database.sqlite", "*.log"]
+  "ignore": ["database.sqlite*", "*.sqlite*", "*.sqlite-journal", "*.log"]
 }
