@@ -7,11 +7,15 @@ import { FloatingDock } from '../components/ui/FloatingDock';
 import { VoiceGuiderProvider } from '../context/VoiceGuiderContext';
 import { PinLockModal } from '../components/voice/PinLockModal';
 import { VoiceAssistantModal } from '../components/voice/VoiceAssistantModal';
+import { useUser } from '../context/UserContext';
 import { cn } from '../utils/cn';
 
 export const MainLayout = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const { user } = useUser();
+
+  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
 
   return (
     <VoiceGuiderProvider>
@@ -44,15 +48,18 @@ export const MainLayout = () => {
           onClose={() => setIsCommandPaletteOpen(false)}
         />
 
-        {/* Floating Arc / VisionOS Bottom Action Dock */}
-        <FloatingDock
-          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        />
+        {/* Floating Arc / VisionOS Bottom Action Dock (Candidates Only) */}
+        {!isAdmin && (
+          <FloatingDock
+            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+          />
+        )}
 
         {/* Main Workspace Area */}
         <main
           className={cn(
-            "pt-20 pb-28 px-6 sm:px-8 transition-all duration-300 min-h-screen",
+            "pt-20 px-6 sm:px-8 transition-all duration-300 min-h-screen",
+            isAdmin ? "pb-12" : "pb-28",
             isSidebarCollapsed ? "ml-[80px]" : "ml-[260px]"
           )}
         >

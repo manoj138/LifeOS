@@ -3,12 +3,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Bell, Sparkles, Command, Plus, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { VoiceGuiderWidget } from '../voice/VoiceGuiderWidget';
+import { useUser } from '../../context/UserContext';
 import { cn } from '../../utils/cn';
 
 export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [hasUnread, setHasUnread] = useState(true);
+  const { user } = useUser();
+
+  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
 
   const getPageTitle = (path) => {
     const routeTitles = {
@@ -60,8 +64,8 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
 
       {/* Right Action Icons & Status */}
       <div className="flex items-center gap-3">
-        {/* Voice Guider Widget (AI Voice & PIN Security) */}
-        <VoiceGuiderWidget />
+        {/* Voice Guider Widget (Candidates Only) */}
+        {!isAdmin && <VoiceGuiderWidget />}
 
         {/* AI Status Badge */}
         <div className="hidden xl:flex items-center gap-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-full text-xs font-medium text-purple-300">
