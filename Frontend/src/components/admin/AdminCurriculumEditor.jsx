@@ -33,9 +33,7 @@ export const AdminCurriculumEditor = () => {
   const [newModuleId, setNewModuleId] = useState('');
 
   // Bulk Generator State
-  const [bulkInput, setBulkInput] = useState(
-    '1. Variables, Scope & Temporal Dead Zone (TDZ)\n2. Closures, Lexical Scope & Private Variables\n3. Promises, Async/Await & Event Loop Architecture'
-  );
+  const [bulkInput, setBulkInput] = useState('');
   const [targetLevel, setTargetLevel] = useState('Beginner');
   const [bulkStatusMessage, setBulkStatusMessage] = useState('');
   const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0, percent: 0 });

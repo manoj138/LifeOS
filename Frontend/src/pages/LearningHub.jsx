@@ -13,7 +13,7 @@ import { LaserBorder } from '../components/ui/LaserBorder';
 import { CodeEditor } from '../components/ui/CodeEditor';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { getFallbackTopicContent } from '../data/learningContent';
+
 import {
   loadLearningProgress,
   saveLearningProgress,
@@ -75,262 +75,30 @@ export const LearningHub = () => {
   const [showLevelMasterModal, setShowLevelMasterModal] = useState(false);
 
 
-  // Decoupled, Distinct Roadmap Modules (Derived from DB or Fallback)
-  const defaultRoadmapModules = [
-    { id: 'js', label: '1. JavaScript (ES6+)', icon: <Code2 className="w-4 h-4 text-cyan-400" />, count: '25 Topics' },
-    { id: 'react', label: '2. React.js', icon: <Layers className="w-4 h-4 text-purple-400" />, count: '23 Topics' },
-    { id: 'node', label: '3. Node.js', icon: <Terminal className="w-4 h-4 text-emerald-400" />, count: '11 Topics' },
-    { id: 'express', label: '4. Express.js', icon: <Server className="w-4 h-4 text-amber-400" />, count: '13 Topics' },
-    { id: 'mongo', label: '5. MongoDB', icon: <Database className="w-4 h-4 text-emerald-500" />, count: '11 Topics' },
-    { id: 'auth', label: '6. Authentication', icon: <ShieldCheck className="w-4 h-4 text-rose-400" />, count: '11 Topics' },
-    { id: 'api', label: '7. API Development', icon: <Activity className="w-4 h-4 text-indigo-400" />, count: '10 Topics' },
-    { id: 'project', label: '8. Project Architecture', icon: <Cpu className="w-4 h-4 text-blue-400" />, count: '9 Topics' },
-    { id: 'dsa', label: '9. DSA Master Studio', icon: <Binary className="w-4 h-4 text-cyan-300" />, count: '12 Topics' },
-    { id: 'aptitude', label: '10. Aptitude & Logic', icon: <Calculator className="w-4 h-4 text-amber-300" />, count: '10 Topics' },
-    { id: 'git', label: '11. Git & GitHub', icon: <GitPullRequest className="w-4 h-4 text-orange-400" />, count: '8 Topics' },
-    { id: 'career', label: '12. Career & LinkedIn', icon: <Briefcase className="w-4 h-4 text-yellow-400" />, count: '10 Topics' },
-    { id: 'devops', label: '13. DevOps & Hostinger VPS', icon: <Server className="w-4 h-4 text-teal-300" />, count: '10 Topics' },
-  ];
+  const roadmapModules = dynamicModules.map((dm, idx) => ({
+    id: dm.id,
+    label: `${idx + 1}. ${dm.title || dm.id}`,
+    icon: <BookOpen className="w-4 h-4 text-cyan-400" />,
+    count: dm.topicCount ? `${dm.topicCount} Topics` : 'Topics'
+  }));
 
-  const roadmapModules = dynamicModules.length > 0
-    ? dynamicModules.map((dm, idx) => {
-        const fallbackMatch = defaultRoadmapModules.find(m => m.id === dm.id);
-        return {
-          id: dm.id,
-          label: `${idx + 1}. ${dm.title || dm.id}`,
-          icon: fallbackMatch?.icon || <BookOpen className="w-4 h-4 text-cyan-400" />,
-          count: dm.topicCount ? `${dm.topicCount} Topics` : fallbackMatch?.count || 'Topics'
-        };
-      })
-    : defaultRoadmapModules;
+  const activeLessonsList = dynamicTopics
+    ? dynamicTopics.map(dt => ({
+        id: dt.id,
+        title: dt.title || dt.topicName,
+        topicName: dt.topicName || dt.title,
+        level: dt.level || 'Beginner',
+      }))
+    : [];
 
-  // Complete Un-truncated Master Syllabus containing ALL 175+ topics with Level Tags
-  const masterSyllabus = {
-    js: {
-      title: "1️⃣ JavaScript (ES6+) Complete Studio (25 Topics)",
-      lessons: [
-        { id: "js-0", title: "1.1 Variables, Scope & Temporal Dead Zone (TDZ)", topicName: "Variables & TDZ", level: "Beginner" },
-        { id: "js-1", title: "1.2 Primitive & Non-Primitive Data Types", topicName: "Data Types", level: "Beginner" },
-        { id: "js-2", title: "1.3 Operators (Arithmetic, Logical, Bitwise)", topicName: "Operators", level: "Beginner" },
-        { id: "js-3", title: "1.4 Conditionals (if-else, switch, ternary)", topicName: "Conditionals", level: "Beginner" },
-        { id: "js-4", title: "1.5 Loops (for, while, do-while, for-of, for-in)", topicName: "Loops", level: "Beginner" },
-        { id: "js-5", title: "1.6 Functions (Declarations vs Expressions)", topicName: "Functions", level: "Beginner" },
-        { id: "js-6", title: "1.7 Arrow Functions & Lexical `this`", topicName: "Arrow Functions", level: "Beginner" },
-        { id: "js-7", title: "1.8 Scope (Global, Function, Block)", topicName: "Scope", level: "Beginner" },
-        { id: "js-8", title: "1.9 Hoisting Mechanism", topicName: "Hoisting", level: "Intermediate" },
-        { id: "js-9", title: "1.10 Closures & Lexical Scope", topicName: "Closures", level: "Intermediate" },
-        { id: "js-10", title: "1.11 Callbacks & Callback Hell", topicName: "Callbacks", level: "Intermediate" },
-        { id: "js-11", title: "1.12 Promises & Promise Chaining", topicName: "Promises", level: "Intermediate" },
-        { id: "js-12", title: "1.13 Async / Await Syntax", topicName: "Async Await", level: "Intermediate" },
-        { id: "js-13", title: "1.14 Array Methods (map, filter, reduce)", topicName: "Array Methods", level: "Beginner" },
-        { id: "js-14", title: "1.15 Objects & Prototype Chain", topicName: "Objects & Prototypes", level: "Intermediate" },
-        { id: "js-15", title: "1.16 Destructuring (Arrays & Objects)", topicName: "Destructuring", level: "Beginner" },
-        { id: "js-16", title: "1.17 Spread Operator (...)", topicName: "Spread Operator", level: "Beginner" },
-        { id: "js-17", title: "1.18 Rest Parameters (...args)", topicName: "Rest Parameters", level: "Beginner" },
-        { id: "js-18", title: "1.19 ES6 Modules (import & export)", topicName: "ES6 Modules", level: "Beginner" },
-        { id: "js-19", title: "1.20 ES6 Classes & Inheritance", topicName: "ES6 Classes", level: "Intermediate" },
-        { id: "js-20", title: "1.21 DOM Manipulation & Event Handling", topicName: "DOM Manipulation", level: "Beginner" },
-        { id: "js-21", title: "1.22 Fetch API & HTTP Network Requests", topicName: "Fetch API", level: "Intermediate" },
-        { id: "js-22", title: "1.23 Event Loop (Call Stack & Queues)", topicName: "Event Loop", level: "Advanced" },
-        { id: "js-23", title: "1.24 Memory Management & Garbage Collection", topicName: "Memory & GC", level: "Advanced" },
-        { id: "js-24", title: "1.25 Execution Context & Call Stack", topicName: "Execution Context", level: "Advanced" }
-      ]
-    },
-    react: {
-      title: "2️⃣ React.js Complete Studio (23 Topics)",
-      lessons: [
-        { id: "react-0", title: "2.1 JSX Syntax & Expressions", topicName: "JSX Syntax", level: "Beginner" },
-        { id: "react-1", title: "2.2 Functional Components", topicName: "Functional Components", level: "Beginner" },
-        { id: "react-2", title: "2.3 Props & Prop Drilling", topicName: "Props", level: "Beginner" },
-        { id: "react-3", title: "2.4 State Management (useState)", topicName: "State & useState", level: "Beginner" },
-        { id: "react-4", title: "2.5 Event Handling", topicName: "Event Handling", level: "Beginner" },
-        { id: "react-5", title: "2.6 Conditional Rendering", topicName: "Conditional Rendering", level: "Beginner" },
-        { id: "react-6", title: "2.7 Lists & Unique Keys", topicName: "Lists & Keys", level: "Beginner" },
-        { id: "react-7", title: "2.8 Controlled vs Uncontrolled Forms", topicName: "Forms", level: "Intermediate" },
-        { id: "react-8", title: "2.9 Lifting State Up", topicName: "Lifting State", level: "Intermediate" },
-        { id: "react-9", title: "2.10 Built-in Hooks (useEffect, useRef)", topicName: "Built-in Hooks", level: "Intermediate" },
-        { id: "react-10", title: "2.11 Custom Hooks Creation", topicName: "Custom Hooks", level: "Intermediate" },
-        { id: "react-11", title: "2.12 Context API & Global State", topicName: "Context API", level: "Intermediate" },
-        { id: "react-12", title: "2.13 Reducers (useReducer)", topicName: "useReducer", level: "Intermediate" },
-        { id: "react-13", title: "2.14 React Router & Navigation", topicName: "React Router", level: "Intermediate" },
-        { id: "react-14", title: "2.15 Protected Routes & Auth Guards", topicName: "Protected Routes", level: "Advanced" },
-        { id: "react-15", title: "2.16 Lazy Loading (React.lazy & Suspense)", topicName: "Lazy Loading", level: "Advanced" },
-        { id: "react-16", title: "2.17 Error Boundaries", topicName: "Error Boundaries", level: "Advanced" },
-        { id: "react-17", title: "2.18 Performance (React.memo, useMemo)", topicName: "Performance Optimization", level: "Advanced" },
-        { id: "react-18", title: "2.19 React Query (TanStack Query)", topicName: "React Query", level: "Advanced" },
-        { id: "react-19", title: "2.20 Axios & HTTP Interceptors", topicName: "Axios Interceptors", level: "Intermediate" },
-        { id: "react-20", title: "2.21 Authentication Integration", topicName: "Auth Integration", level: "Advanced" },
-        { id: "react-21", title: "2.22 Role-Based Access Control (RBAC)", topicName: "RBAC Controls", level: "Advanced" },
-        { id: "react-22", title: "2.23 Reusable CVA Components", topicName: "Reusable Components", level: "Intermediate" }
-      ]
-    },
-    node: {
-      title: "3️⃣ Node.js Architecture (11 Topics)",
-      lessons: [
-        { id: "node-0", title: "3.1 CommonJS vs ES Modules", topicName: "Modules", level: "Beginner" },
-        { id: "node-1", title: "3.2 File System (FS) Operations", topicName: "File System", level: "Beginner" },
-        { id: "node-2", title: "3.3 Path Module Utilities", topicName: "Path Module", level: "Beginner" },
-        { id: "node-3", title: "3.4 OS Module Metrics", topicName: "OS Module", level: "Beginner" },
-        { id: "node-4", title: "3.5 HTTP Core Module Server", topicName: "HTTP Server", level: "Intermediate" },
-        { id: "node-5", title: "3.6 EventEmitter Pattern", topicName: "Events", level: "Intermediate" },
-        { id: "node-6", title: "3.7 Streams (Readable, Writable)", topicName: "Streams", level: "Advanced" },
-        { id: "node-7", title: "3.8 Memory Buffers", topicName: "Buffers", level: "Advanced" },
-        { id: "node-8", title: "3.9 Process Object & Signals", topicName: "Process Object", level: "Intermediate" },
-        { id: "node-9", title: "3.10 Environment Variables (dotenv)", topicName: "Environment Secrets", level: "Beginner" },
-        { id: "node-10", title: "3.11 Package Management (npm & npx)", topicName: "Package Management", level: "Beginner" }
-      ]
-    },
-    express: {
-      title: "4️⃣ Express.js Backend (13 Topics)",
-      lessons: [
-        { id: "express-0", title: "4.1 Express Routing & Methods", topicName: "Express Routing", level: "Beginner" },
-        { id: "express-1", title: "4.2 Middleware Pipeline & Order", topicName: "Middleware Architecture", level: "Intermediate" },
-        { id: "express-2", title: "4.3 Controller Design Pattern", topicName: "Controllers", level: "Intermediate" },
-        { id: "express-3", title: "4.4 Request Params, Query & Body", topicName: "Request Handling", level: "Beginner" },
-        { id: "express-4", title: "4.5 Static Files & Express Storage", topicName: "Static Files", level: "Beginner" },
-        { id: "express-5", title: "4.6 Global Error Handling Middleware", topicName: "Error Handling", level: "Intermediate" },
-        { id: "express-6", title: "4.7 CORS & Security Headers (Helmet)", topicName: "CORS & Security", level: "Intermediate" },
-        { id: "express-7", title: "4.8 Rate Limiting & Throttling", topicName: "Rate Limiting", level: "Advanced" },
-        { id: "express-8", title: "4.9 File Uploads (Multer Integration)", topicName: "Multer Uploads", level: "Intermediate" },
-        { id: "express-9", title: "4.10 Express Router Refactoring", topicName: "Router Modules", level: "Beginner" },
-        { id: "express-10", title: "4.11 Logging Systems (Winston & Morgan)", topicName: "Logging Systems", level: "Intermediate" },
-        { id: "express-11", title: "4.12 Environment-based Config", topicName: "Environment Config", level: "Beginner" },
-        { id: "express-12", title: "4.13 Health Checks & Graceful Shutdown", topicName: "Health Checks", level: "Advanced" }
-      ]
-    },
-    mongo: {
-      title: "5️⃣ MongoDB & Mongoose (11 Topics)",
-      lessons: [
-        { id: "mongo-0", title: "5.1 NoSQL Concepts vs SQL RDBMS", topicName: "NoSQL Concepts", level: "Beginner" },
-        { id: "mongo-1", title: "5.2 BSON Document Data Model", topicName: "BSON Model", level: "Beginner" },
-        { id: "mongo-2", title: "5.3 Mongoose Schema & Model Design", topicName: "Mongoose Schema", level: "Beginner" },
-        { id: "mongo-3", title: "5.4 CRUD Operations in Mongoose", topicName: "Mongoose CRUD", level: "Beginner" },
-        { id: "mongo-4", title: "5.5 Query Operators ($gt, $in, $elemMatch)", topicName: "Query Operators", level: "Intermediate" },
-        { id: "mongo-5", title: "5.6 Indexes & Query Optimization", topicName: "Database Indexes", level: "Advanced" },
-        { id: "mongo-6", title: "5.7 Schema Validation & Middleware Hooks", topicName: "Mongoose Hooks", level: "Intermediate" },
-        { id: "mongo-7", title: "5.8 Population ($lookup & References)", topicName: "Document Population", level: "Intermediate" },
-        { id: "mongo-8", title: "5.9 Aggregation Pipeline ($match, $group)", topicName: "Aggregation Pipeline", level: "Advanced" },
-        { id: "mongo-9", title: "5.10 Transactions & ACID Guarantees", topicName: "ACID Transactions", level: "Advanced" },
-        { id: "mongo-10", title: "5.11 Connection Pooling & Error Resilience", topicName: "Connection Pooling", level: "Advanced" }
-      ]
-    },
-    auth: {
-      title: "6️⃣ Authentication & Security (11 Topics)",
-      lessons: [
-        { id: "auth-0", title: "6.1 Password Hashing (Bcrypt & Salt)", topicName: "Password Hashing", level: "Beginner" },
-        { id: "auth-1", title: "6.2 JWT Tokens (Access vs Refresh Tokens)", topicName: "JWT Auth", level: "Intermediate" },
-        { id: "auth-2", title: "6.3 HTTP-Only Cookies vs LocalStorage", topicName: "Cookie Storage", level: "Intermediate" },
-        { id: "auth-3", title: "6.4 Session-based Authentication", topicName: "Session Auth", level: "Beginner" },
-        { id: "auth-4", title: "6.5 OAuth 2.0 & Google Social Login", topicName: "OAuth 2.0", level: "Advanced" },
-        { id: "auth-5", title: "6.6 CSRF Protection Mechanisms", topicName: "CSRF Defense", level: "Advanced" },
-        { id: "auth-6", title: "6.7 XSS Prevention & Content Sanitization", topicName: "XSS Defense", level: "Intermediate" },
-        { id: "auth-7", title: "6.8 Secure Password Reset Flows", topicName: "Password Reset", level: "Intermediate" },
-        { id: "auth-8", title: "6.9 Email Verification Engine", topicName: "Email Verification", level: "Intermediate" },
-        { id: "auth-9", title: "6.10 Role-Based Access Control (RBAC)", topicName: "Role-Based Access", level: "Advanced" },
-        { id: "auth-10", title: "6.11 Granular Permissions Matrix", topicName: "Permissions Matrix", level: "Advanced" }
-      ]
-    },
-    api: {
-      title: "7️⃣ API Development & Standards (10 Topics)",
-      lessons: [
-        { id: "api-0", title: "7.1 REST API Naming Standards", topicName: "REST Naming", level: "Beginner" },
-        { id: "api-1", title: "7.2 CRUD API Architecture", topicName: "CRUD API", level: "Beginner" },
-        { id: "api-2", title: "7.3 API Pagination Strategy", topicName: "API Pagination", level: "Intermediate" },
-        { id: "api-3", title: "7.4 Dynamic Query Filtering", topicName: "Filtering", level: "Intermediate" },
-        { id: "api-4", title: "7.5 Multi-Column Sorting", topicName: "Sorting", level: "Intermediate" },
-        { id: "api-5", title: "7.6 Full-Text Search Queries", topicName: "Searching", level: "Intermediate" },
-        { id: "api-6", title: "7.7 Input Validation & Sanitization", topicName: "Validation", level: "Intermediate" },
-        { id: "api-7", title: "7.8 Standard HTTP Status Codes", topicName: "Status Codes", level: "Beginner" },
-        { id: "api-8", title: "7.9 Consistent Error Responses", topicName: "Error Payloads", level: "Intermediate" },
-        { id: "api-9", title: "7.10 OpenAPI / Swagger Documentation", topicName: "API Documentation", level: "Advanced" }
-      ]
-    },
-    project: {
-      title: "8️⃣ Project Architecture & Clean Code (9 Topics)",
-      lessons: [
-        { id: "proj-0", title: "8.1 Scalable Folder Structure", topicName: "Folder Structure", level: "Beginner" },
-        { id: "proj-1", title: "8.2 Clean Code & Refactoring", topicName: "Clean Code", level: "Intermediate" },
-        { id: "proj-2", title: "8.3 Reusable Component Patterns", topicName: "Reusable Components", level: "Intermediate" },
-        { id: "proj-3", title: "8.4 SOLID Principles Basics", topicName: "SOLID Basics", level: "Advanced" },
-        { id: "proj-4", title: "8.5 Debugging Workflows", topicName: "Debugging", level: "Intermediate" },
-        { id: "proj-5", title: "8.6 Frontend Performance Optimization", topicName: "Optimization", level: "Advanced" },
-        { id: "proj-6", title: "8.7 Testing Basics (Jest & Vitest)", topicName: "Testing Basics", level: "Intermediate" },
-        { id: "proj-7", title: "8.8 Production Code Auditing", topicName: "Production Readiness", level: "Advanced" },
-        { id: "proj-8", title: "8.9 Monorepo & Microservices Setup", topicName: "Monorepo Setup", level: "Advanced" }
-      ]
-    },
-    dsa: {
-      title: "9️⃣ Data Structures & Algorithms (DSA Studio)",
-      lessons: [
-        { id: "car-0", title: "9.1 Arrays & Two-Pointer Pattern", topicName: "DSA Arrays", level: "Intermediate" },
-        { id: "car-1", title: "9.2 Strings & Sliding Window Pattern", topicName: "DSA Strings", level: "Intermediate" },
-        { id: "car-2", title: "9.3 Linked Lists (Singly & Doubly)", topicName: "DSA Linked List", level: "Intermediate" },
-        { id: "car-3", title: "9.4 Stack & Queue Implementations", topicName: "DSA Stack & Queue", level: "Intermediate" },
-        { id: "car-4", title: "9.5 HashMap & HashSets O(1) Lookups", topicName: "DSA HashMap", level: "Intermediate" },
-        { id: "car-5", title: "9.6 Binary Search & Binary Search Trees", topicName: "DSA BST", level: "Advanced" },
-        { id: "car-6", title: "9.7 Heaps & Priority Queues", topicName: "DSA Heap", level: "Advanced" },
-        { id: "car-7", title: "9.8 Graph BFS & DFS Traversals", topicName: "DSA Graphs", level: "Advanced" },
-        { id: "car-8", title: "9.9 Tries & Prefix Search", topicName: "DSA Trie", level: "Advanced" },
-        { id: "car-9", title: "9.10 Recursion & Backtracking", topicName: "DSA Backtracking", level: "Advanced" },
-        { id: "car-10", title: "9.11 Sorting Algorithms (Quick & Merge)", topicName: "DSA Sorting", level: "Intermediate" },
-        { id: "car-11", title: "9.12 Dynamic Programming (Memo & Tabulation)", topicName: "DSA DP", level: "Advanced" }
-      ]
-    },
-    aptitude: {
-      title: "🔟 Quantitative Aptitude & Logic",
-      lessons: [
-        { id: "car-12", title: "10.1 Percentages & Profit/Loss", topicName: "Percentages", level: "Beginner" },
-        { id: "car-13", title: "10.2 Time & Work, Speed & Distance", topicName: "Speed & Work", level: "Beginner" },
-        { id: "car-14", title: "10.3 Ratio, Averages & Interest Calculations", topicName: "Ratios", level: "Beginner" },
-        { id: "apt-0", title: "10.4 Logical Reasoning & Series Completion", topicName: "Logical Reasoning", level: "Beginner" },
-        { id: "apt-1", title: "10.5 Data Interpretation (Charts & Graphs)", topicName: "Data Interpretation", level: "Intermediate" }
-      ]
-    },
-    git: {
-      title: "1️⃣1️⃣ Git & GitHub Version Control",
-      lessons: [
-        { id: "car-15", title: "11.1 Git Init, Clone, Status, Add & Commit", topicName: "Git Basics", level: "Beginner" },
-        { id: "car-16", title: "11.2 Branching, Merging & Rebase Workflows", topicName: "Git Branching", level: "Intermediate" },
-        { id: "car-17", title: "11.3 Resolving Merge Conflicts & Stashing", topicName: "Git Conflicts", level: "Intermediate" },
-        { id: "git-0", title: "11.4 Pull Requests & Code Review Workflow", topicName: "GitHub PRs", level: "Intermediate" }
-      ]
-    },
-    career: {
-      title: "1️⃣2️⃣ Career & LinkedIn Portfolio Prep",
-      lessons: [
-        { id: "car-18", title: "12.1 Resume ATS Keyword Optimization", topicName: "ATS Resume", level: "Beginner" },
-        { id: "car-19", title: "12.2 LinkedIn Profile & Portfolio Optimization", topicName: "LinkedIn Portfolio", level: "Beginner" },
-        { id: "car-20", title: "12.3 Technical Interview Alignment & QA", topicName: "Interview Alignment", level: "Intermediate" }
-      ]
-    },
-    devops: {
-      title: "1️⃣3️⃣ DevOps & Hostinger VPS Deployment",
-      lessons: [
-        { id: "dev-0", title: "13.1 Linux / Ubuntu SSH Remote Login", topicName: "Linux SSH", level: "Intermediate" },
-        { id: "dev-1", title: "13.2 Hostinger VPS & UFW Firewall Setup", topicName: "Hostinger VPS Setup", level: "Advanced" },
-        { id: "dev-2", title: "13.3 CloudPanel Control Panel Installation", topicName: "CloudPanel Install", level: "Intermediate" },
-        { id: "dev-3", title: "13.4 Domain DNS Records (A, CNAME, MX)", topicName: "DNS Records", level: "Beginner" },
-        { id: "dev-4", title: "13.5 Let's Encrypt SSL & HTTPS Renewal", topicName: "SSL Certificates", level: "Intermediate" },
-        { id: "dev-5", title: "13.6 Nginx Reverse Proxy Configuration", topicName: "Nginx Proxy", level: "Advanced" },
-        { id: "dev-6", title: "13.7 PM2 Process Manager & Clustering", topicName: "PM2 Clustering", level: "Advanced" },
-        { id: "dev-7", title: "13.8 Docker Containerization & Dockerfile", topicName: "Dockerfile Setup", level: "Advanced" },
-        { id: "dev-8", title: "13.9 Docker Compose Multi-Container Setup", topicName: "Docker Compose", level: "Advanced" },
-        { id: "dev-9", title: "13.10 CI/CD GitHub Actions Automated Deploy", topicName: "CI/CD Actions", level: "Advanced" }
-      ]
-    }
+  const activeModuleTitle = dynamicModules.find(m => m.id === activeModule)?.title || activeModule;
+
+  const currentModuleData = {
+    id: activeModule,
+    title: activeModuleTitle,
+    lessons: activeLessonsList
   };
 
-  // Auto-Save progress state to localStorage whenever state changes
-  useEffect(() => {
-    saveLearningProgress({
-      completedLessons,
-      passedQuizzes,
-      lastActiveModule: activeModule,
-      lastActiveLessonIdx: activeLessonIdx
-    });
-  }, [completedLessons, passedQuizzes, activeModule, activeLessonIdx]);
-
-  // Hydration Engine: Retrieves handcrafted detailed topic content, backend dynamic topics, or fallback engine
   const getRichLessonDetail = (lesson) => {
     if (!lesson) return null;
     const dynamicTopic = dynamicTopics?.find(dt => 
@@ -338,50 +106,57 @@ export const LearningHub = () => {
       dt.title === lesson.title || 
       (dt.topicName && lesson.topicName && dt.topicName.toLowerCase() === lesson.topicName.toLowerCase())
     );
-    const fallback = getFallbackTopicContent(lesson);
+
+    if (!dynamicTopic) {
+      return {
+        id: lesson.id,
+        title: lesson.title,
+        difficulty: lesson.level || "Beginner",
+        summary: `Topic: ${lesson.title}`,
+        notes: `Study the core concepts of ${lesson.title}.`,
+        useCases: `Applied in modern web applications.`,
+        keyTakeaways: [`Master fundamental concepts of ${lesson.title}.`],
+        code: `// Practical Example: ${lesson.title}\nconsole.log("Exploring ${lesson.title}...");`,
+        goodCode: null,
+        badCode: null,
+        quiz: [],
+        taskTitle: `Chapter Challenge: ${lesson.title}`,
+        taskDescription: `Complete the practical exercise for ${lesson.title}.`,
+        starterCode: `// Starter Code for ${lesson.title}\n`,
+        solutionCriteria: `Execute code without errors.`
+      };
+    }
 
     return {
-      id: lesson.id,
-      title: lesson.title,
-      difficulty: lesson.level || dynamicTopic?.level || "Beginner",
-      summary: dynamicTopic?.conceptExplanation 
+      id: dynamicTopic.id,
+      title: dynamicTopic.title || dynamicTopic.topicName,
+      difficulty: dynamicTopic.level || "Beginner",
+      summary: dynamicTopic.conceptExplanation 
         ? dynamicTopic.conceptExplanation.split('\n')[0] 
-        : fallback.summary,
-      notes: dynamicTopic?.conceptExplanation || fallback.howItWorks,
-      useCases: dynamicTopic?.projectApplication || fallback.realWorldUse,
-      keyTakeaways: fallback.keyTakeaways,
-      code: dynamicTopic?.codeSnippet || fallback.practiceCode,
-      goodCode: dynamicTopic?.codeSnippet || null,
+        : `Dynamic topic: ${dynamicTopic.title}`,
+      notes: dynamicTopic.conceptExplanation || '',
+      useCases: dynamicTopic.projectApplication || '',
+      keyTakeaways: [
+        `Master fundamental concepts of ${dynamicTopic.title}.`,
+        "Apply standard software architecture patterns.",
+        "Practice building small working examples."
+      ],
+      code: dynamicTopic.codeSnippet || '',
+      goodCode: dynamicTopic.codeSnippet || null,
       badCode: null,
-      quiz: (dynamicTopic?.quizQuestions && dynamicTopic.quizQuestions.length > 0)
+      quiz: (dynamicTopic.quizQuestions && dynamicTopic.quizQuestions.length > 0)
         ? dynamicTopic.quizQuestions.map(q => ({
             question: q.q || q.question,
             options: q.options || [q.a || "Correct Answer", "Option B", "Option C", "Option D"],
             correctIndex: 0,
             explanation: q.a || "Correct implementation"
           }))
-        : fallback.quiz,
-      taskTitle: dynamicTopic?.taskTitle || `Chapter Challenge: ${lesson.title}`,
-      taskDescription: dynamicTopic?.taskDescription || `Solve the practical challenge for ${lesson.title} to unlock progression!`,
-      starterCode: dynamicTopic?.starterCode || `// Starter Code for ${lesson.title}\nfunction solveTask() {\n  return "SUCCESS";\n}`,
-      solutionCriteria: dynamicTopic?.solutionCriteria || `Return object containing status: SUCCESS.`
+        : [],
+      taskTitle: dynamicTopic.taskTitle || `Chapter Challenge: ${dynamicTopic.title}`,
+      taskDescription: dynamicTopic.taskDescription || `Solve the practical challenge for ${dynamicTopic.title}`,
+      starterCode: dynamicTopic.starterCode || `// Starter Code for ${dynamicTopic.title}\n`,
+      solutionCriteria: dynamicTopic.solutionCriteria || `Return valid result object.`
     };
-  };
-
-  const rawModuleSyllabus = masterSyllabus[activeModule] || masterSyllabus.js;
-  
-  const activeLessonsList = (dynamicTopics && dynamicTopics.length > 0)
-    ? dynamicTopics.map(dt => ({
-        id: dt.id,
-        title: dt.title || dt.topicName,
-        topicName: dt.topicName || dt.title,
-        level: dt.level || 'Beginner',
-      }))
-    : rawModuleSyllabus.lessons;
-
-  const currentModuleData = {
-    ...rawModuleSyllabus,
-    lessons: activeLessonsList
   };
 
   // Dual Filtering: By Search Query AND Active Difficulty Level Filter

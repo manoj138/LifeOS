@@ -15,16 +15,12 @@
    - When API / Context data is loading or empty, components must display dynamic fallback placeholders computed from user props or state defaults, never static dummy hardcoded user strings.
 
 
-## ⚡ Incremental Smart Seeder & Data Preservation Rule
+## 🚫 No Database Seeder Rule (No Seeder Generation or Usage)
 
-1. **Zero Overwrite of Existing Records**:
-   - Backend database seeders MUST NOT clear, truncate, or overwrite existing database records that have been modified or edited by users or admins.
-   - Seeders MUST use `findOrCreate` or selective upsert logic matching on primary keys (e.g. `id`).
+1. **Strictly No Seeder Generation or Execution**:
+   - Antigravity MUST NOT create, generate, or execute backend database seeders (e.g. seed scripts, mock data inserters, or automatic seeder triggers).
+   - All database records, modules, topics, and application data MUST be generated, managed, and created dynamically via UI forms, API endpoints, or user/admin actions.
 
-2. **Incremental Missing Data Insertion Only**:
-   - When server boots or seeding is invoked, the seeder MUST check if each topic/record exists.
-   - If a record exists -> LEAVE UNTOUCHED.
-   - If a record is missing -> INSERT ONLY MISSING RECORD.
 
 
 ## 🚫 No Automated Testing Rule (Antigravity Constraints)

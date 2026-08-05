@@ -26,28 +26,21 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
       codeSnippet: `// ===============================================\n` +
         `// Practical Example: Introduction to JavaScript\n` +
         `// ===============================================\n\n` +
-        `// 1. Displaying messages\n` +
-        `const welcomeMessage = "Hello World from JavaScript!";\n` +
-        `console.log("Welcome Message:", welcomeMessage);\n\n` +
-        `// 2. Simple interactive greeting logic\n` +
-        `function greetUser(userName) {\n` +
-        `  if (!userName) {\n` +
-        `    return "Hello, Guest!";\n` +
-        `  }\n` +
-        `  return \`Welcome to LifeOS, \${userName}!\`;\n` +
-        `}\n\n` +
-        `// 3. Execution & Verification\n` +
-        `const greeting = greetUser("Manoj");\n` +
-        `console.log("Output:", greeting);`,
+        `// 1. Outputting text to the developer console\n` +
+        `console.log("🚀 Hello World from JavaScript!");\n\n` +
+        `// 2. Simple top-level variables & arithmetic\n` +
+        `const platformName = "LifeOS Platform";\n` +
+        `const year = 2026;\n` +
+        `console.log("Welcome to " + platformName + " (" + year + ")");`,
       projectApplication: `JavaScript powers 98% of all websites on the internet. It handles form validations, powers interactive web applications (React, Vue), and builds backend REST APIs (Node.js/Express).`,
       quizQuestions: [
         { q: `What role does JavaScript play in modern web development?`, a: `It provides dynamic behavior, user interaction, and application logic to web pages.` },
         { q: `Where can JavaScript code be executed?`, a: `In web browsers and on backend servers via the Node.js runtime.` }
       ],
-      taskTitle: `Chapter Challenge: Write Your First JS Greeting Function`,
-      taskDescription: `Implement a function \`solutionTask(name)\` that returns a greeting string \`"Welcome to JavaScript, " + name\` when a valid name string is passed, or \`"Hello Guest"\` if no name is provided.`,
-      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(name) {\n  // TODO: Return "Welcome to JavaScript, " + name or "Hello Guest"\n  if (!name) return "Hello Guest";\n  return "Welcome to JavaScript, " + name;\n}`,
-      solutionCriteria: `Function must return correct formatted greeting string.`
+      taskTitle: `Chapter Challenge: Output Message to Console`,
+      taskDescription: `Use console.log() to print "Hello World from JavaScript!" to the console.`,
+      starterCode: `// Chapter Task Starter Code\n// TODO: Use console.log to print "Hello World from JavaScript!"\nconsole.log("Hello World from JavaScript!");`,
+      solutionCriteria: `Code must execute console.log with expected text.`
     };
   }
 
@@ -91,10 +84,10 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
         { q: `What is the primary difference between 'let' and 'const'?`, a: `'const' cannot be re-assigned after initialization, whereas 'let' allows re-assignment.` },
         { q: `Why should you avoid using 'var' in modern JavaScript?`, a: `'var' is function-scoped instead of block-scoped and is subject to hoisting bugs.` }
       ],
-      taskTitle: `Chapter Challenge: Variable Scoping & Assignment`,
-      taskDescription: `Write a function named \`solutionTask\` that takes an initial user score, increases it by 15 points using a \`let\` variable, and returns a user profile object containing the user's name (stored in a \`const\`) and the updated score.`,
-      starterCode: `// Chapter Task Starter Code\nfunction solutionTask(initialScore) {\n  // TODO 1: Declare a const 'userName' with value "Alex"\n  // TODO 2: Declare a let 'score' initialized to initialScore\n  // TODO 3: Add 15 points to 'score'\n  // TODO 4: Return object { userName, score }\n  return null;\n}`,
-      solutionCriteria: `Function must return an object with correct userName string and initialScore + 15.`
+      taskTitle: `Chapter Challenge: Variable Scoping & Reassignment`,
+      taskDescription: `Declare a const variable 'userName' set to "Alex", a let variable 'score' set to 10, add 15 points to 'score', and log both variables.`,
+      starterCode: `// Chapter Task Starter Code\n// TODO 1: Declare a const 'userName' with value "Alex"\nconst userName = "Alex";\n\n// TODO 2: Declare a let 'score' initialized to 10\nlet score = 10;\n\n// TODO 3: Add 15 points to 'score'\nscore = score + 15;\n\n// TODO 4: Log userName and score\nconsole.log(userName, score);`,
+      solutionCriteria: `Code must declare const userName and update let score correctly.`
     };
   }
 
@@ -317,32 +310,19 @@ function buildSmartFallbackContent(topicTitle, moduleId = 'js', level = 'Beginne
     codeSnippet: `// ===============================================\n` +
       `// Practical Example: ${topicTitle}\n` +
       `// ===============================================\n\n` +
-      `function demonstrateConcept(inputData) {\n` +
-      `  console.log("🚀 Executing demonstration for ${topicTitle}...");\n` +
-      `  \n` +
-      `  if (!inputData) {\n` +
-      `    return { status: "ERROR", message: "Please provide valid input data." };\n` +
-      `  }\n` +
-      `  \n` +
-      `  return {\n` +
-      `    topic: "${topicTitle}",\n` +
-      `    processedData: inputData,\n` +
-      `    status: "SUCCESS",\n` +
-      `    timestamp: new Date().toISOString()\n` +
-      `  };\n` +
-      `}\n\n` +
-      `// Execution & Verification\n` +
-      `const result = demonstrateConcept({ sample: "Testing ${topicTitle}" });\n` +
-      `console.log("Execution Result:", result);`,
-    projectApplication: `In production web development, ${topicTitle} is applied when organizing application modules, managing user interaction flow, and building maintainable web features.`,
+      `// 1. Core Concept Usage\n` +
+      `console.log("=== Demonstration: ${topicTitle} ===");\n` +
+      `const payload = { topic: "${topicTitle}", status: "Active" };\n` +
+      `console.log("Output Payload:", payload);`,
+    projectApplication: `In real-world web development, ${topicTitle} is used for organizing application logic, processing state updates, and maintaining clean code structure.`,
     quizQuestions: [
       { q: `What is the primary goal of mastering ${topicTitle}?`, a: `To write clear, predictable, and maintainable software application code.` },
       { q: `What is the recommended first step when debugging ${topicTitle}?`, a: `Inspect parameter inputs, console logs, and syntax execution flow.` }
     ],
-    taskTitle: `Chapter Challenge: ${topicTitle} Implementation Task`,
-    taskDescription: `Implement the function \`solutionTask(data)\` to process input data for ${topicTitle} and return a valid result object.`,
-    starterCode: `// Chapter Task Starter Code\nfunction solutionTask(data) {\n  // TODO: Implement logic for ${topicTitle}\n  if (!data) return { success: false };\n  return { success: true, topic: "${topicTitle}", data };\n}`,
-    solutionCriteria: `Function must return an object with success: true.`
+    taskTitle: `Chapter Challenge: ${topicTitle} Task`,
+    taskDescription: `Write code demonstrating the core usage of ${topicTitle}.`,
+    starterCode: `// TODO: Practice ${topicTitle}\nconst topicName = "${topicTitle}";\nconsole.log("Mastering:", topicName);`,
+    solutionCriteria: `Code must execute without syntax errors and produce expected output.`
   };
 }
 
@@ -370,23 +350,23 @@ IMPORTANT CONTENT REQUIREMENTS:
    - "3. 📐 Syntax & Core Mechanics" (Key rules, structural patterns, code examples).
    - "4. ⚠️ Common Student Pitfalls" (Frequently made mistakes and how to avoid them).
    - "5. 💡 Real-World Pro Tip" (Industry best practice or mental model).
-2. codeSnippet MUST be 20-30 lines of well-commented, clean JavaScript/React/HTML code demonstrating practical usage.
-3. Keep explanation clear, educational, and engaging without vague corporate buzzwords.
+2. codeSnippet MUST be concise (10-15 lines), highly readable code that strictly demonstrates ONLY the syntax and core mechanics of "${topicTitle}". DO NOT include complex enterprise pipeline functions, class structures, microservices, or unnecessary abstraction.
+3. taskTitle, taskDescription, and starterCode MUST be tailored specifically to "${topicTitle}". For introductory topics before functions are taught, do NOT wrap starter code in "function solutionTask(data)".
 
 Respond strictly with valid JSON only in the following format without any markdown backticks:
 {
   "title": "${topicTitle}",
   "level": "${level}",
   "conceptExplanation": "Detailed step-by-step markdown deep-dive with numbered steps, bullet points, and code rules...",
-  "codeSnippet": "// Practical runnable code snippet\\n...",
+  "codeSnippet": "// Practical runnable code snippet demonstrating ${topicTitle}\\n...",
   "projectApplication": "Real-world production usage explanation...",
   "quizQuestions": [
     { "q": "Question 1", "a": "Detailed answer" },
     { "q": "Question 2", "a": "Detailed answer" }
   ],
-  "taskTitle": "Chapter Challenge: Practical Implementation Task",
-  "taskDescription": "Clear step-by-step assignment instructions.",
-  "starterCode": "// Starter code for student to complete\\nfunction solutionTask(data) {\\n  // TODO: Implement logic\\n}",
+  "taskTitle": "Chapter Challenge: ${topicTitle} Task",
+  "taskDescription": "Clear step-by-step assignment instructions specific to ${topicTitle}.",
+  "starterCode": "// Topic-specific starter code for student to complete\\n...",
   "solutionCriteria": "Assertion criteria."
 }`;
 
