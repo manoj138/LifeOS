@@ -436,7 +436,26 @@ export const VoiceGuiderProvider = ({ children }) => {
 export const useVoiceGuider = () => {
   const context = useContext(VoiceGuiderContext);
   if (!context) {
-    throw new Error('useVoiceGuider must be used within a VoiceGuiderProvider');
+    console.warn('useVoiceGuider was used outside a VoiceGuiderProvider. Falling back to default voice guider state.');
+    return {
+      isVoiceGuided: false,
+      setIsVoiceGuided: () => {},
+      toggleVoiceGuided: () => {},
+      isListening: false,
+      isSpeaking: false,
+      transcript: '',
+      setTranscript: () => {},
+      guiderLanguage: 'en-US',
+      setGuiderLanguage: () => {},
+      isPinLocked: false,
+      setIsPinLocked: () => {},
+      verifyPin: () => false,
+      setPinCode: () => {},
+      isAssistantModalOpen: false,
+      setIsAssistantModalOpen: () => {},
+      speakText: () => {},
+      stopSpeaking: () => {}
+    };
   }
   return context;
 };
