@@ -28,6 +28,19 @@ export const InterviewPrep = () => {
   const [teleprompterSpeed, setTeleprompterSpeed] = useState('1x');
   const [aiEvaluation, setAiEvaluation] = useState(null);
   const [dynamicQuestions, setDynamicQuestions] = useState(null);
+  const [dynamicModules, setDynamicModules] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchModules = async () => {
+      const res = await apiService.getRoadmapModules();
+      if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
+        setDynamicModules(res.data);
+      }
+    };
+    fetchModules();
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -88,12 +101,18 @@ My core technical focus areas include ${preferences?.focusAreas?.join(', ') || '
   ];
 
 
-  const categoryList = [
-    { id: 'js', label: 'JavaScript Deep', icon: <Code2 className="w-4 h-4 text-cyan-400" /> },
-    { id: 'react', label: 'React Architecture', icon: <Layers className="w-4 h-4 text-purple-400" /> },
-    { id: 'node', label: 'Node & Express', icon: <Terminal className="w-4 h-4 text-emerald-400" /> },
-    { id: 'mongo', label: 'MongoDB & Schemas', icon: <Database className="w-4 h-4 text-amber-400" /> }
-  ];
+  const categoryList = dynamicModules.length > 0
+    ? dynamicModules.map(m => ({
+        id: m.id,
+        label: m.title || m.id,
+        icon: <Code2 className="w-4 h-4 text-cyan-400" />
+      }))
+    : [
+        { id: 'js', label: 'JavaScript Deep', icon: <Code2 className="w-4 h-4 text-cyan-400" /> },
+        { id: 'react', label: 'React Architecture', icon: <Layers className="w-4 h-4 text-purple-400" /> },
+        { id: 'node', label: 'Node & Express', icon: <Terminal className="w-4 h-4 text-emerald-400" /> },
+        { id: 'mongo', label: 'MongoDB & Schemas', icon: <Database className="w-4 h-4 text-amber-400" /> }
+      ];
 
   const currentQuestions = dynamicQuestions || [];
   const currentActiveQ = currentQuestions[activeQuestionIdx] || currentQuestions[0] || null;

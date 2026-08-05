@@ -6,6 +6,7 @@ import { Badge } from '../ui/Badge';
 import { Input } from '../ui/Input';
 import { apiService } from '../../services/api';
 import { FormattedMarkdown } from '../ui/FormattedMarkdown';
+import ConfirmModal from '../common/ConfirmModal';
 
 const ICON_MAP = {
   Code2,
@@ -21,6 +22,14 @@ export const AdminCurriculumEditor = () => {
   const [activeDomain, setActiveDomain] = useState('roadmap'); // 'roadmap' | 'interview' | 'dsa' | 'english' | 'devops'
   const [editorMode, setEditorMode] = useState('bulk_ai'); // 'editor' | 'bulk_ai'
   const [selectedModule, setSelectedModule] = useState('js');
+
+  // Confirmation Modal Central State
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: null
+  });
   const [modulesList, setModulesList] = useState([]);
   const [topics, setTopics] = useState([]);
   const [selectedTopicId, setSelectedTopicId] = useState(null);
@@ -40,6 +49,14 @@ export const AdminCurriculumEditor = () => {
   const [rawQaText, setRawQaText] = useState('');
   const [rawQaCategory, setRawQaCategory] = useState('js');
   const [rawQaDifficulty, setRawQaDifficulty] = useState('Intermediate');
+
+  // Category Modal & Questions Filter State
+  const [isAddingCategoryModal, setIsAddingCategoryModal] = useState(false);
+  const [newCatTitle, setNewCatTitle] = useState('');
+
+  const [iqSearchQuery, setIqSearchQuery] = useState('');
+  const [iqFilterCategory, setIqFilterCategory] = useState('all');
+  const [iqFilterDifficulty, setIqFilterDifficulty] = useState('all');
 
   const [newInterviewCategory, setNewInterviewCategory] = useState('js');
   const [newInterviewQuestion, setNewInterviewQuestion] = useState('');
@@ -109,12 +126,34 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
-  const handleDeleteModule = async (id, title) => {
-    if (window.confirm(`Are you sure you want to delete module "${title}" and all its topics?`)) {
-      await apiService.deleteRoadmapModule(id);
+  const handleCreateCategorySubmit = async (e) => {
+    e.preventDefault();
+    if (!newCatTitle.trim()) return;
+    const generatedId = newCatTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const res = await apiService.createRoadmapModule({
+      id: generatedId || `cat-${Date.now()}`,
+      title: newCatTitle.trim(),
+      order: modulesList.length + 1
+    });
+    if (res?.success) {
+      setNewCatTitle('');
+      setIsAddingCategoryModal(false);
       await fetchModules();
-      if (selectedModule === id) setSelectedModule('js');
     }
+  };
+
+  const handleDeleteModule = (id, title) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Tech Module",
+      message: `Are you sure you want to delete module "${title}" and all its topics?`,
+      onConfirm: async () => {
+        await apiService.deleteRoadmapModule(id);
+        await fetchModules();
+        if (selectedModule === id) setSelectedModule('js');
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const fetchInterviewQuestions = async () => {
@@ -143,11 +182,41 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
-  const handleDeleteInterviewQuestion = async (id) => {
-    if (window.confirm('Delete this interview question?')) {
-      await apiService.deleteInterviewQuestion(id);
-      fetchInterviewQuestions();
-    }
+  const handleDeleteInterviewQuestion = (id) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Interview Question",
+      message: "Are you sure you want to delete this interview question?",
+      onConfirm: async () => {
+        await apiService.deleteInterviewQuestion(id);
+        fetchInterviewQuestions();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
+  const handleDeleteCategoryAndQuestions = (catKey, displayLabel) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Category",
+      message: `Are you sure you want to delete category "${displayLabel}" and all its questions?`,
+      onConfirm: async () => {
+        const matchedModule = modulesList.find(m => (m.id || '').toLowerCase() === catKey.toLowerCase());
+        if (matchedModule) {
+          await apiService.deleteRoadmapModule(matchedModule.id);
+        }
+        const targetQuestions = interviewQuestions.filter(q => (q.category || '').toLowerCase() === catKey.toLowerCase());
+        for (const q of targetQuestions) {
+          await apiService.deleteInterviewQuestion(q.id);
+        }
+        if (iqFilterCategory.toLowerCase() === catKey.toLowerCase()) {
+          setIqFilterCategory('all');
+        }
+        await fetchModules();
+        await fetchInterviewQuestions();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleBulkImportRawQa = async () => {
@@ -238,11 +307,17 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
-  const handleDeleteDsaProblem = async (id) => {
-    if (window.confirm('Delete this DSA problem?')) {
-      await apiService.deleteDsaProblem(id);
-      fetchDsaProblems();
-    }
+  const handleDeleteDsaProblem = (id) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete DSA Problem",
+      message: "Are you sure you want to delete this DSA problem?",
+      onConfirm: async () => {
+        await apiService.deleteDsaProblem(id);
+        fetchDsaProblems();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const fetchEnglishModules = async () => {
@@ -270,11 +345,17 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
-  const handleDeleteEnglishModule = async (id) => {
-    if (window.confirm('Delete this English module?')) {
-      await apiService.deleteEnglishModule(id);
-      fetchEnglishModules();
-    }
+  const handleDeleteEnglishModule = (id) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete English Drill",
+      message: "Are you sure you want to delete this English module?",
+      onConfirm: async () => {
+        await apiService.deleteEnglishModule(id);
+        fetchEnglishModules();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const fetchDevopsSteps = async () => {
@@ -301,11 +382,17 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
-  const handleDeleteDevopsStep = async (id) => {
-    if (window.confirm('Delete this DevOps step?')) {
-      await apiService.deleteDevopsStep(id);
-      fetchDevopsSteps();
-    }
+  const handleDeleteDevopsStep = (id) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete VPS Setup Step",
+      message: "Are you sure you want to delete this DevOps step?",
+      onConfirm: async () => {
+        await apiService.deleteDevopsStep(id);
+        fetchDevopsSteps();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleBulkSeedInterview = async (cat = 'js') => {
@@ -493,11 +580,17 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
-  const handleDeleteTopic = async (id, title) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      await apiService.deleteCurriculumTopic(id);
-      await fetchTopics();
-    }
+  const handleDeleteTopic = (id, title) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Topic",
+      message: `Are you sure you want to delete topic "${title}"?`,
+      onConfirm: async () => {
+        await apiService.deleteCurriculumTopic(id);
+        await fetchTopics();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleBulkGenerate = async () => {
@@ -1056,6 +1149,14 @@ export const AdminCurriculumEditor = () => {
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <Button
+                variant="glow"
+                size="sm"
+                onClick={() => setIsAddingCategoryModal(!isAddingCategoryModal)}
+                leftIcon={<PlusCircle className="w-4 h-4 text-purple-400" />}
+              >
+                + Add Tech Category
+              </Button>
+              <Button
                 variant="glass"
                 size="sm"
                 onClick={() => setIsBulkRawModalOpen(!isBulkRawModalOpen)}
@@ -1073,6 +1174,24 @@ export const AdminCurriculumEditor = () => {
               </Button>
             </div>
           </div>
+
+          {/* Quick Add Tech Category Modal */}
+          {isAddingCategoryModal && (
+            <GlassCard className="p-5 border border-purple-500/40 bg-purple-950/20 animate-fadeIn">
+              <form onSubmit={handleCreateCategorySubmit} className="flex items-center gap-3">
+                <div className="flex-1">
+                  <Input
+                    placeholder="e.g. System Design, Python Architecture, AWS Cloud..."
+                    value={newCatTitle}
+                    onChange={(e) => setNewCatTitle(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="button" variant="ghost" size="sm" onClick={() => setIsAddingCategoryModal(false)}>Cancel</Button>
+                <Button type="submit" variant="glow" size="sm">Save New Category</Button>
+              </form>
+            </GlassCard>
+          )}
 
           {/* Bulk Raw Text Q&A Importer Modal */}
           {isBulkRawModalOpen && (
@@ -1092,11 +1211,11 @@ export const AdminCurriculumEditor = () => {
                     onChange={(e) => setRawQaCategory(e.target.value)}
                     className="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-gray-200"
                   >
-                    <option value="js">JavaScript Deep</option>
-                    <option value="react">React Architecture</option>
-                    <option value="node">Node.js & Express</option>
-                    <option value="mongo">MongoDB & Databases</option>
-                    <option value="devops">DevOps & Cloud</option>
+                    {modulesList.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.title || m.id}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
@@ -1147,11 +1266,11 @@ export const AdminCurriculumEditor = () => {
                       onChange={(e) => setNewInterviewCategory(e.target.value)}
                       className="w-full bg-[#121218] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
                     >
-                      <option value="js">JavaScript Deep</option>
-                      <option value="react">React Architecture</option>
-                      <option value="node">Node & Express</option>
-                      <option value="system-design">System Design & Databases</option>
-                      <option value="hr">HR & Executive Behavioral</option>
+                      {modulesList.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.title || m.id}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div>
@@ -1203,28 +1322,111 @@ export const AdminCurriculumEditor = () => {
             </GlassCard>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {interviewQuestions.map((q) => (
-              <GlassCard key={q.id} className="p-5 space-y-3 relative group">
-                <div className="flex items-center justify-between">
-                  <Badge variant="cyan">{q.category?.toUpperCase() || 'GENERAL'}</Badge>
+          {/* Interactive Question Filters Bar */}
+          <GlassCard className="p-4 space-y-3 border border-white/10 bg-slate-950/60">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <input
+                type="text"
+                placeholder="🔍 Search questions or answers..."
+                value={iqSearchQuery}
+                onChange={(e) => setIqSearchQuery(e.target.value)}
+                className="bg-slate-900 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 min-w-[240px]"
+              />
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-semibold text-gray-400">Category:</span>
+                <button
+                  type="button"
+                  onClick={() => setIqFilterCategory('all')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                    iqFilterCategory === 'all' ? 'bg-purple-600 text-white' : 'bg-slate-900 text-gray-400 hover:text-white'
+                  }`}
+                >
+                  All Categories ({interviewQuestions.length})
+                </button>
+                {Array.from(new Set([
+                  ...modulesList.map(m => (m.id || '').toLowerCase().trim()),
+                  ...interviewQuestions.map(q => (q.category || '').toLowerCase().trim())
+                ])).filter(Boolean).map((catKey) => {
+                  const matchedModule = modulesList.find(m => (m.id || '').toLowerCase() === catKey);
+                  const displayLabel = matchedModule?.title || catKey.toUpperCase();
+                  const catCount = interviewQuestions.filter(q => (q.category || '').toLowerCase() === catKey).length;
+                  return (
+                    <div
+                      key={catKey}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                        iqFilterCategory.toLowerCase() === catKey ? 'bg-purple-600 text-white' : 'bg-slate-900 text-gray-400 hover:text-white border border-white/5'
+                      }`}
+                      onClick={() => setIqFilterCategory(catKey)}
+                    >
+                      <span>{displayLabel} ({catCount})</span>
+                      <button
+                        type="button"
+                        title={`Delete category ${displayLabel}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteCategoryAndQuestions(catKey, displayLabel);
+                        }}
+                        className="ml-1 text-gray-400 hover:text-rose-400 p-0.5 rounded transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-gray-400">Difficulty:</span>
+                {['all', 'Beginner', 'Intermediate', 'Advanced'].map((diff) => (
                   <button
+                    key={diff}
                     type="button"
-                    onClick={() => handleDeleteInterviewQuestion(q.id)}
-                    className="text-gray-500 hover:text-rose-400 p-1"
+                    onClick={() => setIqFilterDifficulty(diff)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all capitalize ${
+                      iqFilterDifficulty === diff ? 'bg-cyan-600 text-white' : 'bg-slate-900 text-gray-400 hover:text-white'
+                    }`}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    {diff}
                   </button>
-                </div>
-                <h4 className="text-sm font-bold text-white tracking-tight">{q.question || q.q}</h4>
-                <p className="text-xs text-gray-300 line-clamp-2">{q.answer || q.a}</p>
-                {q.marathiIntent && (
-                  <span className="text-[10px] text-amber-300 bg-amber-500/10 px-2 py-1 rounded block">
-                    💡 Marathi Intent: {q.marathiIntent}
-                  </span>
-                )}
-              </GlassCard>
-            ))}
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {interviewQuestions
+              .filter((q) => {
+                const matchCat = iqFilterCategory === 'all' || (q.category || '').toLowerCase() === iqFilterCategory.toLowerCase();
+                const matchDiff = iqFilterDifficulty === 'all' || (q.difficulty || '').toLowerCase() === iqFilterDifficulty.toLowerCase();
+                const qText = `${q.question || q.q || ''} ${q.answer || q.a || ''}`.toLowerCase();
+                const matchSearch = !iqSearchQuery.trim() || qText.includes(iqSearchQuery.toLowerCase());
+                return matchCat && matchDiff && matchSearch;
+              })
+              .map((q) => (
+                <GlassCard key={q.id} className="p-5 space-y-3 relative group">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="cyan">{q.category?.toUpperCase() || 'GENERAL'}</Badge>
+                      {q.difficulty && <Badge variant="purple">{q.difficulty}</Badge>}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteInterviewQuestion(q.id)}
+                      className="text-gray-500 hover:text-rose-400 p-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <h4 className="text-sm font-bold text-white tracking-tight">{q.question || q.q}</h4>
+                  <p className="text-xs text-gray-300 line-clamp-2">{q.answer || q.a}</p>
+                  {q.marathiIntent && (
+                    <span className="text-[10px] text-amber-300 bg-amber-500/10 px-2 py-1 rounded block">
+                      💡 Marathi Intent: {q.marathiIntent}
+                    </span>
+                  )}
+                </GlassCard>
+              ))}
           </div>
         </div>
       )}
@@ -1583,6 +1785,18 @@ export const AdminCurriculumEditor = () => {
           </div>
         </div>
       )}
+
+      {/* Ultra-Premium Confirmation Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </div>
   );
 };

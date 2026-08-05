@@ -14,6 +14,7 @@ import { LaserBorder } from '../components/ui/LaserBorder';
 import { CodeEditor } from '../components/ui/CodeEditor';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import ConfirmModal from '../components/common/ConfirmModal';
 
 import {
   loadLearningProgress,
@@ -280,12 +281,17 @@ export const LearningHub = () => {
     }
   };
 
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+
   const handleResetProgress = () => {
-    if (window.confirm("Are you sure you want to reset your learning progress?")) {
-      setCompletedLessons(['js-0']);
-      setPassedQuizzes({ 'js-0': 100 });
-      setActiveLessonIdx(0);
-    }
+    setIsResetConfirmOpen(true);
+  };
+
+  const handleConfirmResetProgress = () => {
+    setCompletedLessons(['js-0']);
+    setPassedQuizzes({ 'js-0': 100 });
+    setActiveLessonIdx(0);
+    setIsResetConfirmOpen(false);
   };
 
 
@@ -990,6 +996,18 @@ export const LearningHub = () => {
           )}
         </div>
       </div>
+
+      {/* Ultra-Premium Reset Progress Confirm Modal */}
+      <ConfirmModal
+        isOpen={isResetConfirmOpen}
+        onClose={() => setIsResetConfirmOpen(false)}
+        onConfirm={handleConfirmResetProgress}
+        title="Reset Learning Progress?"
+        message="Are you sure you want to reset all your completed topics, quiz scores, and streak XP back to Chapter 1?"
+        confirmText="Yes, Reset Progress"
+        cancelText="Cancel"
+        variant="warning"
+      />
     </div>
   );
 };
