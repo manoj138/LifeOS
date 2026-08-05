@@ -18,6 +18,10 @@ require('./src/modals/JournalEntry');
 require('./src/modals/CurriculumTopic');
 require('./src/modals/RoadmapModule');
 require('./src/modals/JobApplication');
+require('./src/modals/InterviewQuestion');
+require('./src/modals/DsaProblem');
+require('./src/modals/DevopsStep');
+require('./src/modals/EnglishModule');
 
 const app = express();
 const port = process.env.PORT || 1235;

@@ -15,8 +15,8 @@ export const DevOpsPage = () => {
   useEffect(() => {
     let isMounted = true;
     const fetchDevOpsTopics = async () => {
-      const res = await apiService.getCurriculumTopics('devops');
-      if (isMounted && res?.success && res.data && res.data.length > 0) {
+      const res = await apiService.getDevopsSteps();
+      if (isMounted && res?.success && Array.isArray(res.data)) {
         setDynamicDevOpsTopics(res.data);
       }
     };
@@ -24,33 +24,7 @@ export const DevOpsPage = () => {
     return () => { isMounted = false; };
   }, []);
 
-
-  const setupSteps = [
-    {
-      step: "Step 1",
-      title: "Provision Hostinger VPS Server",
-      desc: "Order an Ubuntu 24.04 LTS KVM VPS instance on Hostinger. Note your Server IP and SSH root credentials.",
-      command: "ssh root@YOUR_SERVER_IP"
-    },
-    {
-      step: "Step 2",
-      title: "Install CloudPanel Control Panel",
-      desc: "Run the one-line CloudPanel installer script to set up MySQL 8, Nginx, and PHP/Node.js runners.",
-      command: "curl -sS https://installer.cloudpanel.io/ce/v2.x/install.sh | sudo bash"
-    },
-    {
-      step: "Step 3",
-      title: "Deploy Node.js & Docker Containers",
-      desc: "Clone your MERN project repo, configure .env secrets, and spin up Docker Compose service containers.",
-      command: "docker compose up -d --build"
-    },
-    {
-      step: "Step 4",
-      title: "Enable Free SSL Certificate",
-      desc: "In CloudPanel dashboard, navigate to SSL Certificates and issue a 1-click Let's Encrypt Wildcard SSL.",
-      command: "clpctl site:add:ssl --domain=lifeos.ai --type=letsencrypt"
-    }
-  ];
+  const setupSteps = dynamicDevOpsTopics || [];
 
   return (
     <div className="space-y-8 pb-12">

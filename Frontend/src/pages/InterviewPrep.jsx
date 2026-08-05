@@ -14,6 +14,7 @@ import { Badge } from '../components/ui/Badge';
 import { Tabs } from '../components/ui/Tabs';
 import { useVoiceGuider } from '../context/VoiceGuiderContext';
 import { useUser } from '../context/UserContext';
+import { apiService } from '../services/api';
 
 export const InterviewPrep = () => {
   const { speakText, language, startListening, stopListening, userTranscript } = useVoiceGuider();
@@ -25,6 +26,19 @@ export const InterviewPrep = () => {
   const [activeQuestionIdx, setActiveQuestionIdx] = useState(0);
   const [teleprompterSpeed, setTeleprompterSpeed] = useState('1x');
   const [aiEvaluation, setAiEvaluation] = useState(null);
+  const [dynamicQuestions, setDynamicQuestions] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchQuestions = async () => {
+      const res = await apiService.getInterviewQuestions(selectedCategory);
+      if (isMounted && res?.success && Array.isArray(res.data)) {
+        setDynamicQuestions(res.data);
+      }
+    };
+    fetchQuestions();
+    return () => { isMounted = false; };
+  }, [selectedCategory]);
 
   const userName = user?.name || user?.email?.split('@')[0] || 'Candidate';
   const targetRole = preferences?.targetRole || 'Full-Stack Web Developer';
@@ -61,99 +75,6 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
   };
 
 
-  const masterQuestionBank = {
-    js: [
-      {
-        id: "js-1",
-        q: "What are Primitive and Non-Primitive data types in JavaScript?",
-        a: "Primitive data types include String, Number, Boolean, Undefined, Null, BigInt, and Symbol. They are immutable and stored by value. Non-primitive types include Objects, Arrays, and Functions, which are mutable and stored by reference.",
-        marathiIntent: "इंटरव्ह्यूवर तपासत आहे की तुला Memory Allocation (Value vs Reference) समजते का.",
-        keywords: ["primitive", "non-primitive", "immutable", "value", "reference", "string", "number", "object"],
-        code: `let a = 10; // Primitive (Value)\nlet b = { name: "Manoj" }; // Non-Primitive (Reference)`
-      },
-      {
-        id: "js-2",
-        q: "What is the difference between == and ===?",
-        a: "`==` (loose equality) compares values after implicit type coercion, whereas `===` (strict equality) compares both value and data type without coercion.",
-        marathiIntent: "Type coercion चे नियम आणि strict comparison चे महत्त्व समजते का हे तपासले जाते.",
-        keywords: ["loose equality", "strict equality", "coercion", "type", "value"],
-        code: `5 == "5"   // true (type coerced)\n5 === "5"  // false (strictly different types)`
-      },
-      {
-        id: "js-3",
-        q: "What is the Temporal Dead Zone (TDZ)?",
-        a: "The Temporal Dead Zone is the period between entering a scope and the actual line of declaration of a `let` or `const` variable, during which accessing the variable throws a ReferenceError.",
-        marathiIntent: "let, const आणि var मधील hoisting चा फरक तुला माहित आहे का.",
-        keywords: ["scope", "declaration", "let", "const", "hoisting", "referenceerror"],
-        code: `console.log(a); // ReferenceError: Cannot access 'a' before initialization\nlet a = 10;`
-      },
-      {
-        id: "js-4",
-        q: "Explain Event Loop, Call Stack, Microtask, and Macrotask Queues.",
-        a: "JavaScript is single-threaded. Synchronous code executes on the Call Stack. Asynchronous callbacks enter queues: Promises enter the Microtask Queue, while setTimeout/setInterval enter the Macrotask (Task) Queue. The Event Loop continuously monitors the Call Stack and pushes Microtasks first before Macrotasks.",
-        marathiIntent: "Async JavaScript चे inner architecture समजते का हे तपासणारा सर्वात महत्त्वाचा प्रश्न.",
-        keywords: ["call stack", "event loop", "microtask", "macrotask", "single-threaded", "promises", "settimeout"]
-      }
-    ],
-    react: [
-      {
-        id: "react-1",
-        q: "What is the Virtual DOM and Reconciliation?",
-        a: "Virtual DOM is a lightweight in-memory representation of the real DOM. Reconciliation is the process where React compares the new Virtual DOM tree with the previous one using its Diffing algorithm to calculate minimal real DOM updates.",
-        marathiIntent: "React चे performance आणि DOM rendering कसे कार्य करते हे विचारले जाते.",
-        keywords: ["virtual dom", "reconciliation", "diffing", "in-memory", "render", "updates"]
-      },
-      {
-        id: "react-2",
-        q: "Why do we need unique keys in React lists?",
-        a: "Keys give list items a persistent identity across re-renders, enabling React's diffing algorithm to identify which specific items were added, changed, or removed without re-rendering the entire list.",
-        marathiIntent: "Array index का key वापरू नये याचा व्यावहारिक अनुभव तपासतात.",
-        keywords: ["persistent identity", "re-render", "diffing", "unique", "keys"]
-      },
-      {
-        id: "react-3",
-        q: "Controlled vs Uncontrolled Components?",
-        a: "In controlled components, form data is handled by React component state (`useState`). In uncontrolled components, form data is handled natively by the DOM tree using `useRef`.",
-        marathiIntent: "Forms handled कसे केले जातात हे जाणून घेण्यासाठी.",
-        keywords: ["usestate", "useref", "controlled", "uncontrolled", "state", "dom"]
-      }
-    ],
-    node: [
-      {
-        id: "node-1",
-        q: "Is Node.js single-threaded or multi-threaded?",
-        a: "Node.js executes JavaScript on a single main thread using V8. However, for background I/O operations (file system, crypto, network), it uses Libuv's thread pool under the hood.",
-        marathiIntent: "Node.js चे internal architecture आणि Libuv Threadpool माहित आहे का.",
-        keywords: ["single-threaded", "v8", "libuv", "thread pool", "async i/o"]
-      },
-      {
-        id: "node-2",
-        q: "How does the Express Request-Response Cycle work?",
-        a: "Client sends HTTP request → Express receives it → passes through mounted Middlewares → matches Route → executes Controller business logic → queries Database → sends JSON Response back to client.",
-        marathiIntent: "Backend Architecture चा प्रवाह स्पष्ट आहे का.",
-        keywords: ["middleware", "routes", "controller", "database", "json response", "http"]
-      }
-    ],
-    mongo: [
-      {
-        id: "mongo-1",
-        q: "Mongoose Schema vs Model?",
-        a: "A Schema defines the structure, data types, validators, and rules for MongoDB documents. A Model is a compiled wrapper constructor generated from the schema that provides DB methods (find, create, update) to interact with collections.",
-        marathiIntent: "ODM चे मूलभूत ज्ञान तपासले जाते.",
-        keywords: ["schema", "model", "validators", "constructor", "collections", "documents"]
-      }
-    ],
-    ecommerce: [
-      {
-        id: "ecom-1",
-        q: "How do you prevent a seller from editing another seller's product?",
-        a: "Through backend Authorization: After authenticating the user via JWT middleware, the controller checks whether `product.sellerId.toString() === req.user.id`. If not, it returns HTTP 403 Forbidden.",
-        marathiIntent: "🔥 Security question: तू खरोखर Security चे Logic लिहिले आहेस का?",
-        keywords: ["jwt", "authorization", "403 forbidden", "sellerid", "middleware"]
-      }
-    ]
-  };
-
   const categoryList = [
     { id: 'js', label: 'JavaScript Deep', icon: <Code2 className="w-4 h-4 text-cyan-400" /> },
     { id: 'react', label: 'React Architecture', icon: <Layers className="w-4 h-4 text-purple-400" /> },
@@ -162,8 +83,8 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
     { id: 'ecommerce', label: 'E-Commerce Scenarios', icon: <Briefcase className="w-4 h-4 text-rose-400" /> }
   ];
 
-  const currentQuestions = masterQuestionBank[selectedCategory] || masterQuestionBank.js;
-  const currentActiveQ = currentQuestions[activeQuestionIdx] || currentQuestions[0];
+  const currentQuestions = dynamicQuestions || [];
+  const currentActiveQ = currentQuestions[activeQuestionIdx] || currentQuestions[0] || null;
 
   const handleReadQuestion = () => {
     const textToRead = language === 'mr'
