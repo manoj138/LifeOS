@@ -5,6 +5,10 @@ import { SectionHeader } from '../components/common/SectionHeader';
 import { TiltCard } from '../components/ui/TiltCard';
 import { CodeEditor } from '../components/ui/CodeEditor';
 import { DifficultyBadge } from '../components/ui/DifficultyBadge';
+import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
+import { useUser } from '../context/UserContext';
+import { apiService } from '../services/api';
 
 export const DSAPage = () => {
   const [searchParams] = useSearchParams();
@@ -79,74 +83,83 @@ export const DSAPage = () => {
 
         {/* Right Column: Problem Description + Guided Hints + Code Sandbox */}
         <div className="lg:col-span-8 space-y-6">
-          <TiltCard className="p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
-              <div>
-                <span className="text-xs text-amber-400 font-mono font-bold uppercase">
-                  [{currentProblem.topic}]
-                </span>
-                <h2 className="text-xl font-extrabold text-white tracking-tight mt-0.5">
-                  {currentProblem.title}
-                </h2>
+          {currentProblem ? (
+            <>
+              <TiltCard className="p-6 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
+                  <div>
+                    <span className="text-xs text-amber-400 font-mono font-bold uppercase">
+                      [{currentProblem.topic || 'DSA'}]
+                    </span>
+                    <h2 className="text-xl font-extrabold text-white tracking-tight mt-0.5">
+                      {currentProblem.title}
+                    </h2>
+                  </div>
+                  <Badge variant={currentProblem.difficulty === 'Hard' ? 'rose' : 'amber'}>
+                    Target: {currentProblem.timeLimit || '20m'}
+                  </Badge>
+                </div>
+
+                <p className="text-sm text-gray-300 leading-relaxed font-sans">
+                  {currentProblem.description}
+                </p>
+
+                {/* Guided Actions (Hint & Solution Toggles) */}
+                <div className="flex items-center gap-3 pt-2">
+                  <Button
+                    size="xs"
+                    variant="glass"
+                    onClick={() => setShowHint(!showHint)}
+                    leftIcon={<HelpCircle className="w-3.5 h-3.5 text-cyan-400" />}
+                  >
+                    {showHint ? "Hide AI Hint" : "Need a Hint?"}
+                  </Button>
+
+                  <Button
+                    size="xs"
+                    variant="ghost"
+                    onClick={() => setShowSolution(!showSolution)}
+                    leftIcon={showSolution ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  >
+                    {showSolution ? "Hide Solution" : "View Full Solution"}
+                  </Button>
+                </div>
+
+                {/* AI Hint Box */}
+                {showHint && (
+                  <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-200">
+                    💡 <strong>AI Hint:</strong> {currentProblem.hint}
+                  </div>
+                )}
+              </TiltCard>
+
+              {/* Code Editor Sandbox */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-cyan-400" />
+                    Problem Code Workspace
+                  </h3>
+                  <span className="text-xs text-gray-400">Write & Test Code</span>
+                </div>
+
+                <CodeEditor
+                  key={currentProblem.id || activeProblem}
+                  initialFiles={[
+                    {
+                      name: "solution.js",
+                      lang: "javascript",
+                      code: showSolution ? currentProblem.solutionCode : currentProblem.starterCode
+                    }
+                  ]}
+                />
               </div>
-              <Badge variant={currentProblem.difficulty === 'Hard' ? 'rose' : 'amber'}>
-                Target: {currentProblem.timeLimit}
-              </Badge>
-            </div>
-
-            <p className="text-sm text-gray-300 leading-relaxed font-sans">
-              {currentProblem.description}
-            </p>
-
-            {/* Guided Actions (Hint & Solution Toggles) */}
-            <div className="flex items-center gap-3 pt-2">
-              <Button
-                size="xs"
-                variant="glass"
-                onClick={() => setShowHint(!showHint)}
-                leftIcon={<HelpCircle className="w-3.5 h-3.5 text-cyan-400" />}
-              >
-                {showHint ? "Hide AI Hint" : "Need a Hint?"}
-              </Button>
-
-              <Button
-                size="xs"
-                variant="ghost"
-                onClick={() => setShowSolution(!showSolution)}
-                leftIcon={showSolution ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-              >
-                {showSolution ? "Hide Solution" : "View Full Solution"}
-              </Button>
-            </div>
-
-            {/* AI Hint Box */}
-            {showHint && (
-              <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-200">
-                💡 <strong>AI Hint:</strong> {currentProblem.hint}
-              </div>
-            )}
-          </TiltCard>
-
-          {/* Code Editor Sandbox */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-cyan-400" />
-                Problem Code Workspace
-              </h3>
-              <span className="text-xs text-gray-400">Write & Test Code</span>
-            </div>
-
-            <CodeEditor
-              initialFiles={[
-                {
-                  name: "solution.js",
-                  lang: "javascript",
-                  code: showSolution ? currentProblem.solutionCode : currentProblem.starterCode
-                }
-              ]}
-            />
-          </div>
+            </>
+          ) : (
+            <TiltCard className="p-8 text-center space-y-3">
+              <p className="text-gray-400 text-sm">Loading DSA problems or no problems available...</p>
+            </TiltCard>
+          )}
         </div>
       </div>
     </div>
