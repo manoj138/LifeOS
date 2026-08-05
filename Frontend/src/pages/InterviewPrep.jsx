@@ -12,6 +12,7 @@ import { AudioSpectrum } from '../components/ui/AudioSpectrum';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Tabs } from '../components/ui/Tabs';
+import { GlassCard } from '../components/ui/Card';
 import { useVoiceGuider } from '../context/VoiceGuiderContext';
 import { useUser } from '../context/UserContext';
 import { apiService } from '../services/api';
@@ -43,36 +44,48 @@ export const InterviewPrep = () => {
   const userName = user?.name || user?.email?.split('@')[0] || 'Candidate';
   const targetRole = preferences?.targetRole || 'Full-Stack Web Developer';
   const careerLevel = preferences?.careerLevel || 'Intermediate (1-3 yrs experience)';
-  const aiPersona = preferences?.aiPersona || 'Motivational Tech Mentor';
+  const education = preferences?.education || 'B.E. Computer Science';
+  const userLocation = preferences?.location || 'India';
+  const proj1 = preferences?.project1 || 'E-Commerce Platform with Stripe & Coupon Engine';
+  const proj2 = preferences?.project2 || 'LifeOS AI Teleprompter & Learning Studio';
 
   const selfIntroData = {
     name: userName,
-    location: preferences?.location || "India",
-    education: preferences?.education || "Engineering / Computer Science Background",
-    currentRole: `${targetRole} Candidate (${careerLevel})`,
+    location: userLocation,
+    education: education,
+    currentRole: `${targetRole} (${careerLevel})`,
     skills: preferences?.focusAreas || ["React.js", "Node.js", "System Architecture", "DevOps & Cloud", "DSA Algorithms"],
-    projects: [
-      {
-        name: `${targetRole} Portfolio Project`,
-        panels: "Personalised Learning & Interactive Teleprompter Studio",
-        features: "Dynamic Routing, Voice Guider, Daily Time-blocking & Metrics"
-      },
-      {
-        name: "Full-Stack Web Architecture Application",
-        module: "RESTful API Integration & Database Management",
-        features: "Authentication Guard, SQLite Persistence & Responsive UI"
-      }
-    ],
-    fullScript: `Good morning, sir/madam. My name is ${userName}. I hold a Computer Science background and I am specializing as a ${targetRole}.
+    proj1: proj1,
+    proj2: proj2,
+    fullScript: `Good morning, sir/madam. My name is ${userName}. I hold a background in ${education} based out of ${userLocation}, specializing as a ${targetRole}.
 
-I have hands-on experience in building scalable applications, system design optimization, and full-stack development. My experience level is ${careerLevel}.
+I have hands-on experience building production software, system architecture optimization, and full-stack development. My career level is ${careerLevel}.
 
-Key highlights of my recent work include:
-1. Production web application featuring dynamic routing, authentication, telemetry, and AI voice assistant integration.
-2. Full-stack RESTful web applications with robust authentication, clean database schemas, and responsive UI design.
+Key highlights of my portfolio projects include:
+1. ${proj1}: Scalable web application featuring dynamic routing, authentication, API integrations, and robust database state management.
+2. ${proj2}: Interactive enterprise application with modular services, responsive UI design, and automated workflow pipelines.
 
-My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, DevOps, and Communication'}. I am guided by my AI persona, ${aiPersona}, maintaining a daily commitment of ${preferences?.dailyHours || 4} hours. My objective is to deliver high-performance software engineering solutions. Thank you for giving me this opportunity to introduce myself.`
+My core technical focus areas include ${preferences?.focusAreas?.join(', ') || 'Coding, System Design, and Communication'}. My objective is to deliver high-performance software engineering solutions. Thank you for giving me this opportunity to introduce myself.`
   };
+
+  // Follow-Up Questions derived from candidate's tailored intro
+  const derivedFollowUpQuestions = [
+    {
+      q: `You mentioned building '${proj1}'. How did you handle concurrent user transactions and state management?`,
+      a: `In ${proj1}, state integrity is maintained using atomic database transactions (ACID guarantees), optimist concurrency locking, and centralized state handlers.`,
+      mr: `प्रोजेक्ट '${proj1}' मधील ट्रान्झॅक्शन सायकल आणि स्टेट मॅनेजमेंट कसे हँडल केले?`
+    },
+    {
+      q: `You highlighted '${proj2}'. What architectural decisions did you make to ensure low latency and responsive performance?`,
+      a: `In ${proj2}, performance is optimized using lazy component loading, API response caching, debounced event listeners, and minimized DOM re-renders.`,
+      mr: `प्रोजेक्ट '${proj2}' मधील लेटन्सी कमी करण्यासाठी आणि परफॉर्मन्स वाढवण्यासाठी कोणते आर्किटेक्चर वापरले?`
+    },
+    {
+      q: `As a ${targetRole}, how do you approach error handling and RESTful API security in production?`,
+      a: `Error handling is enforced via global express middleware, standardized HTTP status responses (200, 400, 500), CORS origin restrictions, and JWT authentication tokens.`,
+      mr: `RESTful API सुरक्षेसाठी आणि एरर हँडलिंगसाठी काय बेस्ट प्रॅक्टिसेस वापरता?`
+    }
+  ];
 
 
   const categoryList = [
@@ -252,6 +265,34 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
                 </div>
               </div>
             </TiltCard>
+
+            {/* Dynamic Follow-Up Questions Derived from Onboarding Intro */}
+            <LaserBorder className="p-6 space-y-4 border border-purple-500/30 bg-purple-950/20">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  Likely Interviewer Follow-Ups (From Your Intro)
+                </h4>
+                <Badge variant="cyan">95% LIKELY</Badge>
+              </div>
+
+              <div className="space-y-3">
+                {derivedFollowUpQuestions.map((fq, idx) => (
+                  <div key={idx} className="p-3.5 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+                    <h5 className="text-xs font-bold text-white flex items-start gap-2">
+                      <span className="text-purple-400 font-mono">Q{idx + 1}.</span>
+                      <span>{fq.q}</span>
+                    </h5>
+                    <p className="text-[11px] text-gray-300 font-mono bg-black/40 p-2 rounded-lg border border-purple-500/20">
+                      <strong>Sample Answer:</strong> {fq.a}
+                    </p>
+                    <p className="text-[11px] text-purple-300 font-sans italic">
+                      💡 <strong>मराठी हेतू:</strong> {fq.mr}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </LaserBorder>
           </div>
         </div>
       ) : (

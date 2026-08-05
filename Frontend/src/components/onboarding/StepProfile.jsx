@@ -87,6 +87,40 @@ export const StepProfile = ({ formData, updateFormData }) => {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Input
+            label="Education Degree & Background"
+            placeholder="e.g. B.E. Computer Science / MCA"
+            value={formData.education || ''}
+            onChange={(e) => updateFormData({ education: e.target.value })}
+            leftIcon={<Sparkles className="w-4 h-4 text-cyan-400" />}
+          />
+          <Input
+            label="Current Location"
+            placeholder="e.g. Pune, India"
+            value={formData.location || ''}
+            onChange={(e) => updateFormData({ location: e.target.value })}
+            leftIcon={<Target className="w-4 h-4 text-amber-400" />}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Input
+            label="Key Portfolio Project #1"
+            placeholder="e.g. E-Commerce Platform with Stripe & Coupon Engine"
+            value={formData.project1 || ''}
+            onChange={(e) => updateFormData({ project1: e.target.value })}
+            leftIcon={<Briefcase className="w-4 h-4 text-purple-400" />}
+          />
+          <Input
+            label="Key Portfolio Project #2"
+            placeholder="e.g. LifeOS AI Teleprompter & Learning Studio"
+            value={formData.project2 || ''}
+            onChange={(e) => updateFormData({ project2: e.target.value })}
+            leftIcon={<Code2 className="w-4 h-4 text-emerald-400" />}
+          />
+        </div>
+
         <div className="space-y-2 pt-2">
           <label className="block text-xs font-medium text-gray-300 flex items-center gap-2">
             <Target className="w-4 h-4 text-purple-400" />
