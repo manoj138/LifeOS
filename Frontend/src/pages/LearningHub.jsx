@@ -24,6 +24,10 @@ import {
 import { useUser } from '../context/UserContext';
 import { apiService } from '../services/api';
 import { FormattedMarkdown } from '../components/ui/FormattedMarkdown';
+import { SearchInput } from '../components/ui/SearchInput';
+import { DifficultyBadge } from '../components/ui/DifficultyBadge';
+import { FilterPills } from '../components/ui/FilterPills';
+import { EmptyStateCard } from '../components/ui/EmptyStateCard';
 
 export const LearningHub = () => {
   const { preferences } = useUser();
@@ -285,29 +289,19 @@ export const LearningHub = () => {
       )}
 
       {/* Decoupled Roadmap Navigation Selector Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2">
-        {roadmapModules.map((mod) => (
-          <button
-            key={mod.id}
-            onClick={() => {
-              setActiveModule(mod.id);
-              setActiveLessonIdx(0);
-              setSearchQuery('');
-              setQuizAnswers({});
-              setActiveTab('concept');
-              setQuizErrorMessage(null);
-            }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap border ${
-              activeModule === mod.id
-                ? 'bg-gradient-to-r from-blue-600/40 to-purple-600/40 border-purple-500 text-white shadow-lg shadow-purple-500/20'
-                : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white hover:bg-white/[0.08]'
-            }`}
-          >
-            {mod.icon}
-            <span>{mod.label}</span>
-          </button>
-        ))}
-      </div>
+      <FilterPills
+        options={roadmapModules}
+        activeOption={activeModule}
+        onSelect={(modId) => {
+          setActiveModule(modId);
+          setActiveLessonIdx(0);
+          setSearchQuery('');
+          setQuizAnswers({});
+          setActiveTab('concept');
+          setQuizErrorMessage(null);
+        }}
+        size="md"
+      />
 
       {/* Guided Progression Banner: Recommended Next Topic */}
       {nextUncompletedLesson && (
@@ -322,9 +316,7 @@ export const LearningHub = () => {
               </span>
               <h4 className="text-sm font-bold text-white flex items-center gap-2">
                 {nextUncompletedLesson.title}
-                <Badge variant={nextUncompletedLesson.level === 'Beginner' ? 'emerald' : nextUncompletedLesson.level === 'Intermediate' ? 'amber' : 'rose'}>
-                  {nextUncompletedLesson.level}
-                </Badge>
+                <DifficultyBadge level={nextUncompletedLesson.level} />
               </h4>
             </div>
           </div>
@@ -348,21 +340,17 @@ export const LearningHub = () => {
         <div className="lg:col-span-4 space-y-4">
           <div className="p-4 rounded-2xl bg-[#0f0f15] border border-white/10 space-y-4">
             {/* Search Box */}
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search topics (e.g. Scope, Closure, Event Loop)..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setActiveLessonIdx(0);
-                  setQuizAnswers({});
-                  setQuizErrorMessage(null);
-                }}
-                className="w-full bg-white/[0.04] text-xs text-white placeholder:text-gray-500 pl-9 pr-3 py-2 rounded-xl border border-white/10 outline-none focus:border-purple-500/50"
-              />
-            </div>
+            <SearchInput
+              placeholder="Search topics (e.g. Scope, Closure, Event Loop)..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setActiveLessonIdx(0);
+                setQuizAnswers({});
+                setQuizErrorMessage(null);
+              }}
+              onClear={() => setSearchQuery('')}
+            />
 
             {/* Scaffolding Difficulty Tier Filter Buttons */}
             <div className="space-y-1.5 pt-1">

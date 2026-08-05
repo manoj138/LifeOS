@@ -4,10 +4,7 @@ import { Code2, Cpu, CheckCircle2, Play, ArrowRight, Sparkles, Terminal, HelpCir
 import { SectionHeader } from '../components/common/SectionHeader';
 import { TiltCard } from '../components/ui/TiltCard';
 import { CodeEditor } from '../components/ui/CodeEditor';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
-import { apiService } from '../services/api';
-import { useUser } from '../context/UserContext';
+import { DifficultyBadge } from '../components/ui/DifficultyBadge';
 
 export const DSAPage = () => {
   const [searchParams] = useSearchParams();
@@ -177,7 +174,7 @@ class LRUCache {
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-bold">{p.title}</span>
-                    <Badge variant={p.difficulty === 'Hard' ? 'rose' : 'amber'}>{p.difficulty}</Badge>
+                    <DifficultyBadge level={p.difficulty === 'Hard' ? 'Advanced' : p.difficulty === 'Medium' ? 'Intermediate' : 'Beginner'} />
                   </div>
                   <span className="text-[10px] text-gray-400 font-mono">{p.topic}</span>
                 </button>
