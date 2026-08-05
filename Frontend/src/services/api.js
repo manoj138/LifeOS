@@ -288,10 +288,162 @@ export const apiService = {
     }
   },
 
-  // Admin Metrics
+  // Admin Metrics & Candidates
   async getAdminMetrics() {
     try {
       const res = await Api.get('/admin/metrics');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async getCandidates() {
+    try {
+      const res = await Api.get('/admin/candidates');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteCandidate(id) {
+    try {
+      const res = await Api.delete(`/admin/candidates/${id}`);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteCurriculumTopic(id) {
+    try {
+      const res = await Api.delete(`/curriculum/topics/${id}`);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async generateSingleTopicWithAI(data) {
+    const topicTitle = typeof data === 'string' ? data : data.topicTitle;
+    const moduleId = data.moduleId || 'js';
+    const level = data.level || 'Beginner';
+    return this.generateSingleTopicAi(topicTitle, moduleId, level);
+  },
+
+  async saveOnboarding(data) {
+    return this.updatePreferences(data);
+  },
+
+  // Daily Planner Tasks
+  async getPlannerTasks() {
+    try {
+      const res = await Api.get('/planner/tasks');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createPlannerTask(data) {
+    try {
+      const res = await Api.post('/planner/tasks', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Habits
+  async getHabits() {
+    try {
+      const res = await Api.get('/habits');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createHabit(data) {
+    try {
+      const res = await Api.post('/habits', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Goals
+  async getGoals() {
+    try {
+      const res = await Api.get('/goals');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createGoal(data) {
+    try {
+      const res = await Api.post('/goals', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Fitness Logs
+  async getFitnessLogs() {
+    try {
+      const res = await Api.get('/fitness/logs');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createFitnessLog(data) {
+    try {
+      const res = await Api.post('/fitness/logs', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Journal Entries
+  async getJournalEntries() {
+    try {
+      const res = await Api.get('/journal/entries');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createJournalEntry(data) {
+    try {
+      const res = await Api.post('/journal/entries', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Projects
+  async getProjects() {
+    try {
+      const res = await Api.get('/projects');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createProject(data) {
+    try {
+      const res = await Api.post('/projects', data);
       return res.data;
     } catch (err) {
       return { success: false, fallback: true };

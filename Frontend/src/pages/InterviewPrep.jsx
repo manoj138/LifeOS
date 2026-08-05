@@ -86,10 +86,14 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
   const currentQuestions = dynamicQuestions || [];
   const currentActiveQ = currentQuestions[activeQuestionIdx] || currentQuestions[0] || null;
 
+  const currentQText = currentActiveQ ? (currentActiveQ.question || currentActiveQ.q || 'Interview Question') : '';
+  const currentAText = currentActiveQ ? (currentActiveQ.answer || currentActiveQ.a || 'Sample Answer') : '';
+
   const handleReadQuestion = () => {
+    if (!currentActiveQ) return;
     const textToRead = language === 'mr'
-      ? `इंटरव्ह्यू प्रश्न: ${currentActiveQ.q}`
-      : `Interview Question: ${currentActiveQ.q}`;
+      ? `इंटरव्ह्यू प्रश्न: ${currentQText}`
+      : `Interview Question: ${currentQText}`;
     speakText(textToRead, language);
   };
 
@@ -106,8 +110,9 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
   };
 
   const evaluateAnswer = () => {
-    const textToAnalyze = (userTranscript || currentActiveQ.a).toLowerCase();
-    const targetKeywords = currentActiveQ.keywords || ["javascript", "react", "node", "data"];
+    if (!currentActiveQ) return;
+    const textToAnalyze = (userTranscript || currentAText).toLowerCase();
+    const targetKeywords = currentActiveQ.keywords || (currentQText ? currentQText.split(' ').filter(w => w.length > 3) : ["javascript", "react", "node", "data"]);
 
     const found = targetKeywords.filter(kw => textToAnalyze.includes(kw.toLowerCase()));
     const rawScore = Math.min(10, Math.max(6.8, (found.length / targetKeywords.length) * 4 + 6)).toFixed(1);
@@ -285,7 +290,7 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
                 <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
                   {currentQuestions.map((q, idx) => (
                     <button
-                      key={q.id}
+                      key={q.id || idx}
                       onClick={() => {
                         setActiveQuestionIdx(idx);
                         setAiEvaluation(null);
@@ -296,7 +301,7 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
                           : 'bg-white/[0.03] border-white/10 text-gray-300 hover:bg-white/[0.06]'
                       }`}
                     >
-                      <span className="font-bold line-clamp-2">{q.q}</span>
+                      <span className="font-bold line-clamp-2">{q.question || q.q || 'Question'}</span>
                     </button>
                   ))}
                 </div>
@@ -305,85 +310,91 @@ My primary focus areas are ${preferences?.focusAreas?.join(', ') || 'Coding, Dev
 
             {/* Question Detail & Answer Studio */}
             <div className="lg:col-span-8 space-y-6">
-              <LaserBorder className="p-6 space-y-6">
-                <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                  <Badge variant="purple">Question {activeQuestionIdx + 1} of {currentQuestions.length}</Badge>
+              {currentActiveQ ? (
+                <LaserBorder className="p-6 space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <Badge variant="purple">Question {activeQuestionIdx + 1} of {currentQuestions.length}</Badge>
 
-                  {/* AI Read Question Out Loud Button */}
-                  <Button
-                    variant="glass"
-                    size="sm"
-                    onClick={handleReadQuestion}
-                    leftIcon={<Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
-                  >
-                    Ask Me Question (AI Voice)
-                  </Button>
-                </div>
-
-                <h2 className="text-xl font-extrabold text-white tracking-tight">
-                  "{currentActiveQ.q}"
-                </h2>
-
-                {/* English Master Answer */}
-                <div className="p-4 rounded-2xl bg-[#09090d] border border-purple-500/30 space-y-2">
-                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                    🌟 Word-for-Word English Interview Answer:
-                  </span>
-                  <p className="text-sm text-gray-100 leading-relaxed font-sans font-medium">
-                    "{currentActiveQ.a}"
-                  </p>
-                </div>
-
-                {/* Marathi Interviewer Intent Box */}
-                {currentActiveQ.marathiIntent && (
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 leading-relaxed">
-                    💡 <strong>इंटरव्ह्यूवर काय तपासत आहे? (Marathi Intent):</strong> {currentActiveQ.marathiIntent}
-                  </div>
-                )}
-
-                {/* AI Score Evaluation Banner */}
-                {aiEvaluation && (
-                  <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-purple-950/80 to-cyan-950/80 border border-emerald-500/40 space-y-3 shadow-xl">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                        <span className="text-sm font-bold text-white">AI Delivery & Technical Rating</span>
-                      </div>
-                      <Badge variant="emerald" className="text-sm px-3 py-1 font-bold">
-                        Score: {aiEvaluation.score} / 10
-                      </Badge>
-                    </div>
-
-                    <p className="text-xs text-emerald-200 font-medium leading-relaxed">
-                      {aiEvaluation.feedback}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      <span className="text-[10px] font-bold text-gray-400 self-center">Keywords Recognized:</span>
-                      {aiEvaluation.keywordsFound.map((kw, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                          ✓ {kw}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Live Voice Recording & Rating Area */}
-                <div className="p-4 rounded-2xl bg-[#09090d] border border-white/10 space-y-4">
-                  <AudioSpectrum isActive={isRecording} barCount={28} />
-                  <div className="flex justify-center">
+                    {/* AI Read Question Out Loud Button */}
                     <Button
-                      variant={isRecording ? 'danger' : 'glow'}
-                      size="lg"
-                      onClick={handleToggleRecording}
-                      leftIcon={isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                      variant="glass"
+                      size="sm"
+                      onClick={handleReadQuestion}
+                      leftIcon={<Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
                     >
-                      {isRecording ? 'Stop & Get AI Score' : 'Practice Answer Out Loud'}
+                      Ask Me Question (AI Voice)
                     </Button>
                   </div>
-                </div>
-              </LaserBorder>
+
+                  <h2 className="text-xl font-extrabold text-white tracking-tight">
+                    "{currentQText}"
+                  </h2>
+
+                  {/* English Master Answer */}
+                  <div className="p-4 rounded-2xl bg-[#09090d] border border-purple-500/30 space-y-2">
+                    <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                      🌟 Word-for-Word English Interview Answer:
+                    </span>
+                    <p className="text-sm text-gray-100 leading-relaxed font-sans font-medium">
+                      "{currentAText}"
+                    </p>
+                  </div>
+
+                  {/* Marathi Interviewer Intent Box */}
+                  {currentActiveQ.marathiIntent && (
+                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 leading-relaxed">
+                      💡 <strong>इंटरव्ह्यूवर काय तपासत आहे? (Marathi Intent):</strong> {currentActiveQ.marathiIntent}
+                    </div>
+                  )}
+
+                  {/* AI Score Evaluation Banner */}
+                  {aiEvaluation && (
+                    <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-purple-950/80 to-cyan-950/80 border border-emerald-500/40 space-y-3 shadow-xl">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                          <span className="text-sm font-bold text-white">AI Delivery & Technical Rating</span>
+                        </div>
+                        <Badge variant="emerald" className="text-sm px-3 py-1 font-bold">
+                          Score: {aiEvaluation.score} / 10
+                        </Badge>
+                      </div>
+
+                      <p className="text-xs text-emerald-200 font-medium leading-relaxed">
+                        {aiEvaluation.feedback}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        <span className="text-[10px] font-bold text-gray-400 self-center">Keywords Recognized:</span>
+                        {aiEvaluation.keywordsFound.map((kw, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                            ✓ {kw}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Live Voice Recording & Rating Area */}
+                  <div className="p-4 rounded-2xl bg-[#09090d] border border-white/10 space-y-4">
+                    <AudioSpectrum isActive={isRecording} barCount={28} />
+                    <div className="flex justify-center">
+                      <Button
+                        variant={isRecording ? 'danger' : 'glow'}
+                        size="lg"
+                        onClick={handleToggleRecording}
+                        leftIcon={isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                      >
+                        {isRecording ? 'Stop & Get AI Score' : 'Practice Answer Out Loud'}
+                      </Button>
+                    </div>
+                  </div>
+                </LaserBorder>
+              ) : (
+                <LaserBorder className="p-8 text-center space-y-3">
+                  <p className="text-gray-400 text-sm">No interview questions available for this category.</p>
+                </LaserBorder>
+              )}
             </div>
           </div>
         </div>

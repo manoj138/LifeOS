@@ -134,6 +134,7 @@ const startServer = async () => {
     await ensureTablesExist();
     await ensureModuleColumns();
     await ensureTopicColumns();
+    await sequelize.sync();
     console.log('✅ SQLite Database Models synced successfully.');
     
     // Auto-repair any outdated AI topics in database.sqlite
