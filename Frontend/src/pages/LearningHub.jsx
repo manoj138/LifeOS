@@ -29,7 +29,6 @@ import { SearchInput } from '../components/ui/SearchInput';
 import { DifficultyBadge } from '../components/ui/DifficultyBadge';
 import { FilterPills } from '../components/ui/FilterPills';
 import { EmptyStateCard } from '../components/ui/EmptyStateCard';
-import { TopicVisualizer } from '../components/learning/TopicVisualizer';
 
 export const LearningHub = () => {
   const { preferences, user } = useUser();
@@ -670,17 +669,6 @@ export const LearningHub = () => {
                 </button>
 
                 <button
-                  onClick={() => setActiveTab('visual')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    activeTab === 'visual'
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" /> 🎨 Animated Visual Flow
-                </button>
-
-                <button
                   onClick={() => setActiveTab('code')}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                     activeTab === 'code'
@@ -736,19 +724,9 @@ export const LearningHub = () => {
                 </button>
               </div>
 
-              {/* TAB: ANIMATED VISUAL FLOW */}
-              {activeTab === 'visual' && (
-                <div className="space-y-5 animate-fadeIn">
-                  <TopicVisualizer lesson={currentLessonData} module={activeModule} />
-                </div>
-              )}
-
               {/* TAB 1: CONCEPT & ANALOGY */}
               {activeTab === 'concept' && (
                 <div className="space-y-5">
-                  {/* Interactive Visual Simulator embedded directly into Concept Tab */}
-                  <TopicVisualizer lesson={currentLessonData} module={activeModule} />
-
                   {/* 💡 Concept Overview */}
                   <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 text-xs text-cyan-200 font-medium leading-relaxed flex items-start gap-3">
                     <Lightbulb className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
