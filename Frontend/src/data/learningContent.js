@@ -2,17 +2,7 @@
 // Aggregates modular topic packs (JavaScript, React, Backend, DevOps, DSA)
 // Enhances fallbacks with dynamic, rich technical mechanics and realistic bad vs good code examples.
 
-import { jsTopics } from './learning/jsTopics';
-import { reactTopics } from './learning/reactTopics';
-import { backendTopics } from './learning/backendTopics';
-import { devopsTopics } from './learning/devopsTopics';
-
-export const learningContent = {
-  ...jsTopics,
-  ...reactTopics,
-  ...backendTopics,
-  ...devopsTopics
-};
+export const learningContent = {};
 
 // Advanced dynamic generator for topics that do not have handcrafted modules yet
 export const getFallbackTopicContent = (lesson) => {

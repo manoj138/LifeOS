@@ -13,7 +13,7 @@ import { LaserBorder } from '../components/ui/LaserBorder';
 import { CodeEditor } from '../components/ui/CodeEditor';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { learningContent, getFallbackTopicContent } from '../data/learningContent';
+import { getFallbackTopicContent } from '../data/learningContent';
 import {
   loadLearningProgress,
   saveLearningProgress,
@@ -338,22 +338,21 @@ export const LearningHub = () => {
       dt.title === lesson.title || 
       (dt.topicName && lesson.topicName && dt.topicName.toLowerCase() === lesson.topicName.toLowerCase())
     );
-    const customContent = learningContent[lesson.id];
     const fallback = getFallbackTopicContent(lesson);
 
     return {
       id: lesson.id,
       title: lesson.title,
-      difficulty: lesson.level || dynamicTopic?.level || customContent?.difficulty || "Beginner",
+      difficulty: lesson.level || dynamicTopic?.level || "Beginner",
       summary: dynamicTopic?.conceptExplanation 
         ? dynamicTopic.conceptExplanation.split('\n')[0] 
-        : customContent?.summary || fallback.summary,
-      notes: dynamicTopic?.conceptExplanation || customContent?.howItWorks || fallback.howItWorks,
-      useCases: dynamicTopic?.projectApplication || customContent?.realWorldUse || fallback.realWorldUse,
-      keyTakeaways: customContent?.keyTakeaways || fallback.keyTakeaways,
-      code: dynamicTopic?.codeSnippet || customContent?.practiceCode || fallback.practiceCode,
-      goodCode: dynamicTopic?.codeSnippet || customContent?.goodCode,
-      badCode: customContent?.badCode,
+        : fallback.summary,
+      notes: dynamicTopic?.conceptExplanation || fallback.howItWorks,
+      useCases: dynamicTopic?.projectApplication || fallback.realWorldUse,
+      keyTakeaways: fallback.keyTakeaways,
+      code: dynamicTopic?.codeSnippet || fallback.practiceCode,
+      goodCode: dynamicTopic?.codeSnippet || null,
+      badCode: null,
       quiz: (dynamicTopic?.quizQuestions && dynamicTopic.quizQuestions.length > 0)
         ? dynamicTopic.quizQuestions.map(q => ({
             question: q.q || q.question,
@@ -361,7 +360,7 @@ export const LearningHub = () => {
             correctIndex: 0,
             explanation: q.a || "Correct implementation"
           }))
-        : customContent?.quiz || fallback.quiz,
+        : fallback.quiz,
       taskTitle: dynamicTopic?.taskTitle || `Chapter Challenge: ${lesson.title}`,
       taskDescription: dynamicTopic?.taskDescription || `Solve the practical challenge for ${lesson.title} to unlock progression!`,
       starterCode: dynamicTopic?.starterCode || `// Starter Code for ${lesson.title}\nfunction solveTask() {\n  return "SUCCESS";\n}`,

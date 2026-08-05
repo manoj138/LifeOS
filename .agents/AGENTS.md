@@ -36,6 +36,10 @@
 
 ## 📋 Mandatory Implementation Plan First Rule
 
-1. **Always Provide an Implementation Plan Before Execution**:
+1. **Mandatory Deep Codebase Inspection First**:
+   - Before drafting any `implementation_plan.md`, Antigravity MUST thoroughly read and inspect all relevant Frontend files (`pages/`, `components/`, `services/`, `layouts/`, `contexts/`) and Backend files (`routes/`, `controllers/`, `modals/`, `config/`, `middleware/`) involved in or affected by the user's request.
+   - All proposed changes, file paths, and function signatures in the plan MUST be derived from actual existing codebase investigation, not assumptions.
+
+2. **Always Provide an Implementation Plan Before Execution**:
    - For every user request or prompt, Antigravity MUST first create an `implementation_plan.md` artifact detailing the proposed changes, design decisions, and verification steps.
    - Antigravity MUST NOT make code changes or run state-modifying shell commands until the user explicitly approves the implementation plan.
