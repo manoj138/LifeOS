@@ -6,7 +6,19 @@ const getQuestions = async (req, res) => {
     const { category } = req.query;
     const where = category ? { category } : {};
     const questions = await InterviewQuestion.findAll({ where, order: [['createdAt', 'ASC']] });
-    return sendSuccess(res, 'Interview questions fetched successfully', questions);
+
+    const cleanedQuestions = questions.map(q => {
+      const plain = q.toJSON ? q.toJSON() : { ...q };
+      if (plain.answer) {
+        plain.answer = plain.answer.replace(/^(ns|Ans|Answer|A)\s*[:.-]?\s*/i, '').trim();
+      }
+      if (plain.question) {
+        plain.question = plain.question.replace(/^(Question|Q\d*|\d+[\.\)])\s*[:.-]?\s*/i, '').trim();
+      }
+      return plain;
+    });
+
+    return sendSuccess(res, 'Interview questions fetched successfully', cleanedQuestions);
   } catch (error) {
     return sendError(res, 'Error fetching interview questions', error, 500);
   }

@@ -117,8 +117,11 @@ My core technical focus areas include ${preferences?.focusAreas?.join(', ') || '
   const currentQuestions = dynamicQuestions || [];
   const currentActiveQ = currentQuestions[activeQuestionIdx] || currentQuestions[0] || null;
 
-  const currentQText = currentActiveQ ? (currentActiveQ.question || currentActiveQ.q || 'Interview Question') : '';
-  const currentAText = currentActiveQ ? (currentActiveQ.answer || currentActiveQ.a || 'Sample Answer') : '';
+  const rawQ = currentActiveQ ? (currentActiveQ.question || currentActiveQ.q || 'Interview Question') : '';
+  const rawA = currentActiveQ ? (currentActiveQ.answer || currentActiveQ.a || 'Sample Answer') : '';
+
+  const currentQText = rawQ.replace(/^(Question|Q\d*|\d+[\.\)])\s*[:.-]?\s*/i, '').trim();
+  const currentAText = rawA.replace(/^(ns|Ans|Answer|A)\s*[:.-]?\s*/i, '').trim();
 
   const handleReadQuestion = () => {
     if (!currentActiveQ) return;

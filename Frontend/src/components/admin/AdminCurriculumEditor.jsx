@@ -136,9 +136,13 @@ export const AdminCurriculumEditor = () => {
       order: modulesList.length + 1
     });
     if (res?.success) {
+      const newCatId = res.data?.id || generatedId;
       setNewCatTitle('');
       setIsAddingCategoryModal(false);
       await fetchModules();
+      setIqFilterCategory(newCatId);
+      setRawQaCategory(newCatId);
+      setNewInterviewCategory(newCatId);
     }
   };
 
@@ -230,14 +234,16 @@ export const AdminCurriculumEditor = () => {
 
     lines.forEach(line => {
       const trimmed = line.trim();
-      if (trimmed.match(/^(Q|Q\d+|\d+\.|\d+\))\s*/i)) {
+      if (!trimmed) return;
+
+      if (trimmed.match(/^(Question|Q\d*|\d+[\.\)])\s*/i)) {
         if (currentQ) {
           items.push({ q: currentQ, a: currentA || 'Answer under compilation.' });
           currentA = '';
         }
-        currentQ = trimmed.replace(/^(Q|Q\d+|\d+\.|\d+\))\s*[:.-]?\s*/i, '');
-      } else if (trimmed.match(/^(A|Ans|Answer)\s*/i)) {
-        currentA = trimmed.replace(/^(A|Ans|Answer)\s*[:.-]?\s*/i, '');
+        currentQ = trimmed.replace(/^(Question|Q\d*|\d+[\.\)])\s*[:.-]?\s*/i, '');
+      } else if (trimmed.match(/^(Answer|Ans|A)\s*/i)) {
+        currentA = trimmed.replace(/^(Answer|Ans|A)\s*[:.-]?\s*/i, '');
       } else if (currentA) {
         currentA += ' ' + trimmed;
       } else if (currentQ) {
@@ -263,13 +269,18 @@ export const AdminCurriculumEditor = () => {
     }
 
     for (const item of items) {
-      await apiService.createInterviewQuestion({
-        category: rawQaCategory,
-        question: item.q,
-        answer: item.a,
-        marathiIntent: `इंटरव्ह्यूवर मुख्यत्वे ${item.q.substring(0, 35)} बद्दलची तांत्रिक समजूत तपासत आहे.`,
-        difficulty: rawQaDifficulty
-      });
+      const cleanQ = (item.q || '').replace(/^(Question|Q\d*|\d+[\.\)])\s*[:.-]?\s*/i, '').trim();
+      const cleanA = (item.a || '').replace(/^(Answer|Ans|A|ns)\s*[:.-]?\s*/i, '').trim();
+
+      if (cleanQ) {
+        await apiService.createInterviewQuestion({
+          category: rawQaCategory,
+          question: cleanQ,
+          answer: cleanA || 'Comprehensive technical answer.',
+          marathiIntent: `इंटरव्ह्यूवर मुख्यत्वे ${cleanQ.substring(0, 35)} बद्दलची तांत्रिक समजूत तपासत आहे.`,
+          difficulty: rawQaDifficulty
+        });
+      }
     }
 
     setRawQaText('');
@@ -1348,16 +1359,22 @@ export const AdminCurriculumEditor = () => {
                   ...modulesList.map(m => (m.id || '').toLowerCase().trim()),
                   ...interviewQuestions.map(q => (q.category || '').toLowerCase().trim())
                 ])).filter(Boolean).map((catKey) => {
-                  const matchedModule = modulesList.find(m => (m.id || '').toLowerCase() === catKey);
+                  const toSlug = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                  const catSlug = toSlug(catKey);
+                  const matchedModule = modulesList.find(m => toSlug(m.id || m.title) === catSlug);
                   const displayLabel = matchedModule?.title || catKey.toUpperCase();
-                  const catCount = interviewQuestions.filter(q => (q.category || '').toLowerCase() === catKey).length;
+                  const catCount = interviewQuestions.filter(q => toSlug(q.category) === catSlug).length;
                   return (
                     <div
                       key={catKey}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                        iqFilterCategory.toLowerCase() === catKey ? 'bg-purple-600 text-white' : 'bg-slate-900 text-gray-400 hover:text-white border border-white/5'
+                        toSlug(iqFilterCategory) === catSlug ? 'bg-purple-600 text-white' : 'bg-slate-900 text-gray-400 hover:text-white border border-white/5'
                       }`}
-                      onClick={() => setIqFilterCategory(catKey)}
+                      onClick={() => {
+                        setIqFilterCategory(catKey);
+                        setRawQaCategory(catKey);
+                        setNewInterviewCategory(catKey);
+                      }}
                     >
                       <span>{displayLabel} ({catCount})</span>
                       <button
@@ -1395,15 +1412,58 @@ export const AdminCurriculumEditor = () => {
           </GlassCard>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {interviewQuestions
-              .filter((q) => {
-                const matchCat = iqFilterCategory === 'all' || (q.category || '').toLowerCase() === iqFilterCategory.toLowerCase();
-                const matchDiff = iqFilterDifficulty === 'all' || (q.difficulty || '').toLowerCase() === iqFilterDifficulty.toLowerCase();
+            {(() => {
+              const toSlug = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+              const activeSlug = toSlug(iqFilterCategory);
+              const rawActive = (iqFilterCategory || '').toLowerCase().trim();
+
+              const filtered = interviewQuestions.filter((q) => {
+                const itemSlug = toSlug(q.category);
+                const rawCat = (q.category || '').toLowerCase().trim();
+
+                const matchCat =
+                  iqFilterCategory === 'all' ||
+                  activeSlug === itemSlug ||
+                  rawCat === rawActive ||
+                  (activeSlug && itemSlug && (itemSlug.includes(activeSlug) || activeSlug.includes(itemSlug)));
+
+                const matchDiff =
+                  iqFilterDifficulty === 'all' ||
+                  !q.difficulty ||
+                  (q.difficulty || '').toLowerCase().trim() === (iqFilterDifficulty || '').toLowerCase().trim();
+
                 const qText = `${q.question || q.q || ''} ${q.answer || q.a || ''}`.toLowerCase();
                 const matchSearch = !iqSearchQuery.trim() || qText.includes(iqSearchQuery.toLowerCase());
+
                 return matchCat && matchDiff && matchSearch;
-              })
-              .map((q) => (
+              });
+
+              if (filtered.length === 0) {
+                return (
+                  <GlassCard className="p-8 text-center space-y-4 col-span-2 border border-purple-500/30 bg-purple-950/20">
+                    <AlertCircle className="w-8 h-8 text-purple-400 mx-auto animate-pulse" />
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-white">No questions matching selected filters</h4>
+                      <p className="text-xs text-gray-400">
+                        Category: <span className="text-purple-300 font-mono font-bold">{iqFilterCategory}</span> | Difficulty: <span className="text-cyan-300 font-mono font-bold">{iqFilterDifficulty}</span>
+                      </p>
+                    </div>
+                    <Button
+                      variant="glow"
+                      size="sm"
+                      onClick={() => {
+                        setIqFilterCategory('all');
+                        setIqFilterDifficulty('all');
+                        setIqSearchQuery('');
+                      }}
+                    >
+                      🔄 Reset All Filters (View All {interviewQuestions.length} Questions)
+                    </Button>
+                  </GlassCard>
+                );
+              }
+
+              return filtered.map((q) => (
                 <GlassCard key={q.id} className="p-5 space-y-3 relative group">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -1418,15 +1478,16 @@ export const AdminCurriculumEditor = () => {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <h4 className="text-sm font-bold text-white tracking-tight">{q.question || q.q}</h4>
-                  <p className="text-xs text-gray-300 line-clamp-2">{q.answer || q.a}</p>
+                  <h4 className="text-sm font-bold text-white tracking-tight">{(q.question || q.q || '').replace(/^(Question|Q\d*|\d+[\.\)])\s*[:.-]?\s*/i, '').trim()}</h4>
+                  <p className="text-xs text-gray-300 line-clamp-2">{(q.answer || q.a || '').replace(/^(ns|Ans|Answer|A)\s*[:.-]?\s*/i, '').trim()}</p>
                   {q.marathiIntent && (
                     <span className="text-[10px] text-amber-300 bg-amber-500/10 px-2 py-1 rounded block">
                       💡 Marathi Intent: {q.marathiIntent}
                     </span>
                   )}
                 </GlassCard>
-              ))}
+              ));
+            })()}
           </div>
         </div>
       )}
