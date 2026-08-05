@@ -48,6 +48,9 @@ export const InterviewPrep = () => {
       const res = await apiService.getRoadmapModules();
       if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
         setDynamicModules(res.data);
+        if (res.data[0]?.id) {
+          setArenaDomain(res.data[0].id);
+        }
       }
     };
     fetchModules();
@@ -563,7 +566,10 @@ My core technical focus areas include ${preferences?.focusAreas?.join(', ') || '
 
               <div className="space-y-4 pt-2">
                 <div>
-                  <label className="block text-xs font-bold text-gray-300 mb-2">1. Select Target Tech Domain:</label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-bold text-gray-300">1. Select Target Tech Domain (Your Onboarding Stack):</label>
+                    <span className="text-[10px] text-emerald-400 font-mono font-bold">Synced with {userName}'s Profile</span>
+                  </div>
                   <div className="flex items-center gap-2 overflow-x-auto pb-1">
                     {categoryList.map((cat) => (
                       <button
@@ -623,10 +629,10 @@ My core technical focus areas include ${preferences?.focusAreas?.join(', ') || '
               {/* Talking AI Avatar Sidebar */}
               <div className="lg:col-span-4 space-y-4">
                 <GlassCard className="p-6 text-center space-y-4 border border-emerald-500/40 bg-emerald-950/20">
-                  <div className="relative w-32 h-32 mx-auto rounded-3xl border-2 border-emerald-500/50 bg-slate-900 overflow-hidden flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.3)]">
-                    <img src={talkingGreenManSvg} alt="AI Senior Interviewer" className="w-full h-full object-contain scale-110" />
+                  <div className="relative w-48 h-48 mx-auto rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-b from-emerald-950/40 via-slate-900 to-black overflow-hidden flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.4)]">
+                    <img src={talkingGreenManSvg} alt="AI Senior Interviewer" className="w-full h-full object-contain scale-[1.85] translate-y-1 transition-transform duration-500" />
                     {isArenaAiSpeaking && (
-                      <div className="absolute inset-0 border-4 border-emerald-400 rounded-3xl animate-ping opacity-30" />
+                      <div className="absolute inset-0 border-4 border-emerald-400 rounded-3xl animate-ping opacity-40" />
                     )}
                   </div>
 
