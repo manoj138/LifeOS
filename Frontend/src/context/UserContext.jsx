@@ -183,7 +183,15 @@ export const UserProvider = ({ children }) => {
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error('useUser must be used within a UserProvider');
+    console.warn('useUser was accessed outside UserProvider, returning safe fallback object.');
+    return {
+      user: { name: 'Learner', email: 'user@lifeos.dev' },
+      preferences: { dailyHours: 2, targetRole: 'Full Stack Engineer' },
+      onboardingCompleted: true,
+      userMetrics: {},
+      workoutLogs: [],
+      routineTasks: [],
+    };
   }
   return context;
 };

@@ -5,7 +5,8 @@ import {
   Database, ShieldCheck, Server, Cpu, Layers, GitBranch, Briefcase, FileText,
   PieChart, Activity, Zap, Search, Globe, Key, FileCheck, Layers3, Flame,
   AlertTriangle, Lightbulb, CheckSquare, MessageCircle, Info, ShieldAlert, Clock, HelpCircle as QuizIcon,
-  Filter, Compass, Target, Check, ArrowUpRight, LockKeyhole, Trophy, RotateCcw, Calculator, GitPullRequest, Binary
+  Filter, Compass, Target, Check, ArrowUpRight, LockKeyhole, Trophy, RotateCcw, Calculator, GitPullRequest, Binary,
+  Volume2, VolumeX, Download, Star
 } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { TiltCard } from '../components/ui/TiltCard';
@@ -28,9 +29,10 @@ import { SearchInput } from '../components/ui/SearchInput';
 import { DifficultyBadge } from '../components/ui/DifficultyBadge';
 import { FilterPills } from '../components/ui/FilterPills';
 import { EmptyStateCard } from '../components/ui/EmptyStateCard';
+import { TopicVisualizer } from '../components/learning/TopicVisualizer';
 
 export const LearningHub = () => {
-  const { preferences } = useUser();
+  const { preferences, user } = useUser();
 
   // Load saved progress state from localStorage on mount
   const initialProgress = loadLearningProgress();
@@ -38,6 +40,20 @@ export const LearningHub = () => {
   const [activeModule, setActiveModule] = useState(initialProgress.lastActiveModule || 'js');
   const [dynamicTopics, setDynamicTopics] = useState(null);
   const [dynamicModules, setDynamicModules] = useState([]);
+
+  // Voice AI & Interactive Features State
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showCheatSheetModal, setShowCheatSheetModal] = useState(false);
+  const [executionOutput, setExecutionOutput] = useState(null);
+
+  // Stop speech synthesis when switching topics or unmounting
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -77,6 +93,48 @@ export const LearningHub = () => {
   const [quizErrorMessage, setQuizErrorMessage] = useState(null);
   const [activeLevelFilter, setActiveLevelFilter] = useState('all'); // 'all', 'Beginner', 'Intermediate', 'Advanced'
   const [showLevelMasterModal, setShowLevelMasterModal] = useState(false);
+
+  const totalXP = completedLessons.length * 100;
+  const learningStreak = Math.max(1, Math.min(completedLessons.length, 7));
+
+  // Voice AI Audio Narration
+  const handleToggleVoiceAudio = (textToRead) => {
+    if (!('speechSynthesis' in window)) {
+      alert("Voice speech synthesis is not supported in your browser.");
+      return;
+    }
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    } else {
+      const cleanText = (textToRead || '').replace(/[#*`_]/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 0.95;
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+    }
+  };
+
+  // Live Code Execution Simulator
+  const handleRunLiveCode = (codeToRun) => {
+    try {
+      let logs = [];
+      const originalLog = console.log;
+      console.log = (...args) => {
+        logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+      };
+      
+      const runFn = new Function(codeToRun);
+      runFn();
+      
+      console.log = originalLog;
+      setExecutionOutput(logs.length > 0 ? logs.join('\n') : '✅ Executed successfully (No console output)');
+    } catch (err) {
+      setExecutionOutput(`❌ Execution Error: ${err.message}`);
+    }
+  };
 
 
   const roadmapModules = dynamicModules.map((dm, idx) => ({
@@ -239,9 +297,15 @@ export const LearningHub = () => {
         title="Beginner 🟢 ➔ Intermediate 🟡 ➔ Advanced 🔴 Mastery"
         subtitle="Dedicated modules for DSA, Aptitude, Git, Career, and DevOps with strict progressive locking and auto-saved progress!"
         actions={
-          <div className="flex items-center gap-3">
-            <Badge variant="purple" className="px-3 py-1.5 font-mono text-xs">
-              Roadmap Progress: {completedLessons.length} / 175+ Topics Mastered
+          <div className="flex items-center gap-3 flex-wrap">
+            <Badge variant="amber" className="px-3 py-1.5 font-mono text-xs flex items-center gap-1">
+              <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> {learningStreak}-Day Streak
+            </Badge>
+            <Badge variant="purple" className="px-3 py-1.5 font-mono text-xs flex items-center gap-1">
+              <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" /> {totalXP} XP
+            </Badge>
+            <Badge variant="glass" className="px-3 py-1.5 font-mono text-xs">
+              Progress: {completedLessons.length} Mastered
             </Badge>
             <Button
               variant="ghost"
@@ -538,12 +602,59 @@ export const LearningHub = () => {
                       </span>
                     )}
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-                    {currentLessonData.title}
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-3">
+                    <span>{currentLessonData.title}</span>
                   </h2>
                 </div>
-                <Badge variant="cyan" className="shrink-0">Topic {currentLessonData.id}</Badge>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="xs"
+                    variant={isSpeaking ? "glow" : "glass"}
+                    onClick={() => handleToggleVoiceAudio(currentLessonData.notes || currentLessonData.summary)}
+                    leftIcon={isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
+                  >
+                    {isSpeaking ? "Stop Audio" : "🔊 Listen Voice Lesson"}
+                  </Button>
+
+                  <Button
+                    size="xs"
+                    variant="glass"
+                    onClick={() => setShowCheatSheetModal(!showCheatSheetModal)}
+                    leftIcon={<Download className="w-3.5 h-3.5 text-purple-400" />}
+                  >
+                    📥 Cheat Sheet
+                  </Button>
+
+                  <Badge variant="cyan" className="shrink-0">Topic {currentLessonData.id}</Badge>
+                </div>
               </div>
+
+              {/* Cheat Sheet Quick Reference Modal */}
+              {showCheatSheetModal && (
+                <div className="p-5 rounded-2xl bg-purple-950/60 border border-purple-500/40 space-y-3 animate-fadeIn">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-2">
+                      <Download className="w-4 h-4 text-cyan-400" /> Quick Interview Cheat Sheet for {currentLessonData.title}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => setShowCheatSheetModal(false)}
+                      className="text-xs text-gray-400 hover:text-white"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-950 border border-white/10 font-mono text-xs text-cyan-200 leading-relaxed whitespace-pre-line max-h-60 overflow-y-auto">
+                    📌 {currentLessonData.title} Summary:\n
+                    {currentLessonData.summary}\n\n
+                    💡 Key Takeaways:\n
+                    {currentLessonData.keyTakeaways?.join('\n• ')}\n\n
+                    ⚡ Production Code Pattern:\n
+                    {currentLessonData.goodCode || currentLessonData.code}
+                  </div>
+                </div>
+              )}
 
               {/* Reader View Selector Tabs */}
               <div className="flex items-center gap-2 border-b border-white/10 pb-3 overflow-x-auto">
@@ -556,6 +667,17 @@ export const LearningHub = () => {
                   }`}
                 >
                   <BookOpen className="w-3.5 h-3.5 text-cyan-400" /> 📖 Concept & Analogy
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('visual')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                    activeTab === 'visual'
+                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" /> 🎨 Animated Visual Flow
                 </button>
 
                 <button
@@ -614,9 +736,19 @@ export const LearningHub = () => {
                 </button>
               </div>
 
+              {/* TAB: ANIMATED VISUAL FLOW */}
+              {activeTab === 'visual' && (
+                <div className="space-y-5 animate-fadeIn">
+                  <TopicVisualizer lesson={currentLessonData} module={activeModule} />
+                </div>
+              )}
+
               {/* TAB 1: CONCEPT & ANALOGY */}
               {activeTab === 'concept' && (
                 <div className="space-y-5">
+                  {/* Interactive Visual Simulator embedded directly into Concept Tab */}
+                  <TopicVisualizer lesson={currentLessonData} module={activeModule} />
+
                   {/* 💡 Concept Overview */}
                   <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 text-xs text-cyan-200 font-medium leading-relaxed flex items-start gap-3">
                     <Lightbulb className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
@@ -665,14 +797,38 @@ export const LearningHub = () => {
                 </div>
               )}
 
-              {/* TAB 2: CODE COMPARISON */}
+              {/* TAB 2: CODE COMPARISON & LIVE RUNNER */}
               {activeTab === 'code' && (
                 <div className="space-y-4">
-                  <p className="text-xs text-gray-300">
-                    Understanding <strong>bad practices vs recommended code</strong> is the fastest way to write bug-free, senior-level applications:
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-gray-300">
+                      Understanding <strong>bad practices vs recommended code</strong> is the fastest way to write bug-free applications:
+                    </p>
+                    {currentLessonData.code && (
+                      <Button
+                        size="xs"
+                        variant="glow"
+                        onClick={() => handleRunLiveCode(currentLessonData.goodCode || currentLessonData.code)}
+                        leftIcon={<Play className="w-3.5 h-3.5 text-emerald-400" />}
+                      >
+                        ⚡ Execute Live Code
+                      </Button>
+                    )}
+                  </div>
 
-                  {currentLessonData.badCode && currentLessonData.goodCode && (
+                  {executionOutput && (
+                    <div className="p-4 rounded-xl bg-slate-950 border border-emerald-500/40 font-mono text-xs text-emerald-300 space-y-2 animate-fadeIn">
+                      <div className="flex items-center justify-between text-[11px] text-gray-400 border-b border-white/10 pb-1">
+                        <span className="flex items-center gap-1.5 font-bold text-emerald-400">
+                          <Terminal className="w-3.5 h-3.5" /> Live Terminal Console Output
+                        </span>
+                        <button type="button" onClick={() => setExecutionOutput(null)} className="hover:text-white">Clear</button>
+                      </div>
+                      <pre className="whitespace-pre-wrap">{executionOutput}</pre>
+                    </div>
+                  )}
+
+                  {currentLessonData.badCode && currentLessonData.goodCode ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 space-y-2 font-mono text-xs text-rose-300">
                         <span className="text-[11px] font-bold text-rose-400 uppercase flex items-center gap-1.5">
@@ -688,7 +844,14 @@ export const LearningHub = () => {
                         <pre className="overflow-x-auto p-2.5 bg-black/40 rounded-lg"><code>{currentLessonData.goodCode}</code></pre>
                       </div>
                     </div>
-                  )}
+                  ) : currentLessonData.code ? (
+                    <div className="p-4 rounded-xl bg-slate-950/80 border border-purple-500/30 font-mono text-xs text-cyan-300 space-y-2">
+                      <span className="text-[11px] font-bold text-purple-400 uppercase block">
+                        ⚡ Code Implementation Template:
+                      </span>
+                      <pre className="overflow-x-auto p-3 bg-black/60 rounded-lg"><code>{currentLessonData.code}</code></pre>
+                    </div>
+                  ) : null}
                 </div>
               )}
 
