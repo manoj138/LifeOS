@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { useVoiceGuider } from '../context/VoiceGuiderContext';
-import { StepProfile } from '../components/onboarding/StepProfile';
-import { StepFocusGoals } from '../components/onboarding/StepFocusGoals';
-import { StepSkillLevel } from '../components/onboarding/StepSkillLevel';
-import { StepRoutineFitness } from '../components/onboarding/StepRoutineFitness';
-import { StepVoiceAI } from '../components/onboarding/StepVoiceAI';
+import { StepPersonalIdentity } from '../components/onboarding/StepPersonalIdentity';
+import { StepAcademicCredentials } from '../components/onboarding/StepAcademicCredentials';
+import { StepGraduationStatus } from '../components/onboarding/StepGraduationStatus';
+import { StepWorkExperience } from '../components/onboarding/StepWorkExperience';
+import { StepProjectPrimary } from '../components/onboarding/StepProjectPrimary';
+import { StepProjectSecondary } from '../components/onboarding/StepProjectSecondary';
+import { StepTargetSpecialization } from '../components/onboarding/StepTargetSpecialization';
+import { StepSkillAssessment } from '../components/onboarding/StepSkillAssessment';
+import { StepCommitmentTimeline } from '../components/onboarding/StepCommitmentTimeline';
+import { StepVoiceAISecurity } from '../components/onboarding/StepVoiceAISecurity';
 import { Button } from '../components/ui/Button';
 import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 
@@ -23,21 +28,43 @@ export const OnboardingPage = () => {
     }
   }, [user, onboardingCompleted, navigate]);
 
-  // Form State
+  // Form State initialized with rich defaults
   const [formData, setFormData] = useState({
     name: user?.name || user?.email?.split('@')[0] || '',
-    careerLevel: preferences?.careerLevel || 'Intermediate (1-3 yrs experience)',
+    cityState: preferences?.cityState || 'Pune, Maharashtra',
+    aiLanguage: preferences?.aiLanguage || 'English',
+    degree: preferences?.degree || 'B.E. / B.Tech Computer Science',
+    collegeName: preferences?.collegeName || 'COEP Technological University',
+    collegeCity: preferences?.collegeCity || 'Pune',
+    educationStatus: preferences?.educationStatus || 'Completed',
+    currentSemester: preferences?.currentSemester || '7th - 8th Sem (Final Year)',
+    graduationPeriod: preferences?.graduationPeriod || '6 Months Ago (2025 Batch)',
+    hasExperience: preferences?.hasExperience || 'No',
+    experienceType: preferences?.experienceType || 'Fresher',
+    companyName: preferences?.companyName || '',
+    experienceRole: preferences?.experienceRole || '',
+    experienceDuration: preferences?.experienceDuration || '',
+    companyTechStack: preferences?.companyTechStack || '',
+    project1Name: preferences?.project1Name || 'E-Commerce Platform with Stripe & Coupon Engine',
+    project1Tagline: preferences?.project1Tagline || 'Scalable Full-Stack E-Commerce Engine',
+    project1Desc: preferences?.project1Desc || 'Full-stack application with real-time payment processing, coupon algorithms & inventory tracking.',
+    project1TechStack: preferences?.project1TechStack || 'React, Node.js, Express, MongoDB, Docker',
+    project1Link: preferences?.project1Link || 'https://github.com/user/ecommerce-engine',
+    project2Name: preferences?.project2Name || 'LifeOS AI Teleprompter & Learning Studio',
+    project2Desc: preferences?.project2Desc || 'AI-assisted speech coach, voice command interpreter & autonomous learning dashboard.',
+    project2TechStack: preferences?.project2TechStack || 'React, Web Speech API, Express, SQLite',
+    leetcodeHandle: preferences?.leetcodeHandle || '',
+    githubHandle: preferences?.githubHandle || '',
+    linkedinUrl: preferences?.linkedinUrl || '',
     targetRole: preferences?.targetRole || 'Full-Stack Web Developer',
-    education: preferences?.education || 'B.E. Computer Science',
-    location: preferences?.location || 'Pune, India',
-    project1: preferences?.project1 || 'E-Commerce Platform with Stripe & Coupon Engine',
-    project2: preferences?.project2 || 'LifeOS AI Teleprompter & Learning Studio',
-    focusAreas: preferences?.focusAreas || ['Coding & DSA', 'DevOps & Cloud', 'English Fluency', 'Fitness & Energy'],
-    targetDate: preferences?.targetDate || '2026-12-31',
+    targetCompanyTier: preferences?.targetCompanyTier || 'High-Growth Product Startups (Series A-C)',
     skillLevels: preferences?.skillLevels || { dsa: 'Intermediate', devops: 'Beginner', english: 'Intermediate' },
+    weakDsaTopics: preferences?.weakDsaTopics || ['Dynamic Programming', 'Graphs & BFS/DFS'],
+    weakDevopsTopics: preferences?.weakDevopsTopics || ['Kubernetes Clusters', 'CI/CD Pipelines (GitHub Actions)'],
     dailyHours: preferences?.dailyHours || 4,
-    fitnessGoal: preferences?.fitnessGoal || 'Build Muscle & Increase Energy',
-    workoutType: preferences?.workoutType || 'Gym Weightlifting & Strength',
+    preferredTimeSlot: preferences?.preferredTimeSlot || 'Night Owl (8 PM - 12 AM)',
+    targetDate: preferences?.targetDate || '2026-12-31',
+    focusAreas: preferences?.focusAreas || ['Coding & DSA', 'DevOps & Cloud', 'English Fluency', 'System Architecture'],
     aiPersona: preferences?.aiPersona || 'Motivational Tech Mentor',
     pin: '1234',
   });
@@ -47,7 +74,7 @@ export const OnboardingPage = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < 10) {
       setCurrentStep((prev) => prev + 1);
     } else {
       // Submit & Finish Onboarding with Custom PIN Setup
@@ -82,24 +109,25 @@ export const OnboardingPage = () => {
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <span className="font-extrabold text-xl tracking-tight text-white">
-            Life<span className="text-purple-400">OS</span> AI Setup
+            Life<span className="text-purple-400">OS</span> AI Deep Setup
           </span>
         </div>
 
-        {/* Step Counter Pills */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {[1, 2, 3, 4, 5].map((step) => {
+        {/* 10 Step Counter Pills */}
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((step) => {
             const isCompleted = step < currentStep;
             const isCurrent = step === currentStep;
             return (
               <div
                 key={step}
+                title={`Step ${step}`}
                 className={`h-2 rounded-full transition-all duration-300 ${
                   isCurrent
-                    ? 'w-8 sm:w-10 bg-purple-500 shadow-md shadow-purple-500/50'
+                    ? 'w-6 sm:w-8 bg-purple-500 shadow-md shadow-purple-500/50'
                     : isCompleted
-                    ? 'w-3 sm:w-4 bg-purple-900'
-                    : 'w-3 sm:w-4 bg-white/10'
+                    ? 'w-2 sm:w-3 bg-purple-800'
+                    : 'w-2 sm:w-3 bg-white/10'
                 }`}
               />
             );
@@ -108,26 +136,21 @@ export const OnboardingPage = () => {
       </div>
 
       {/* Main Wizard Content Card */}
-      <div className="max-w-2xl w-full mx-auto my-auto z-10 py-6">
+      <div className="max-w-2xl w-full mx-auto my-auto z-10 py-4">
         <div className="bg-[#12131a]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl shadow-purple-950/20">
-          {currentStep === 1 && (
-            <StepProfile formData={formData} updateFormData={updateFormData} />
-          )}
-          {currentStep === 2 && (
-            <StepFocusGoals formData={formData} updateFormData={updateFormData} />
-          )}
-          {currentStep === 3 && (
-            <StepSkillLevel formData={formData} updateFormData={updateFormData} />
-          )}
-          {currentStep === 4 && (
-            <StepRoutineFitness formData={formData} updateFormData={updateFormData} />
-          )}
-          {currentStep === 5 && (
-            <StepVoiceAI formData={formData} updateFormData={updateFormData} />
-          )}
+          {currentStep === 1 && <StepPersonalIdentity formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 2 && <StepAcademicCredentials formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 3 && <StepGraduationStatus formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 4 && <StepWorkExperience formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 5 && <StepProjectPrimary formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 6 && <StepProjectSecondary formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 7 && <StepTargetSpecialization formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 8 && <StepSkillAssessment formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 9 && <StepCommitmentTimeline formData={formData} updateFormData={updateFormData} />}
+          {currentStep === 10 && <StepVoiceAISecurity formData={formData} updateFormData={updateFormData} />}
 
           {/* Wizard Action Buttons */}
-          <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-8">
+          <div className="flex items-center justify-between pt-6 border-t border-white/10 mt-6">
             <Button
               variant="secondary"
               onClick={handleBack}
@@ -138,27 +161,31 @@ export const OnboardingPage = () => {
               Back
             </Button>
 
+            <span className="text-xs text-gray-500 font-mono font-medium">
+              Step {currentStep} of 10
+            </span>
+
             <Button
               variant="primary"
               onClick={handleNext}
               rightIcon={
-                currentStep === 5 ? (
+                currentStep === 10 ? (
                   <CheckCircle2 className="w-4 h-4" />
                 ) : (
                   <ArrowRight className="w-4 h-4" />
                 )
               }
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-600/30"
+              className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-600/30 text-xs font-semibold"
             >
-              {currentStep === 5 ? 'Complete & Setup LifeOS' : 'Continue Step'}
+              {currentStep === 10 ? 'Launch LifeOS' : 'Continue'}
             </Button>
           </div>
         </div>
       </div>
 
       {/* Footer Info */}
-      <div className="text-center text-xs text-gray-500 z-10 py-2">
-        LifeOS Autonomous Learning & Growth Assistant • Fully Customized to Your Goals
+      <div className="text-center text-[11px] text-gray-500 z-10 py-1">
+        LifeOS Autonomous Learning & Growth Assistant • Ultra-Deep 10-Step Setup
       </div>
     </div>
   );

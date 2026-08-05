@@ -71,47 +71,73 @@ export const InterviewPrep = () => {
 
   const userName = user?.name || user?.email?.split('@')[0] || 'Candidate';
   const targetRole = preferences?.targetRole || 'Full-Stack Web Developer';
-  const careerLevel = preferences?.careerLevel || 'Intermediate (1-3 yrs experience)';
-  const education = preferences?.education || 'B.E. Computer Science';
-  const userLocation = preferences?.location || 'India';
-  const proj1 = preferences?.project1 || 'E-Commerce Platform with Stripe & Coupon Engine';
-  const proj2 = preferences?.project2 || 'LifeOS AI Teleprompter & Learning Studio';
+  const cityState = preferences?.cityState || preferences?.location || 'Pune, India';
+  const degree = preferences?.degree || preferences?.education || 'B.E. Computer Science';
+  const collegeName = preferences?.collegeName || 'COEP Technological University';
+  const eduStatus = preferences?.educationStatus || 'Completed';
+  const eduTimeline = eduStatus === 'Completed'
+    ? (preferences?.graduationPeriod || '6 Months Ago')
+    : (preferences?.currentSemester || 'Final Year');
+  
+  const hasExp = (preferences?.hasExperience || 'No') === 'Yes';
+  const companyName = preferences?.companyName || 'Tech Startup';
+  const expRole = preferences?.experienceRole || 'Full-Stack Intern';
+  const expDuration = preferences?.experienceDuration || '6 Months';
+  const expTech = preferences?.companyTechStack || 'React, Node.js, Express';
+
+  const proj1Name = preferences?.project1Name || preferences?.project1 || 'E-Commerce Platform';
+  const proj1Desc = preferences?.project1Desc || 'Full-Stack web application with real-time payment integration and inventory tracking.';
+  const proj1Tech = preferences?.project1TechStack || 'React, Node.js, Express, MongoDB, Docker';
+
+  const proj2Name = preferences?.project2Name || preferences?.project2 || 'LifeOS AI Studio';
+  const proj2Desc = preferences?.project2Desc || 'AI Teleprompter & Personal Learning Studio.';
+  const proj2Tech = preferences?.project2TechStack || 'React, Web Speech API, Tailwind, Express';
+
+  const weakDsaStr = Array.isArray(preferences?.weakDsaTopics) ? preferences.weakDsaTopics.join(', ') : 'Dynamic Programming';
+  const weakDevopsStr = Array.isArray(preferences?.weakDevopsTopics) ? preferences.weakDevopsTopics.join(', ') : 'Kubernetes';
 
   const selfIntroData = {
     name: userName,
-    location: userLocation,
-    education: education,
-    currentRole: `${targetRole} (${careerLevel})`,
+    location: cityState,
+    education: `${degree} from ${collegeName} (${eduStatus}: ${eduTimeline})`,
+    currentRole: `${targetRole} Target`,
     skills: preferences?.focusAreas || ["React.js", "Node.js", "System Architecture", "DevOps & Cloud", "DSA Algorithms"],
-    proj1: proj1,
-    proj2: proj2,
-    fullScript: `Good morning, sir/madam. My name is ${userName}. I hold a background in ${education} based out of ${userLocation}, specializing as a ${targetRole}.
+    proj1: proj1Name,
+    proj2: proj2Name,
+    fullScript: `Good morning, sir/madam. My name is ${userName}. I am based out of ${cityState}. I hold a ${degree} degree from ${collegeName} (${eduStatus} - ${eduTimeline}). My primary technical goal is to excel as a ${targetRole}.
 
-I have hands-on experience building production software, system architecture optimization, and full-stack development. My career level is ${careerLevel}.
+${hasExp ? `Professional Work Experience:
+I have prior hands-on industry experience working at ${companyName} as a ${expRole} for ${expDuration}, where I utilized ${expTech} to build scalable software.` : `Career Readiness:
+I am an ambitious fresher focused on software engineering principles, clean code design, and data structures.`}
 
-Key highlights of my portfolio projects include:
-1. ${proj1}: Scalable web application featuring dynamic routing, authentication, API integrations, and robust database state management.
-2. ${proj2}: Interactive enterprise application with modular services, responsive UI design, and automated workflow pipelines.
+Portfolio Projects Showcase:
+1. ${proj1Name} (Tech Stack: ${proj1Tech}):
+   ${proj1Desc}
+2. ${proj2Name} (Tech Stack: ${proj2Tech}):
+   ${proj2Desc}
 
-My core technical focus areas include ${preferences?.focusAreas?.join(', ') || 'Coding, System Design, and Communication'}. My objective is to deliver high-performance software engineering solutions. Thank you for giving me this opportunity to introduce myself.`
+Technical Focus & Continuous Improvement:
+I actively practice problem solving with a commitment of ${preferences?.dailyHours || 4} hours daily. I am currently strengthening my expertise in core engineering concepts, specifically targeting ${weakDsaStr} in DSA and ${weakDevopsStr} in DevOps infrastructure.
+
+Thank you for giving me this opportunity to introduce myself.`
   };
 
   // Follow-Up Questions derived from candidate's tailored intro
   const derivedFollowUpQuestions = [
     {
-      q: `You mentioned building '${proj1}'. How did you handle concurrent user transactions and state management?`,
-      a: `In ${proj1}, state integrity is maintained using atomic database transactions (ACID guarantees), optimist concurrency locking, and centralized state handlers.`,
-      mr: `प्रोजेक्ट '${proj1}' मधील ट्रान्झॅक्शन सायकल आणि स्टेट मॅनेजमेंट कसे हँडल केले?`
+      q: `You built '${proj1Name}' using ${proj1Tech}. How did you handle architecture and database scalability?`,
+      a: `In ${proj1Name}, database scalability is maintained using indexing, optimized query aggregation pipelines, and modular REST controllers built with ${proj1Tech}.`,
+      mr: `प्रोजेक्ट '${proj1Name}' मधील डेटाबेस आणि आर्किटेक्चरचे स्केलेबिलिटी कसे मॅनेज केले?`
     },
     {
-      q: `You highlighted '${proj2}'. What architectural decisions did you make to ensure low latency and responsive performance?`,
-      a: `In ${proj2}, performance is optimized using lazy component loading, API response caching, debounced event listeners, and minimized DOM re-renders.`,
-      mr: `प्रोजेक्ट '${proj2}' मधील लेटन्सी कमी करण्यासाठी आणि परफॉर्मन्स वाढवण्यासाठी कोणते आर्किटेक्चर वापरले?`
+      q: `You highlighted '${proj2Name}' (${proj2Tech}). What architectural choices ensured low latency and smooth UI performance?`,
+      a: `In ${proj2Name}, UI performance is optimized using lazy component loading, API response caching, debounced event listeners, and state isolation.`,
+      mr: `प्रोजेक्ट '${proj2Name}' मधील परफॉर्मन्स वाढवण्यासाठी आणि लेटन्सी कमी करण्यासाठी कोणते उपाय केले?`
     },
     {
-      q: `As a ${targetRole}, how do you approach error handling and RESTful API security in production?`,
-      a: `Error handling is enforced via global express middleware, standardized HTTP status responses (200, 400, 500), CORS origin restrictions, and JWT authentication tokens.`,
-      mr: `RESTful API सुरक्षेसाठी आणि एरर हँडलिंगसाठी काय बेस्ट प्रॅक्टिसेस वापरता?`
+      q: `As a candidate targeting ${targetRole}, how do you approach strengthening your weak areas like ${weakDsaStr}?`,
+      a: `I follow a structured practice routine (${preferences?.dailyHours || 4} hrs/day), breaking down ${weakDsaStr} problems into pattern categories and solving them systematically.`,
+      mr: `${targetRole} म्हणून तयारी करताना ${weakDsaStr} सारख्या विषयांवर प्रभुत्व मिळवण्यासाठी कसा सराव करता?`
     }
   ];
 

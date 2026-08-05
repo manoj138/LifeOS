@@ -31,18 +31,11 @@ const saveOnboarding = async (req, res) => {
       pref = await UserPreference.create({ userId });
     }
 
-    await pref.update({
-      targetRole: targetRole || pref.targetRole,
-      careerLevel: careerLevel || pref.careerLevel,
-      focusAreas: focusAreas || pref.focusAreas,
-      skillLevels: skillLevels || pref.skillLevels,
-      dailyHours: dailyHours || pref.dailyHours,
-      targetDate: targetDate || pref.targetDate,
-      fitnessGoal: fitnessGoal || pref.fitnessGoal,
-      workoutType: workoutType || pref.workoutType,
-      aiPersona: aiPersona || pref.aiPersona,
-      onboardingCompleted: true,
-    });
+    const payload = { ...req.body, onboardingCompleted: true };
+    delete payload.name;
+    delete payload.pin;
+
+    await pref.update(payload);
 
     return sendSuccess(res, 'Onboarding completed and saved to database', pref);
   } catch (error) {
