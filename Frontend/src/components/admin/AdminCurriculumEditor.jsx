@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Input } from '../ui/Input';
 import { apiService } from '../../services/api';
+import { FormattedMarkdown } from '../ui/FormattedMarkdown';
 
 const ICON_MAP = {
   Code2,
@@ -594,6 +595,12 @@ export const AdminCurriculumEditor = () => {
                     onChange={(e) => setFormData({ ...formData, conceptExplanation: e.target.value })}
                     className="w-full bg-slate-900 border border-white/15 rounded-xl p-3 text-xs font-mono text-gray-200 focus:outline-none focus:border-purple-500"
                   />
+                  {formData.conceptExplanation && (
+                    <div className="p-3 rounded-xl bg-slate-950/80 border border-purple-500/20 mt-2 space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-purple-400">Live Formatted Markdown Preview:</span>
+                      <FormattedMarkdown content={formData.conceptExplanation} />
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">

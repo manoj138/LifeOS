@@ -23,6 +23,7 @@ import {
 
 import { useUser } from '../context/UserContext';
 import { apiService } from '../services/api';
+import { FormattedMarkdown } from '../components/ui/FormattedMarkdown';
 
 export const LearningHub = () => {
   const { preferences } = useUser();
@@ -877,8 +878,8 @@ export const LearningHub = () => {
                         <FileText className="w-4 h-4 text-purple-400" />
                         Step-by-Step Execution Mechanics
                       </h3>
-                      <div className="text-xs text-gray-300 leading-relaxed whitespace-pre-line font-sans p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-                        {currentLessonData.notes}
+                      <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                        <FormattedMarkdown content={currentLessonData.notes} />
                       </div>
                     </div>
                   )}
