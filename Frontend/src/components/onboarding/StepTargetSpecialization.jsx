@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, Code2, Server, Layout, Database, Sparkles, Building2 } from 'lucide-react';
+import { Target, Code2, Server, Layout, Database, Sparkles, Building2, CheckCircle2 } from 'lucide-react';
 
 const TARGET_ROLES = [
   {
@@ -41,20 +41,20 @@ const COMPANY_TIERS = [
 
 export const StepTargetSpecialization = ({ formData, updateFormData }) => {
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       <div className="text-center space-y-2">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
-          <Sparkles className="w-3.5 h-3.5" /> Step 7 of 10
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 shadow-inner">
+          <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" /> Step 7 of 10
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Target Role & Dream Companies</h2>
-        <p className="text-sm text-gray-400 max-w-md mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Target Role & Dream Companies</h2>
+        <p className="text-xs sm:text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
           Choose your primary target engineering role and company tier to align your learning path.
         </p>
       </div>
 
       <div className="space-y-6 max-w-xl mx-auto">
         <div className="space-y-2">
-          <label className="block text-xs font-medium text-gray-300 flex items-center gap-2">
+          <label className="block text-xs font-semibold text-gray-300 flex items-center gap-2">
             <Target className="w-4 h-4 text-purple-400" />
             Primary Target Role Specialization
           </label>
@@ -66,21 +66,28 @@ export const StepTargetSpecialization = ({ formData, updateFormData }) => {
                 <div
                   key={role.id}
                   onClick={() => updateFormData({ targetRole: role.id })}
-                  className={`relative p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
+                  className={`relative p-4 rounded-2xl border cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-95 ${
                     isSelected
-                      ? 'bg-gradient-to-br from-purple-900/40 to-slate-900 border-purple-500 shadow-xl shadow-purple-950/40 ring-1 ring-purple-500'
+                      ? 'bg-gradient-to-br from-purple-950/70 to-slate-900 border-purple-500 shadow-xl shadow-purple-950/50 ring-2 ring-purple-500/60'
                       : 'bg-slate-900/60 border-white/10 hover:border-white/25 hover:bg-slate-900/90'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`p-2.5 rounded-xl bg-gradient-to-br ${role.color} text-white shadow-md`}>
+                    <div className={`p-2.5 rounded-xl bg-gradient-to-br ${role.color} text-white shadow-md flex-shrink-0`}>
                       <Icon className="w-5 h-5" />
                     </div>
-                    <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-white">{role.title}</h4>
-                      <p className="text-xs text-gray-400 leading-relaxed">{role.desc}</p>
+                    <div className="space-y-1 pr-4">
+                      <h4 className="text-xs sm:text-sm font-bold text-white flex items-center justify-between">
+                        <span>{role.title}</span>
+                      </h4>
+                      <p className="text-[11px] text-gray-400 leading-relaxed">{role.desc}</p>
                     </div>
                   </div>
+                  {isSelected && (
+                    <div className="absolute top-3 right-3">
+                      <CheckCircle2 className="w-4 h-4 text-purple-400 animate-pop-check" />
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -88,11 +95,11 @@ export const StepTargetSpecialization = ({ formData, updateFormData }) => {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-xs font-medium text-gray-300 flex items-center gap-2">
+          <label className="block text-xs font-semibold text-gray-300 flex items-center gap-2">
             <Building2 className="w-4 h-4 text-cyan-400" />
             Target Company Tier & Culture
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {COMPANY_TIERS.map((tier) => {
               const isSelected = (formData.targetCompanyTier || 'High-Growth Product Startups (Series A-C)') === tier;
               return (
@@ -100,13 +107,14 @@ export const StepTargetSpecialization = ({ formData, updateFormData }) => {
                   type="button"
                   key={tier}
                   onClick={() => updateFormData({ targetCompanyTier: tier })}
-                  className={`p-3 rounded-xl text-left border text-xs font-medium transition-all ${
+                  className={`p-3.5 rounded-xl text-left border text-xs font-medium transition-all duration-300 flex items-center justify-between hover:scale-[1.02] active:scale-95 ${
                     isSelected
-                      ? 'bg-cyan-600/20 border-cyan-500 text-white ring-1 ring-cyan-500 shadow-md'
-                      : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-200'
+                      ? 'bg-cyan-950/60 border-cyan-500 text-white ring-1 ring-cyan-500 shadow-md'
+                      : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-200 hover:bg-white/10'
                   }`}
                 >
-                  {tier}
+                  <span className="line-clamp-1">{tier}</span>
+                  {isSelected && <CheckCircle2 className="w-4 h-4 text-cyan-400 animate-pop-check flex-shrink-0" />}
                 </button>
               );
             })}

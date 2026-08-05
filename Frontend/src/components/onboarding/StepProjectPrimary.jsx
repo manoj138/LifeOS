@@ -4,13 +4,13 @@ import { Input } from '../ui/Input';
 
 export const StepProjectPrimary = ({ formData, updateFormData }) => {
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       <div className="text-center space-y-2">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
-          <Sparkles className="w-3.5 h-3.5" /> Step 5 of 10
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 shadow-inner">
+          <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" /> Step 5 of 10
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Primary Showcase Portfolio Project</h2>
-        <p className="text-sm text-gray-400 max-w-md mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Primary Showcase Portfolio Project</h2>
+        <p className="text-xs sm:text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
           Describe your flagship project. AI will generate deep system design & architecture questions based on this!
         </p>
       </div>
@@ -34,7 +34,7 @@ export const StepProjectPrimary = ({ formData, updateFormData }) => {
         />
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-medium text-gray-300 flex items-center gap-2">
+          <label className="block text-xs font-semibold text-gray-300 flex items-center gap-2">
             <FileText className="w-4 h-4 text-indigo-400" />
             Detailed Project Description & Key Features
           </label>
@@ -43,7 +43,7 @@ export const StepProjectPrimary = ({ formData, updateFormData }) => {
             placeholder="Describe what the project does, key technical architecture, databases, APIs, and challenges solved..."
             value={formData.project1Desc || ''}
             onChange={(e) => updateFormData({ project1Desc: e.target.value })}
-            className="w-full bg-slate-900/80 border border-white/15 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500 placeholder:text-gray-500"
+            className="w-full bg-slate-900/90 border border-white/15 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/40 transition-all duration-300 placeholder:text-gray-500"
           />
         </div>
 

@@ -109,6 +109,50 @@
   to { transform: rotate(360deg); }
 }
 
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(28px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes popCheck {
+  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+  70% { transform: scale(1.2) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes pulseLaser {
+  0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 16px rgba(6, 182, 212, 0.9)); }
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-20px) scale(1.1); }
+}
+
 .animate-spin-slow {
   animation: spinSlow 12s linear infinite;
 }
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pop-check {
+  animation: popCheck 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-pulse-laser {
+  animation: pulseLaser 3s ease-in-out infinite;
+}
+
+.animate-orb-float {
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
