@@ -32,13 +32,28 @@ export const LearningHub = () => {
 
   const [activeModule, setActiveModule] = useState(initialProgress.lastActiveModule || 'js');
   const [dynamicTopics, setDynamicTopics] = useState(null);
+  const [dynamicModules, setDynamicModules] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchModules = async () => {
+      const res = await apiService.getRoadmapModules();
+      if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
+        setDynamicModules(res.data);
+      }
+    };
+    fetchModules();
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
     const fetchTopics = async () => {
       const res = await apiService.getCurriculumTopics(activeModule);
-      if (isMounted && res?.success && res.data && res.data.length > 0) {
+      if (isMounted && res?.success && Array.isArray(res.data)) {
         setDynamicTopics(res.data);
+      } else if (isMounted) {
+        setDynamicTopics(null);
       }
     };
     fetchTopics();
@@ -59,8 +74,8 @@ export const LearningHub = () => {
   const [showLevelMasterModal, setShowLevelMasterModal] = useState(false);
 
 
-  // Decoupled, Distinct Roadmap Modules
-  const roadmapModules = [
+  // Decoupled, Distinct Roadmap Modules (Derived from DB or Fallback)
+  const defaultRoadmapModules = [
     { id: 'js', label: '1. JavaScript (ES6+)', icon: <Code2 className="w-4 h-4 text-cyan-400" />, count: '25 Topics' },
     { id: 'react', label: '2. React.js', icon: <Layers className="w-4 h-4 text-purple-400" />, count: '23 Topics' },
     { id: 'node', label: '3. Node.js', icon: <Terminal className="w-4 h-4 text-emerald-400" />, count: '11 Topics' },
@@ -75,6 +90,18 @@ export const LearningHub = () => {
     { id: 'career', label: '12. Career & LinkedIn', icon: <Briefcase className="w-4 h-4 text-yellow-400" />, count: '10 Topics' },
     { id: 'devops', label: '13. DevOps & Hostinger VPS', icon: <Server className="w-4 h-4 text-teal-300" />, count: '10 Topics' },
   ];
+
+  const roadmapModules = dynamicModules.length > 0
+    ? dynamicModules.map((dm, idx) => {
+        const fallbackMatch = defaultRoadmapModules.find(m => m.id === dm.id);
+        return {
+          id: dm.id,
+          label: `${idx + 1}. ${dm.title || dm.id}`,
+          icon: fallbackMatch?.icon || <BookOpen className="w-4 h-4 text-cyan-400" />,
+          count: dm.topicCount ? `${dm.topicCount} Topics` : fallbackMatch?.count || 'Topics'
+        };
+      })
+    : defaultRoadmapModules;
 
   // Complete Un-truncated Master Syllabus containing ALL 175+ topics with Level Tags
   const masterSyllabus = {
@@ -158,45 +185,45 @@ export const LearningHub = () => {
         { id: "express-0", title: "4.1 Express Routing & Methods", topicName: "Express Routing", level: "Beginner" },
         { id: "express-1", title: "4.2 Middleware Pipeline & Order", topicName: "Middleware Architecture", level: "Intermediate" },
         { id: "express-2", title: "4.3 Controller Design Pattern", topicName: "Controllers", level: "Intermediate" },
-        { id: "express-3", title: "4.4 Service Layer Separation", topicName: "Service Layer", level: "Intermediate" },
-        { id: "express-4", title: "4.5 REST API Architecture", topicName: "REST API Design", level: "Intermediate" },
-        { id: "express-5", title: "4.6 Request Validation (Zod / Joi)", topicName: "Request Validation", level: "Intermediate" },
-        { id: "express-6", title: "4.7 Authentication Middleware", topicName: "Auth Middleware", level: "Advanced" },
-        { id: "express-7", title: "4.8 Authorization Middleware (RBAC)", topicName: "Role Authorization", level: "Advanced" },
-        { id: "express-8", title: "4.9 Centralized Error Handling", topicName: "Global Error Handling", level: "Advanced" },
-        { id: "express-9", title: "4.10 File Upload (Multer)", topicName: "File Uploads", level: "Intermediate" },
-        { id: "express-10", title: "4.11 Express Rate Limiting", topicName: "Rate Limiting", level: "Advanced" },
-        { id: "express-11", title: "4.12 Security Best Practices (Helmet)", topicName: "Security Best Practices", level: "Advanced" },
-        { id: "express-12", title: "4.13 Logging & Profiling (Winston)", topicName: "Logging & Profiling", level: "Advanced" }
+        { id: "express-3", title: "4.4 Request Params, Query & Body", topicName: "Request Handling", level: "Beginner" },
+        { id: "express-4", title: "4.5 Static Files & Express Storage", topicName: "Static Files", level: "Beginner" },
+        { id: "express-5", title: "4.6 Global Error Handling Middleware", topicName: "Error Handling", level: "Intermediate" },
+        { id: "express-6", title: "4.7 CORS & Security Headers (Helmet)", topicName: "CORS & Security", level: "Intermediate" },
+        { id: "express-7", title: "4.8 Rate Limiting & Throttling", topicName: "Rate Limiting", level: "Advanced" },
+        { id: "express-8", title: "4.9 File Uploads (Multer Integration)", topicName: "Multer Uploads", level: "Intermediate" },
+        { id: "express-9", title: "4.10 Express Router Refactoring", topicName: "Router Modules", level: "Beginner" },
+        { id: "express-10", title: "4.11 Logging Systems (Winston & Morgan)", topicName: "Logging Systems", level: "Intermediate" },
+        { id: "express-11", title: "4.12 Environment-based Config", topicName: "Environment Config", level: "Beginner" },
+        { id: "express-12", title: "4.13 Health Checks & Graceful Shutdown", topicName: "Health Checks", level: "Advanced" }
       ]
     },
     mongo: {
       title: "5️⃣ MongoDB & Mongoose (11 Topics)",
       lessons: [
-        { id: "mongo-0", title: "5.1 MongoDB CRUD Operations", topicName: "MongoDB CRUD", level: "Beginner" },
-        { id: "mongo-1", title: "5.2 Mongoose Schema Design", topicName: "Mongoose Schema", level: "Beginner" },
-        { id: "mongo-2", title: "5.3 Mongoose Models & Methods", topicName: "Mongoose Models", level: "Intermediate" },
-        { id: "mongo-3", title: "5.4 Relationships (Embedded vs Referenced)", topicName: "Document Relations", level: "Intermediate" },
-        { id: "mongo-4", title: "5.5 Query Population (populate())", topicName: "Query Population", level: "Intermediate" },
-        { id: "mongo-5", title: "5.6 Database Indexing (B-Tree)", topicName: "Database Indexing", level: "Advanced" },
-        { id: "mongo-6", title: "5.7 Aggregation Pipeline ($match, $lookup)", topicName: "Aggregation Pipeline", level: "Advanced" },
-        { id: "mongo-7", title: "5.8 Database Transactions & Sessions", topicName: "Transactions", level: "Advanced" },
-        { id: "mongo-8", title: "5.9 Pagination Strategies", topicName: "Pagination", level: "Intermediate" },
-        { id: "mongo-9", title: "5.10 Text Search & Regex Queries", topicName: "Text Search", level: "Intermediate" },
-        { id: "mongo-10", title: "5.11 Database Backup & Restore", topicName: "Backup & Restore", level: "Advanced" }
+        { id: "mongo-0", title: "5.1 NoSQL Concepts vs SQL RDBMS", topicName: "NoSQL Concepts", level: "Beginner" },
+        { id: "mongo-1", title: "5.2 BSON Document Data Model", topicName: "BSON Model", level: "Beginner" },
+        { id: "mongo-2", title: "5.3 Mongoose Schema & Model Design", topicName: "Mongoose Schema", level: "Beginner" },
+        { id: "mongo-3", title: "5.4 CRUD Operations in Mongoose", topicName: "Mongoose CRUD", level: "Beginner" },
+        { id: "mongo-4", title: "5.5 Query Operators ($gt, $in, $elemMatch)", topicName: "Query Operators", level: "Intermediate" },
+        { id: "mongo-5", title: "5.6 Indexes & Query Optimization", topicName: "Database Indexes", level: "Advanced" },
+        { id: "mongo-6", title: "5.7 Schema Validation & Middleware Hooks", topicName: "Mongoose Hooks", level: "Intermediate" },
+        { id: "mongo-7", title: "5.8 Population ($lookup & References)", topicName: "Document Population", level: "Intermediate" },
+        { id: "mongo-8", title: "5.9 Aggregation Pipeline ($match, $group)", topicName: "Aggregation Pipeline", level: "Advanced" },
+        { id: "mongo-9", title: "5.10 Transactions & ACID Guarantees", topicName: "ACID Transactions", level: "Advanced" },
+        { id: "mongo-10", title: "5.11 Connection Pooling & Error Resilience", topicName: "Connection Pooling", level: "Advanced" }
       ]
     },
     auth: {
       title: "6️⃣ Authentication & Security (11 Topics)",
       lessons: [
-        { id: "auth-0", title: "6.1 JSON Web Tokens (JWT) Architecture", topicName: "JWT Architecture", level: "Intermediate" },
-        { id: "auth-1", title: "6.2 Refresh Token Rotation", topicName: "Refresh Token Rotation", level: "Advanced" },
-        { id: "auth-2", title: "6.3 Access Token Verification", topicName: "Access Tokens", level: "Intermediate" },
-        { id: "auth-3", title: "6.4 Google OAuth 2.0 Integration", topicName: "Google OAuth", level: "Advanced" },
-        { id: "auth-4", title: "6.5 Password Hashing (Bcrypt)", topicName: "Password Hashing", level: "Intermediate" },
-        { id: "auth-5", title: "6.6 OTP Verification System", topicName: "OTP System", level: "Intermediate" },
-        { id: "auth-6", title: "6.7 Forgot Password Workflow", topicName: "Forgot Password", level: "Intermediate" },
-        { id: "auth-7", title: "6.8 Password Reset Endpoint", topicName: "Password Reset", level: "Intermediate" },
+        { id: "auth-0", title: "6.1 Password Hashing (Bcrypt & Salt)", topicName: "Password Hashing", level: "Beginner" },
+        { id: "auth-1", title: "6.2 JWT Tokens (Access vs Refresh Tokens)", topicName: "JWT Auth", level: "Intermediate" },
+        { id: "auth-2", title: "6.3 HTTP-Only Cookies vs LocalStorage", topicName: "Cookie Storage", level: "Intermediate" },
+        { id: "auth-3", title: "6.4 Session-based Authentication", topicName: "Session Auth", level: "Beginner" },
+        { id: "auth-4", title: "6.5 OAuth 2.0 & Google Social Login", topicName: "OAuth 2.0", level: "Advanced" },
+        { id: "auth-5", title: "6.6 CSRF Protection Mechanisms", topicName: "CSRF Defense", level: "Advanced" },
+        { id: "auth-6", title: "6.7 XSS Prevention & Content Sanitization", topicName: "XSS Defense", level: "Intermediate" },
+        { id: "auth-7", title: "6.8 Secure Password Reset Flows", topicName: "Password Reset", level: "Intermediate" },
         { id: "auth-8", title: "6.9 Email Verification Engine", topicName: "Email Verification", level: "Intermediate" },
         { id: "auth-9", title: "6.10 Role-Based Access Control (RBAC)", topicName: "Role-Based Access", level: "Advanced" },
         { id: "auth-10", title: "6.11 Granular Permissions Matrix", topicName: "Permissions Matrix", level: "Advanced" }
@@ -305,7 +332,11 @@ export const LearningHub = () => {
   // Hydration Engine: Retrieves handcrafted detailed topic content, backend dynamic topics, or fallback engine
   const getRichLessonDetail = (lesson) => {
     if (!lesson) return null;
-    const dynamicTopic = dynamicTopics?.find(dt => dt.id === lesson.id || dt.title === lesson.title);
+    const dynamicTopic = dynamicTopics?.find(dt => 
+      String(dt.id) === String(lesson.id) || 
+      dt.title === lesson.title || 
+      (dt.topicName && lesson.topicName && dt.topicName.toLowerCase() === lesson.topicName.toLowerCase())
+    );
     const customContent = learningContent[lesson.id];
     const fallback = getFallbackTopicContent(lesson);
 
@@ -339,16 +370,13 @@ export const LearningHub = () => {
 
   const rawModuleSyllabus = masterSyllabus[activeModule] || masterSyllabus.js;
   
-  const activeLessonsList = dynamicTopics && dynamicTopics.length > 0
-    ? [
-        ...dynamicTopics.map(dt => ({
-          id: dt.id,
-          title: dt.title,
-          topicName: dt.topicName || dt.title,
-          level: dt.level || 'Beginner',
-        })),
-        ...rawModuleSyllabus.lessons.filter(bl => !dynamicTopics.some(dt => dt.id === bl.id))
-      ]
+  const activeLessonsList = (dynamicTopics && dynamicTopics.length > 0)
+    ? dynamicTopics.map(dt => ({
+        id: dt.id,
+        title: dt.title || dt.topicName,
+        topicName: dt.topicName || dt.title,
+        level: dt.level || 'Beginner',
+      }))
     : rawModuleSyllabus.lessons;
 
   const currentModuleData = {
