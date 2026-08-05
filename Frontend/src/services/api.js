@@ -258,10 +258,64 @@ export const apiService = {
     }
   },
 
+  async createInterviewQuestion(data) {
+    try {
+      const res = await Api.post('/interview/questions', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteInterviewQuestion(id) {
+    try {
+      const res = await Api.delete(`/interview/questions/${id}`);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async bulkGenerateInterviewSequence({ category, titles }) {
+    try {
+      const res = await Api.post('/interview/questions/bulk-generate-sequence', { category, titles });
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
   // DSA Problems
   async getDsaProblems() {
     try {
       const res = await Api.get('/dsa/problems');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createDsaProblem(data) {
+    try {
+      const res = await Api.post('/dsa/problems', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteDsaProblem(id) {
+    try {
+      const res = await Api.delete(`/dsa/problems/${id}`);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async bulkGenerateDsaSequence({ titles }) {
+    try {
+      const res = await Api.post('/dsa/problems/bulk-generate-sequence', { titles });
       return res.data;
     } catch (err) {
       return { success: false, fallback: true };
@@ -278,10 +332,64 @@ export const apiService = {
     }
   },
 
+  async createDevopsStep(data) {
+    try {
+      const res = await Api.post('/devops/steps', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteDevopsStep(id) {
+    try {
+      const res = await Api.delete(`/devops/steps/${id}`);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async bulkGenerateDevopsSequence({ titles }) {
+    try {
+      const res = await Api.post('/devops/steps/bulk-generate-sequence', { titles });
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
   // English Modules
   async getEnglishModules() {
     try {
       const res = await Api.get('/english/modules');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async createEnglishModule(data) {
+    try {
+      const res = await Api.post('/english/modules', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteEnglishModule(id) {
+    try {
+      const res = await Api.delete(`/english/modules/${id}`);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async bulkGenerateEnglishSequence({ titles }) {
+    try {
+      const res = await Api.post('/english/modules/bulk-generate-sequence', { titles });
       return res.data;
     } catch (err) {
       return { success: false, fallback: true };

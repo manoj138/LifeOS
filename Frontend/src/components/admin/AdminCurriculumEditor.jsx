@@ -18,6 +18,7 @@ const ICON_MAP = {
 };
 
 export const AdminCurriculumEditor = () => {
+  const [activeDomain, setActiveDomain] = useState('roadmap'); // 'roadmap' | 'interview' | 'dsa' | 'english' | 'devops'
   const [editorMode, setEditorMode] = useState('bulk_ai'); // 'editor' | 'bulk_ai'
   const [selectedModule, setSelectedModule] = useState('js');
   const [modulesList, setModulesList] = useState([]);
@@ -26,6 +27,42 @@ export const AdminCurriculumEditor = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [isLoadingTopics, setIsLoadingTopics] = useState(false);
+
+  // Domain Specific State Data
+  const [interviewQuestions, setInterviewQuestions] = useState([]);
+  const [dsaProblems, setDsaProblems] = useState([]);
+  const [englishModules, setEnglishModules] = useState([]);
+  const [devopsSteps, setDevopsSteps] = useState([]);
+
+  // Form Modals / Forms State
+  const [isAddingInterview, setIsAddingInterview] = useState(false);
+  const [newInterviewCategory, setNewInterviewCategory] = useState('js');
+  const [newInterviewQuestion, setNewInterviewQuestion] = useState('');
+  const [newInterviewAnswer, setNewInterviewAnswer] = useState('');
+  const [newInterviewMarathiIntent, setNewInterviewMarathiIntent] = useState('');
+  const [newInterviewDifficulty, setNewInterviewDifficulty] = useState('Beginner');
+
+  const [isAddingDsa, setIsAddingDsa] = useState(false);
+  const [newDsaTitle, setNewDsaTitle] = useState('');
+  const [newDsaTopic, setNewDsaTopic] = useState('Arrays');
+  const [newDsaDifficulty, setNewDsaDifficulty] = useState('Easy');
+  const [newDsaTimeLimit, setNewDsaTimeLimit] = useState('15m');
+  const [newDsaDescription, setNewDsaDescription] = useState('');
+  const [newDsaStarterCode, setNewDsaStarterCode] = useState('function solution() {\n  // write code\n}');
+  const [newDsaHint, setNewDsaHint] = useState('');
+  const [newDsaSolutionCode, setNewDsaSolutionCode] = useState('');
+
+  const [isAddingEnglish, setIsAddingEnglish] = useState(false);
+  const [newEngTitle, setNewEngTitle] = useState('');
+  const [newEngCategory, setNewEngCategory] = useState('pronunciation');
+  const [newEngDescription, setNewEngDescription] = useState('');
+  const [newEngBadgeLabel, setNewEngBadgeLabel] = useState('Daily Drill');
+
+  const [isAddingDevops, setIsAddingDevops] = useState(false);
+  const [newDevStep, setNewDevStep] = useState('Step 1');
+  const [newDevTitle, setNewDevTitle] = useState('');
+  const [newDevDesc, setNewDevDesc] = useState('');
+  const [newDevCommand, setNewDevCommand] = useState('sudo systemctl status nginx');
 
   // Add Module Modal State
   const [isAddingModule, setIsAddingModule] = useState(false);
@@ -75,8 +112,197 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
+  const fetchInterviewQuestions = async () => {
+    const res = await apiService.getInterviewQuestions();
+    if (res?.success && Array.isArray(res.data)) {
+      setInterviewQuestions(res.data);
+    }
+  };
+
+  const handleCreateInterviewQuestion = async (e) => {
+    e.preventDefault();
+    if (!newInterviewQuestion.trim() || !newInterviewAnswer.trim()) return;
+    const res = await apiService.createInterviewQuestion({
+      category: newInterviewCategory,
+      question: newInterviewQuestion.trim(),
+      answer: newInterviewAnswer.trim(),
+      marathiIntent: newInterviewMarathiIntent.trim() || null,
+      difficulty: newInterviewDifficulty,
+    });
+    if (res?.success) {
+      setNewInterviewQuestion('');
+      setNewInterviewAnswer('');
+      setNewInterviewMarathiIntent('');
+      setIsAddingInterview(false);
+      fetchInterviewQuestions();
+    }
+  };
+
+  const handleDeleteInterviewQuestion = async (id) => {
+    if (window.confirm('Delete this interview question?')) {
+      await apiService.deleteInterviewQuestion(id);
+      fetchInterviewQuestions();
+    }
+  };
+
+  const fetchDsaProblems = async () => {
+    const res = await apiService.getDsaProblems();
+    if (res?.success && Array.isArray(res.data)) {
+      setDsaProblems(res.data);
+    }
+  };
+
+  const handleCreateDsaProblem = async (e) => {
+    e.preventDefault();
+    if (!newDsaTitle.trim() || !newDsaDescription.trim()) return;
+    const res = await apiService.createDsaProblem({
+      title: newDsaTitle.trim(),
+      topic: newDsaTopic,
+      difficulty: newDsaDifficulty,
+      timeLimit: newDsaTimeLimit,
+      description: newDsaDescription.trim(),
+      starterCode: newDsaStarterCode,
+      hint: newDsaHint.trim(),
+      solutionCode: newDsaSolutionCode.trim(),
+    });
+    if (res?.success) {
+      setNewDsaTitle('');
+      setNewDsaDescription('');
+      setNewDsaHint('');
+      setNewDsaSolutionCode('');
+      setIsAddingDsa(false);
+      fetchDsaProblems();
+    }
+  };
+
+  const handleDeleteDsaProblem = async (id) => {
+    if (window.confirm('Delete this DSA problem?')) {
+      await apiService.deleteDsaProblem(id);
+      fetchDsaProblems();
+    }
+  };
+
+  const fetchEnglishModules = async () => {
+    const res = await apiService.getEnglishModules();
+    if (res?.success && Array.isArray(res.data)) {
+      setEnglishModules(res.data);
+    }
+  };
+
+  const handleCreateEnglishModule = async (e) => {
+    e.preventDefault();
+    if (!newEngTitle.trim()) return;
+    const res = await apiService.createEnglishModule({
+      title: newEngTitle.trim(),
+      category: newEngCategory,
+      description: newEngDescription.trim(),
+      badgeLabel: newEngBadgeLabel.trim(),
+      badgeColor: 'purple',
+    });
+    if (res?.success) {
+      setNewEngTitle('');
+      setNewEngDescription('');
+      setIsAddingEnglish(false);
+      fetchEnglishModules();
+    }
+  };
+
+  const handleDeleteEnglishModule = async (id) => {
+    if (window.confirm('Delete this English module?')) {
+      await apiService.deleteEnglishModule(id);
+      fetchEnglishModules();
+    }
+  };
+
+  const fetchDevopsSteps = async () => {
+    const res = await apiService.getDevopsSteps();
+    if (res?.success && Array.isArray(res.data)) {
+      setDevopsSteps(res.data);
+    }
+  };
+
+  const handleCreateDevopsStep = async (e) => {
+    e.preventDefault();
+    if (!newDevTitle.trim() || !newDevDesc.trim()) return;
+    const res = await apiService.createDevopsStep({
+      step: newDevStep.trim(),
+      title: newDevTitle.trim(),
+      desc: newDevDesc.trim(),
+      command: newDevCommand.trim(),
+    });
+    if (res?.success) {
+      setNewDevTitle('');
+      setNewDevDesc('');
+      setIsAddingDevops(false);
+      fetchDevopsSteps();
+    }
+  };
+
+  const handleDeleteDevopsStep = async (id) => {
+    if (window.confirm('Delete this DevOps step?')) {
+      await apiService.deleteDevopsStep(id);
+      fetchDevopsSteps();
+    }
+  };
+
+  const handleBulkSeedInterview = async (cat = 'js') => {
+    setIsAiGenerating(true);
+    const sampleTitles = [
+      "Event Loop, Microtask Queue & Call Stack Execution",
+      "Closures, Lexical Environment & Scope Leakage",
+      "Prototypal Inheritance & Object Prototype Chain",
+      "Promises vs Async/Await & Error Handling Patterns",
+      "Debouncing vs Throttling in High-Performance UI"
+    ];
+    await apiService.bulkGenerateInterviewSequence({ category: cat, titles: sampleTitles });
+    await fetchInterviewQuestions();
+    setIsAiGenerating(false);
+  };
+
+  const handleBulkSeedDsa = async () => {
+    setIsAiGenerating(true);
+    const sampleProblems = [
+      "Two Sum Hash Map Approach",
+      "Valid Anagram Frequency Counter",
+      "Reverse Linked List Pointer Manipulation",
+      "Binary Search on Sorted Array",
+      "Longest Substring Without Repeating Characters"
+    ];
+    await apiService.bulkGenerateDsaSequence({ titles: sampleProblems });
+    await fetchDsaProblems();
+    setIsAiGenerating(false);
+  };
+
+  const handleBulkSeedEnglish = async () => {
+    setIsAiGenerating(true);
+    const sampleModules = [
+      "Executive Architecture Pitching & System Demos",
+      "Technical Code Walkthrough & Refactoring Vocabulary",
+      "Handling Tough Technical Q&A with Executive Presence"
+    ];
+    await apiService.bulkGenerateEnglishSequence({ titles: sampleModules });
+    await fetchEnglishModules();
+    setIsAiGenerating(false);
+  };
+
+  const handleBulkSeedDevops = async () => {
+    setIsAiGenerating(true);
+    const sampleSteps = [
+      "Hostinger VPS Server SSH Connection & UFW Firewall Setup",
+      "Node.js & PM2 Process Manager Installation",
+      "Nginx Reverse Proxy & SSL Certificate Deployment"
+    ];
+    await apiService.bulkGenerateDevopsSequence({ titles: sampleSteps });
+    await fetchDevopsSteps();
+    setIsAiGenerating(false);
+  };
+
   useEffect(() => {
     fetchModules();
+    fetchInterviewQuestions();
+    fetchDsaProblems();
+    fetchEnglishModules();
+    fetchDevopsSteps();
   }, []);
 
   const [formData, setFormData] = useState({
@@ -271,37 +497,108 @@ export const AdminCurriculumEditor = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header & Mode Switches */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-        <div>
-          <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-400" />
-            Curriculum Content & AI Generator Console
-          </h3>
-          <p className="text-xs text-gray-400">
-            Manage roadmap modules, bulk-generate sequence topics with AI, and assign chapter-wise practical tasks.
-          </p>
-        </div>
+      {/* Domain Navigation Bar */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10">
+        <button
+          type="button"
+          onClick={() => setActiveDomain('roadmap')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${
+            activeDomain === 'roadmap'
+              ? 'bg-purple-600/30 border-purple-500 text-white shadow-lg'
+              : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'
+          }`}
+        >
+          <BookOpen className="w-4 h-4 text-cyan-400" />
+          <span>📚 Roadmap Topics</span>
+        </button>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant={editorMode === 'bulk_ai' ? 'glow' : 'glass'}
-            size="sm"
-            onClick={() => setEditorMode('bulk_ai')}
-            leftIcon={<ListOrdered className="w-4 h-4 text-cyan-400" />}
-          >
-            ⚡ Sequence-Based Bulk AI Generator
-          </Button>
-          <Button
-            variant={editorMode === 'editor' ? 'glow' : 'glass'}
-            size="sm"
-            onClick={() => setEditorMode('editor')}
-            leftIcon={<Edit3 className="w-4 h-4 text-purple-400" />}
-          >
-            ✏️ Manual Topic Editor
-          </Button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setActiveDomain('interview')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${
+            activeDomain === 'interview'
+              ? 'bg-purple-600/30 border-purple-500 text-white shadow-lg'
+              : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-purple-400" />
+          <span>🎙️ Interview Questions ({interviewQuestions.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDomain('dsa')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${
+            activeDomain === 'dsa'
+              ? 'bg-purple-600/30 border-purple-500 text-white shadow-lg'
+              : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'
+          }`}
+        >
+          <Code2 className="w-4 h-4 text-amber-400" />
+          <span>🧩 DSA Problems ({dsaProblems.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDomain('english')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${
+            activeDomain === 'english'
+              ? 'bg-purple-600/30 border-purple-500 text-white shadow-lg'
+              : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'
+          }`}
+        >
+          <Terminal className="w-4 h-4 text-emerald-400" />
+          <span>🗣️ English Coach ({englishModules.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDomain('devops')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${
+            activeDomain === 'devops'
+              ? 'bg-purple-600/30 border-purple-500 text-white shadow-lg'
+              : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'
+          }`}
+        >
+          <Server className="w-4 h-4 text-cyan-400" />
+          <span>⚡ DevOps VPS ({devopsSteps.length})</span>
+        </button>
       </div>
+
+      {/* Domain 1: Roadmap & Topics Manager (Default) */}
+      {activeDomain === 'roadmap' && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Header & Mode Switches */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+            <div>
+              <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-400" />
+                Curriculum Content & AI Generator Console
+              </h3>
+              <p className="text-xs text-gray-400">
+                Manage roadmap modules, bulk-generate sequence topics with AI, and assign chapter-wise practical tasks.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant={editorMode === 'bulk_ai' ? 'glow' : 'glass'}
+                size="sm"
+                onClick={() => setEditorMode('bulk_ai')}
+                leftIcon={<ListOrdered className="w-4 h-4 text-cyan-400" />}
+              >
+                ⚡ Sequence-Based Bulk AI Generator
+              </Button>
+              <Button
+                variant={editorMode === 'editor' ? 'glow' : 'glass'}
+                size="sm"
+                onClick={() => setEditorMode('editor')}
+                leftIcon={<Edit3 className="w-4 h-4 text-purple-400" />}
+              >
+                ✏️ Manual Topic Editor
+              </Button>
+            </div>
+          </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Module Selector & Topic List Sidebar */}
@@ -678,6 +975,491 @@ export const AdminCurriculumEditor = () => {
           </div>
         )}
       </div>
+    </div>
+  )}
+
+      {/* Domain 2: Interview Questions Bank Manager */}
+      {activeDomain === 'interview' && (
+        <div className="space-y-6 animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-400" />
+                Interview Questions & Marathi Intent Bank
+              </h3>
+              <p className="text-xs text-gray-400">
+                Manage tech interview questions, English master answers, and Marathi intent translations.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="glow"
+                size="sm"
+                onClick={() => handleBulkSeedInterview('js')}
+                disabled={isAiGenerating}
+                leftIcon={<Sparkles className="w-4 h-4 text-purple-400" />}
+              >
+                {isAiGenerating ? 'Generating...' : '⚡ 1-Click AI Bulk Generate Questions'}
+              </Button>
+              <Button
+                variant="glass"
+                size="sm"
+                onClick={() => setIsAddingInterview(!isAddingInterview)}
+                leftIcon={<PlusCircle className="w-4 h-4" />}
+              >
+                {isAddingInterview ? 'Close Form' : 'Add Manual Question'}
+              </Button>
+            </div>
+          </div>
+
+          {isAddingInterview && (
+            <GlassCard className="p-6 space-y-4 border border-purple-500/40 bg-purple-950/20">
+              <h4 className="text-sm font-bold text-purple-300">Create New Interview Question</h4>
+              <form onSubmit={handleCreateInterviewQuestion} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">Category</label>
+                    <select
+                      value={newInterviewCategory}
+                      onChange={(e) => setNewInterviewCategory(e.target.value)}
+                      className="w-full bg-[#121218] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                    >
+                      <option value="js">JavaScript Deep</option>
+                      <option value="react">React Architecture</option>
+                      <option value="node">Node & Express</option>
+                      <option value="system-design">System Design & Databases</option>
+                      <option value="hr">HR & Executive Behavioral</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">Difficulty</label>
+                    <select
+                      value={newInterviewDifficulty}
+                      onChange={(e) => setNewInterviewDifficulty(e.target.value)}
+                      className="w-full bg-[#121218] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                    >
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                    </select>
+                  </div>
+                </div>
+
+                <Input
+                  label="Question Text"
+                  required
+                  placeholder="e.g. Explain Event Loop & Microtask Queue in Node.js"
+                  value={newInterviewQuestion}
+                  onChange={(e) => setNewInterviewQuestion(e.target.value)}
+                />
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-gray-300">Master English Answer Script</label>
+                  <textarea
+                    rows={3}
+                    required
+                    placeholder="Word-for-word response for teleprompter practice..."
+                    value={newInterviewAnswer}
+                    onChange={(e) => setNewInterviewAnswer(e.target.value)}
+                    className="w-full bg-[#121218] border border-white/10 rounded-xl p-3 text-xs text-white"
+                  />
+                </div>
+
+                <Input
+                  label="Marathi Intent Explanation (इंटरव्ह्यूवर काय तपासत आहे?)"
+                  placeholder="उदा. कॉलबॅक क्यु आणि मायक्रोक्रॅप मधील फरक समजणे..."
+                  value={newInterviewMarathiIntent}
+                  onChange={(e) => setNewInterviewMarathiIntent(e.target.value)}
+                />
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button type="button" variant="ghost" onClick={() => setIsAddingInterview(false)}>Cancel</Button>
+                  <Button type="submit" variant="primary">Save Question</Button>
+                </div>
+              </form>
+            </GlassCard>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {interviewQuestions.map((q) => (
+              <GlassCard key={q.id} className="p-5 space-y-3 relative group">
+                <div className="flex items-center justify-between">
+                  <Badge variant="cyan">{q.category?.toUpperCase() || 'GENERAL'}</Badge>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteInterviewQuestion(q.id)}
+                    className="text-gray-500 hover:text-rose-400 p-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <h4 className="text-sm font-bold text-white tracking-tight">{q.question || q.q}</h4>
+                <p className="text-xs text-gray-300 line-clamp-2">{q.answer || q.a}</p>
+                {q.marathiIntent && (
+                  <span className="text-[10px] text-amber-300 bg-amber-500/10 px-2 py-1 rounded block">
+                    💡 Marathi Intent: {q.marathiIntent}
+                  </span>
+                )}
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Domain 3: DSA Problem Bank Manager */}
+      {activeDomain === 'dsa' && (
+        <div className="space-y-6 animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                <Code2 className="w-5 h-5 text-amber-400" />
+                LeetCode DSA Problem Bank
+              </h3>
+              <p className="text-xs text-gray-400">
+                Manage algorithm practice problems, starter code templates, AI hints, and solution code.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="glow"
+                size="sm"
+                onClick={handleBulkSeedDsa}
+                disabled={isAiGenerating}
+                leftIcon={<Sparkles className="w-4 h-4 text-amber-400" />}
+              >
+                {isAiGenerating ? 'Generating...' : '⚡ 1-Click AI Bulk Generate Problems'}
+              </Button>
+              <Button
+                variant="glass"
+                size="sm"
+                onClick={() => setIsAddingDsa(!isAddingDsa)}
+                leftIcon={<PlusCircle className="w-4 h-4" />}
+              >
+                {isAddingDsa ? 'Close Form' : 'Add Manual Problem'}
+              </Button>
+            </div>
+          </div>
+
+          {isAddingDsa && (
+            <GlassCard className="p-6 space-y-4 border border-amber-500/40 bg-amber-950/10">
+              <h4 className="text-sm font-bold text-amber-300">Create New DSA Problem</h4>
+              <form onSubmit={handleCreateDsaProblem} className="space-y-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <Input
+                    label="Problem Title"
+                    required
+                    placeholder="e.g. Two Sum"
+                    value={newDsaTitle}
+                    onChange={(e) => setNewDsaTitle(e.target.value)}
+                  />
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">Topic</label>
+                    <input
+                      type="text"
+                      className="w-full bg-[#121218] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                      value={newDsaTopic}
+                      onChange={(e) => setNewDsaTopic(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">Difficulty</label>
+                    <select
+                      value={newDsaDifficulty}
+                      onChange={(e) => setNewDsaDifficulty(e.target.value)}
+                      className="w-full bg-[#121218] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                    >
+                      <option value="Easy">Easy</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Hard">Hard</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-gray-300">Problem Description</label>
+                  <textarea
+                    rows={3}
+                    required
+                    placeholder="Describe problem constraints and example inputs/outputs..."
+                    value={newDsaDescription}
+                    onChange={(e) => setNewDsaDescription(e.target.value)}
+                    className="w-full bg-[#121218] border border-white/10 rounded-xl p-3 text-xs text-white"
+                  />
+                </div>
+
+                <Input
+                  label="AI Hint"
+                  placeholder="e.g. Use a Hash Map to store complement values in O(N)..."
+                  value={newDsaHint}
+                  onChange={(e) => setNewDsaHint(e.target.value)}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">Starter Code</label>
+                    <textarea
+                      rows={4}
+                      value={newDsaStarterCode}
+                      onChange={(e) => setNewDsaStarterCode(e.target.value)}
+                      className="w-full bg-black/60 border border-white/10 rounded-xl p-3 text-xs font-mono text-cyan-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">Solution Code</label>
+                    <textarea
+                      rows={4}
+                      value={newDsaSolutionCode}
+                      onChange={(e) => setNewDsaSolutionCode(e.target.value)}
+                      className="w-full bg-black/60 border border-emerald-500/30 rounded-xl p-3 text-xs font-mono text-emerald-300"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button type="button" variant="ghost" onClick={() => setIsAddingDsa(false)}>Cancel</Button>
+                  <Button type="submit" variant="primary">Save Problem</Button>
+                </div>
+              </form>
+            </GlassCard>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {dsaProblems.map((p) => (
+              <GlassCard key={p.id} className="p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Badge variant={p.difficulty === 'Hard' ? 'rose' : p.difficulty === 'Medium' ? 'amber' : 'emerald'}>
+                    {p.difficulty || 'Easy'}
+                  </Badge>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteDsaProblem(p.id)}
+                    className="text-gray-500 hover:text-rose-400 p-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <h4 className="text-sm font-bold text-white tracking-tight">{p.title}</h4>
+                <p className="text-xs text-gray-400 line-clamp-2">{p.description}</p>
+                <span className="text-[10px] font-mono text-cyan-400">{p.topic}</span>
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Domain 4: English Coach Modules Manager */}
+      {activeDomain === 'english' && (
+        <div className="space-y-6 animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                <Terminal className="w-5 h-5 text-emerald-400" />
+                English Coach & Executive Fluency Modules
+              </h3>
+              <p className="text-xs text-gray-400">
+                Manage English speaking drills, technical vocabulary sets, and executive presentation modules.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="glow"
+                size="sm"
+                onClick={handleBulkSeedEnglish}
+                disabled={isAiGenerating}
+                leftIcon={<Sparkles className="w-4 h-4 text-emerald-400" />}
+              >
+                {isAiGenerating ? 'Generating...' : '⚡ 1-Click AI Bulk Generate Modules'}
+              </Button>
+              <Button
+                variant="glass"
+                size="sm"
+                onClick={() => setIsAddingEnglish(!isAddingEnglish)}
+                leftIcon={<PlusCircle className="w-4 h-4" />}
+              >
+                {isAddingEnglish ? 'Close Form' : 'Add Manual Module'}
+              </Button>
+            </div>
+          </div>
+
+          {isAddingEnglish && (
+            <GlassCard className="p-6 space-y-4 border border-emerald-500/40 bg-emerald-950/10">
+              <h4 className="text-sm font-bold text-emerald-300">Create New English Module</h4>
+              <form onSubmit={handleCreateEnglishModule} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="Module Title"
+                    required
+                    placeholder="e.g. Executive Architecture Pitching"
+                    value={newEngTitle}
+                    onChange={(e) => setNewEngTitle(e.target.value)}
+                  />
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">Category</label>
+                    <select
+                      value={newEngCategory}
+                      onChange={(e) => setNewEngCategory(e.target.value)}
+                      className="w-full bg-[#121218] border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                    >
+                      <option value="pronunciation">Pronunciation & Accent</option>
+                      <option value="vocabulary">Technical Vocabulary</option>
+                      <option value="dialogue">Roleplay Dialogue</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-gray-300">Description</label>
+                  <textarea
+                    rows={3}
+                    placeholder="Module focus and learning outcomes..."
+                    value={newEngDescription}
+                    onChange={(e) => setNewEngDescription(e.target.value)}
+                    className="w-full bg-[#121218] border border-white/10 rounded-xl p-3 text-xs text-white"
+                  />
+                </div>
+
+                <Input
+                  label="Badge Tag Label"
+                  placeholder="e.g. Accent Drill / System Demo"
+                  value={newEngBadgeLabel}
+                  onChange={(e) => setNewEngBadgeLabel(e.target.value)}
+                />
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button type="button" variant="ghost" onClick={() => setIsAddingEnglish(false)}>Cancel</Button>
+                  <Button type="submit" variant="primary">Save Module</Button>
+                </div>
+              </form>
+            </GlassCard>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {englishModules.map((m) => (
+              <GlassCard key={m.id} className="p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Badge variant="purple">{m.category?.toUpperCase() || 'ENGLISH'}</Badge>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteEnglishModule(m.id)}
+                    className="text-gray-500 hover:text-rose-400 p-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <h4 className="text-sm font-bold text-white tracking-tight">{m.title}</h4>
+                <p className="text-xs text-gray-400">{m.description}</p>
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Domain 5: DevOps & VPS Setup Manager */}
+      {activeDomain === 'devops' && (
+        <div className="space-y-6 animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                <Server className="w-5 h-5 text-cyan-400" />
+                DevOps & Hostinger VPS Setup Tutorials
+              </h3>
+              <p className="text-xs text-gray-400">
+                Manage cloud deployment steps, terminal commands, and server setup tutorials.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="glow"
+                size="sm"
+                onClick={handleBulkSeedDevops}
+                disabled={isAiGenerating}
+                leftIcon={<Sparkles className="w-4 h-4 text-cyan-400" />}
+              >
+                {isAiGenerating ? 'Generating...' : '⚡ 1-Click AI Bulk Generate VPS Steps'}
+              </Button>
+              <Button
+                variant="glass"
+                size="sm"
+                onClick={() => setIsAddingDevops(!isAddingDevops)}
+                leftIcon={<PlusCircle className="w-4 h-4" />}
+              >
+                {isAddingDevops ? 'Close Form' : 'Add Manual Step'}
+              </Button>
+            </div>
+          </div>
+
+          {isAddingDevops && (
+            <GlassCard className="p-6 space-y-4 border border-cyan-500/40 bg-cyan-950/10">
+              <h4 className="text-sm font-bold text-cyan-300">Create New DevOps Setup Step</h4>
+              <form onSubmit={handleCreateDevopsStep} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="Step Badge (e.g. Step 1, Step 2)"
+                    required
+                    value={newDevStep}
+                    onChange={(e) => setNewDevStep(e.target.value)}
+                  />
+                  <Input
+                    label="Step Title"
+                    required
+                    placeholder="e.g. Nginx Reverse Proxy Setup"
+                    value={newDevTitle}
+                    onChange={(e) => setNewDevTitle(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-gray-300">Description</label>
+                  <textarea
+                    rows={3}
+                    required
+                    placeholder="Instructions for SSH or server config..."
+                    value={newDevDesc}
+                    onChange={(e) => setNewDevDesc(e.target.value)}
+                    className="w-full bg-[#121218] border border-white/10 rounded-xl p-3 text-xs text-white"
+                  />
+                </div>
+
+                <Input
+                  label="Bash Command Snippet"
+                  placeholder="e.g. sudo nginx -t && sudo systemctl reload nginx"
+                  value={newDevCommand}
+                  onChange={(e) => setNewDevCommand(e.target.value)}
+                />
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button type="button" variant="ghost" onClick={() => setIsAddingDevops(false)}>Cancel</Button>
+                  <Button type="submit" variant="primary">Save Step</Button>
+                </div>
+              </form>
+            </GlassCard>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {devopsSteps.map((s) => (
+              <GlassCard key={s.id} className="p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Badge variant="cyan">{s.step}</Badge>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteDevopsStep(s.id)}
+                    className="text-gray-500 hover:text-rose-400 p-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <h4 className="text-sm font-bold text-white tracking-tight">{s.title}</h4>
+                <p className="text-xs text-gray-400">{s.desc}</p>
+                {s.command && (
+                  <div className="p-2 rounded-lg bg-black/60 font-mono text-[10px] text-purple-300">
+                    <code>{s.command}</code>
+                  </div>
+                )}
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

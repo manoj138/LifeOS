@@ -23,4 +23,30 @@ const createQuestion = async (req, res) => {
   }
 };
 
-module.exports = { getQuestions, createQuestion };
+const deleteQuestion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await InterviewQuestion.destroy({ where: { id } });
+    return sendSuccess(res, 'Interview question deleted successfully', null);
+  } catch (error) {
+    return sendError(res, 'Error deleting interview question', error, 500);
+  }
+};
+
+const { generateInterviewQuestionsBulk } = require('../helper/aiGenerator');
+
+const bulkGenerateSequence = async (req, res) => {
+  try {
+    const { category, titles } = req.body;
+    if (!Array.isArray(titles) || titles.length === 0) {
+      return sendError(res, 'Titles array is required', null, 400);
+    }
+    const generatedItems = generateInterviewQuestionsBulk(category || 'js', titles);
+    const created = await InterviewQuestion.bulkCreate(generatedItems);
+    return sendSuccess(res, 'Bulk interview questions generated successfully', created, 201);
+  } catch (error) {
+    return sendError(res, 'Error generating bulk interview questions', error, 500);
+  }
+};
+
+module.exports = { getQuestions, createQuestion, deleteQuestion, bulkGenerateSequence };

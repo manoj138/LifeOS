@@ -403,8 +403,58 @@ Respond strictly with valid JSON only in the following format without any markdo
   return buildSmartFallbackContent(topicTitle, moduleId, level);
 }
 
+function generateInterviewQuestionsBulk(category = 'js', titles = []) {
+  return titles.map((title, idx) => ({
+    id: `iq_${Date.now()}_${idx}`,
+    category,
+    question: title.trim(),
+    answer: `In high-level architecture, ${title.trim()} handles critical execution scope, ensuring memory safety, predictable data flow, and optimal performance under load.`,
+    marathiIntent: `इंटरव्ह्यूवर मुख्यत्वे ${title.trim()} बद्दलची तांत्रिक समजूत, रिअल-टाइम ॲप्लिकेशनमधील उपयोग आणि एरर हँडलिंग तपासत आहे.`,
+    difficulty: 'Intermediate'
+  }));
+}
+
+function generateDsaProblemsBulk(titles = []) {
+  return titles.map((title, idx) => ({
+    id: `dsa_${Date.now()}_${idx}`,
+    title: title.trim(),
+    topic: 'Algorithmic Patterns',
+    difficulty: idx % 3 === 0 ? 'Easy' : idx % 3 === 1 ? 'Medium' : 'Hard',
+    timeLimit: '20m',
+    description: `Solve the algorithmic problem '${title.trim()}'. Optimize for O(N) time complexity and minimal space utilization.`,
+    starterCode: `function solution(input) {\n  // TODO: Implement solution for ${title.trim()}\n  return input;\n}`,
+    hint: `Consider using a hash table or dynamic programming table to store pre-computed subproblem results.`,
+    solutionCode: `function solution(input) {\n  // Optimal Solution\n  const lookup = new Map();\n  return input;\n}`
+  }));
+}
+
+function generateEnglishModulesBulk(titles = []) {
+  return titles.map((title, idx) => ({
+    id: `eng_${Date.now()}_${idx}`,
+    title: title.trim(),
+    category: idx % 2 === 0 ? 'pronunciation' : 'vocabulary',
+    description: `Master professional executive English communication for ${title.trim()}. Practice fluency and technical vocabulary.`,
+    badgeLabel: 'Executive Drill',
+    badgeColor: 'purple'
+  }));
+}
+
+function generateDevopsStepsBulk(titles = []) {
+  return titles.map((title, idx) => ({
+    id: `dev_${Date.now()}_${idx}`,
+    step: `Step ${idx + 1}`,
+    title: title.trim(),
+    desc: `Follow these deployment instructions to configure ${title.trim()} on your Hostinger VPS server.`,
+    command: `sudo systemctl restart nginx && sudo ufw status`
+  }));
+}
+
 module.exports = {
-  generateTopicContent
+  generateTopicContent,
+  generateInterviewQuestionsBulk,
+  generateDsaProblemsBulk,
+  generateEnglishModulesBulk,
+  generateDevopsStepsBulk,
 };
 
 
