@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Edit3, Save, Sparkles, Check, Code2, Layers, Server, Binary, Terminal, CheckCircle2, RefreshCw, AlertCircle, Trash2, ListOrdered, CheckSquare, PlusCircle } from 'lucide-react';
+import { BookOpen, Edit3, Save, Sparkles, Check, Code2, Layers, Server, Binary, Terminal, CheckCircle2, RefreshCw, AlertCircle, Trash2, ListOrdered, CheckSquare, PlusCircle, FileText } from 'lucide-react';
 import { GlassCard } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -36,6 +36,11 @@ export const AdminCurriculumEditor = () => {
 
   // Form Modals / Forms State
   const [isAddingInterview, setIsAddingInterview] = useState(false);
+  const [isBulkRawModalOpen, setIsBulkRawModalOpen] = useState(false);
+  const [rawQaText, setRawQaText] = useState('');
+  const [rawQaCategory, setRawQaCategory] = useState('js');
+  const [rawQaDifficulty, setRawQaDifficulty] = useState('Intermediate');
+
   const [newInterviewCategory, setNewInterviewCategory] = useState('js');
   const [newInterviewQuestion, setNewInterviewQuestion] = useState('');
   const [newInterviewAnswer, setNewInterviewAnswer] = useState('');
@@ -143,6 +148,64 @@ export const AdminCurriculumEditor = () => {
       await apiService.deleteInterviewQuestion(id);
       fetchInterviewQuestions();
     }
+  };
+
+  const handleBulkImportRawQa = async () => {
+    if (!rawQaText.trim()) return;
+    
+    // Parse raw Q&A block text
+    const lines = rawQaText.split('\n');
+    let items = [];
+    let currentQ = '';
+    let currentA = '';
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed.match(/^(Q|Q\d+|\d+\.|\d+\))\s*/i)) {
+        if (currentQ) {
+          items.push({ q: currentQ, a: currentA || 'Answer under compilation.' });
+          currentA = '';
+        }
+        currentQ = trimmed.replace(/^(Q|Q\d+|\d+\.|\d+\))\s*[:.-]?\s*/i, '');
+      } else if (trimmed.match(/^(A|Ans|Answer)\s*/i)) {
+        currentA = trimmed.replace(/^(A|Ans|Answer)\s*[:.-]?\s*/i, '');
+      } else if (currentA) {
+        currentA += ' ' + trimmed;
+      } else if (currentQ) {
+        currentQ += ' ' + trimmed;
+      }
+    });
+
+    if (currentQ) {
+      items.push({ q: currentQ, a: currentA || 'Answer under compilation.' });
+    }
+
+    if (items.length === 0) {
+      const blocks = rawQaText.split(/\n\s*\n/);
+      blocks.forEach((block) => {
+        if (block.trim()) {
+          const parts = block.split('\n');
+          items.push({
+            q: parts[0].trim(),
+            a: parts.slice(1).join(' ').trim() || 'Comprehensive architecture answer.'
+          });
+        }
+      });
+    }
+
+    for (const item of items) {
+      await apiService.createInterviewQuestion({
+        category: rawQaCategory,
+        question: item.q,
+        answer: item.a,
+        marathiIntent: `इंटरव्ह्यूवर मुख्यत्वे ${item.q.substring(0, 35)} बद्दलची तांत्रिक समजूत तपासत आहे.`,
+        difficulty: rawQaDifficulty
+      });
+    }
+
+    setRawQaText('');
+    setIsBulkRawModalOpen(false);
+    fetchInterviewQuestions();
   };
 
   const fetchDsaProblems = async () => {
@@ -991,15 +1054,14 @@ export const AdminCurriculumEditor = () => {
                 Manage tech interview questions, English master answers, and Marathi intent translations.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
-                variant="glow"
+                variant="glass"
                 size="sm"
-                onClick={() => handleBulkSeedInterview('js')}
-                disabled={isAiGenerating}
-                leftIcon={<Sparkles className="w-4 h-4 text-purple-400" />}
+                onClick={() => setIsBulkRawModalOpen(!isBulkRawModalOpen)}
+                leftIcon={<FileText className="w-4 h-4 text-cyan-400" />}
               >
-                {isAiGenerating ? 'Generating...' : '⚡ 1-Click AI Bulk Generate Questions'}
+                📋 Bulk Raw Text Importer
               </Button>
               <Button
                 variant="glass"
@@ -1011,6 +1073,67 @@ export const AdminCurriculumEditor = () => {
               </Button>
             </div>
           </div>
+
+          {/* Bulk Raw Text Q&A Importer Modal */}
+          {isBulkRawModalOpen && (
+            <GlassCard className="p-6 space-y-4 border border-cyan-500/40 bg-cyan-950/20 animate-fadeIn">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <h4 className="text-sm font-bold text-cyan-300 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-cyan-400" /> Paste Raw Questions & Answers (Bulk Importer)
+                </h4>
+                <button type="button" onClick={() => setIsBulkRawModalOpen(false)} className="text-xs text-gray-400 hover:text-white">Close</button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Target Tech Domain</label>
+                  <select
+                    value={rawQaCategory}
+                    onChange={(e) => setRawQaCategory(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-gray-200"
+                  >
+                    <option value="js">JavaScript Deep</option>
+                    <option value="react">React Architecture</option>
+                    <option value="node">Node.js & Express</option>
+                    <option value="mongo">MongoDB & Databases</option>
+                    <option value="devops">DevOps & Cloud</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Default Difficulty</label>
+                  <select
+                    value={rawQaDifficulty}
+                    onChange={(e) => setRawQaDifficulty(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-gray-200"
+                  >
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-xs font-medium text-gray-300">
+                  Paste Raw Q&A Text (Copies from Word, ChatGPT, PDF, WhatsApp):
+                </label>
+                <textarea
+                  rows={6}
+                  value={rawQaText}
+                  onChange={(e) => setRawQaText(e.target.value)}
+                  placeholder={`Q1: What is closure in JavaScript?\nAns: A closure is a function bound together with lexical scope.\n\nQ2: What is Event Loop?\nAns: Event loop offloads async tasks.`}
+                  className="w-full bg-slate-950 border border-cyan-500/30 rounded-xl p-3 text-xs font-mono text-cyan-200 focus:outline-none focus:border-cyan-400"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button size="sm" variant="glass" onClick={() => setIsBulkRawModalOpen(false)}>Cancel</Button>
+                <Button size="sm" variant="glow" onClick={handleBulkImportRawQa} leftIcon={<Sparkles className="w-4 h-4 text-cyan-400" />}>
+                  ⚡ Auto-Format & Bulk Import to Database
+                </Button>
+              </div>
+            </GlassCard>
+          )}
 
           {isAddingInterview && (
             <GlassCard className="p-6 space-y-4 border border-purple-500/40 bg-purple-950/20">

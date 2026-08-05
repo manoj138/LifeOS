@@ -92,8 +92,7 @@ My core technical focus areas include ${preferences?.focusAreas?.join(', ') || '
     { id: 'js', label: 'JavaScript Deep', icon: <Code2 className="w-4 h-4 text-cyan-400" /> },
     { id: 'react', label: 'React Architecture', icon: <Layers className="w-4 h-4 text-purple-400" /> },
     { id: 'node', label: 'Node & Express', icon: <Terminal className="w-4 h-4 text-emerald-400" /> },
-    { id: 'mongo', label: 'MongoDB & Schemas', icon: <Database className="w-4 h-4 text-amber-400" /> },
-    { id: 'ecommerce', label: 'E-Commerce Scenarios', icon: <Briefcase className="w-4 h-4 text-rose-400" /> }
+    { id: 'mongo', label: 'MongoDB & Schemas', icon: <Database className="w-4 h-4 text-amber-400" /> }
   ];
 
   const currentQuestions = dynamicQuestions || [];

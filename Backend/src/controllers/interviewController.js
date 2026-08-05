@@ -38,12 +38,21 @@ const { generateInterviewQuestionsBulk } = require('../helper/aiGenerator');
 const bulkGenerateSequence = async (req, res) => {
   try {
     const { category, titles } = req.body;
-    if (!Array.isArray(titles) || titles.length === 0) {
-      return sendError(res, 'Titles array is required', null, 400);
+    const generatedItems = generateInterviewQuestionsBulk(category || 'js', Array.isArray(titles) ? titles : []);
+    
+    // Deduplication safeguard: Fetch existing question texts
+    const existing = await InterviewQuestion.findAll({ attributes: ['question'] });
+    const existingSet = new Set(existing.map(e => (e.question || '').toLowerCase().trim()));
+
+    // Filter only unique items
+    const uniqueItems = generatedItems.filter(item => !existingSet.has((item.question || '').toLowerCase().trim()));
+
+    if (uniqueItems.length === 0) {
+      return sendSuccess(res, 'All questions in this bank already exist in your database', []);
     }
-    const generatedItems = generateInterviewQuestionsBulk(category || 'js', titles);
-    const created = await InterviewQuestion.bulkCreate(generatedItems);
-    return sendSuccess(res, 'Bulk interview questions generated successfully', created, 201);
+
+    const created = await InterviewQuestion.bulkCreate(uniqueItems);
+    return sendSuccess(res, `Bulk generated ${created.length} unique interview questions`, created, 201);
   } catch (error) {
     return sendError(res, 'Error generating bulk interview questions', error, 500);
   }
