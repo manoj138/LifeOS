@@ -11,7 +11,6 @@ const AuthPage = lazy(() => import('../pages/AuthPage').then(m => ({ default: m.
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage').then(m => ({ default: m.OnboardingPage })));
 const Dashboard = lazy(() => import('../pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const DailyPlanner = lazy(() => import('../pages/DailyPlanner').then(m => ({ default: m.DailyPlanner })));
-const GoalsPage = lazy(() => import('../pages/GoalsPage').then(m => ({ default: m.GoalsPage })));
 const LearningHub = lazy(() => import('../pages/LearningHub').then(m => ({ default: m.LearningHub })));
 const InterviewPrep = lazy(() => import('../pages/InterviewPrep').then(m => ({ default: m.InterviewPrep })));
 const EnglishPage = lazy(() => import('../pages/EnglishPage').then(m => ({ default: m.EnglishPage })));
@@ -19,8 +18,6 @@ const DSAPage = lazy(() => import('../pages/DSAPage').then(m => ({ default: m.DS
 const DevOpsPage = lazy(() => import('../pages/DevOpsPage').then(m => ({ default: m.DevOpsPage })));
 const ProjectManager = lazy(() => import('../pages/ProjectManager').then(m => ({ default: m.ProjectManager })));
 const JobTracker = lazy(() => import('../pages/JobTracker').then(m => ({ default: m.JobTracker })));
-const HabitTracker = lazy(() => import('../pages/HabitTracker').then(m => ({ default: m.HabitTracker })));
-const JournalPage = lazy(() => import('../pages/JournalPage').then(m => ({ default: m.JournalPage })));
 const AnalyticsPage = lazy(() => import('../pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const AdminPage = lazy(() => import('../pages/AdminPage').then(m => ({ default: m.AdminPage })));
@@ -59,7 +56,6 @@ export const AppRoutes = () => {
             </Route>
 
             <Route path="planner" element={<DailyPlanner />} />
-            <Route path="goals" element={<GoalsPage />} />
             <Route path="learning" element={<LearningHub />} />
             <Route path="interview" element={<InterviewPrep />} />
             <Route path="english" element={<EnglishPage />} />
@@ -67,8 +63,6 @@ export const AppRoutes = () => {
             <Route path="devops" element={<DevOpsPage />} />
             <Route path="projects" element={<ProjectManager />} />
             <Route path="jobs" element={<JobTracker />} />
-            <Route path="habits" element={<HabitTracker />} />
-            <Route path="journal" element={<JournalPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="loading-preview" element={<LoadingStatePage />} />

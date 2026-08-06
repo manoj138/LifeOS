@@ -15,16 +15,13 @@ export const CommandPalette = ({ isOpen, onClose }) => {
   const commands = [
     { id: 'dashboard', label: 'Go to Dashboard', group: 'Navigation', icon: <LayoutDashboard className="w-4 h-4 text-blue-400" />, path: '/app/dashboard' },
     { id: 'planner', label: 'Daily Planner & Time-Blocking', group: 'Productivity', icon: <Calendar className="w-4 h-4 text-indigo-400" />, path: '/app/planner' },
-    { id: 'goals', label: 'Life Goals & Milestones', group: 'Productivity', icon: <Target className="w-4 h-4 text-purple-400" />, path: '/app/goals' },
     { id: 'learning', label: 'MERN Stack & Fullstack Roadmap', group: 'Skills', icon: <BookOpen className="w-4 h-4 text-cyan-400" />, path: '/app/learning' },
     { id: 'interview', label: 'AI Interview Simulator & Flashcards', group: 'Skills', icon: <MessageSquareCode className="w-4 h-4 text-pink-400" />, path: '/app/interview' },
     { id: 'english', label: 'English Speaking & Fluency Coach', group: 'Skills', icon: <Mic className="w-4 h-4 text-emerald-400" />, path: '/app/english' },
     { id: 'dsa', label: 'DSA Algorithmic Visualizer & Problem Solver', group: 'Skills', icon: <Code2 className="w-4 h-4 text-amber-400" />, path: '/app/dsa' },
     { id: 'devops', label: 'Hostinger VPS & CloudPanel Manager', group: 'Infrastructure', icon: <Server className="w-4 h-4 text-sky-400" />, path: '/app/devops' },
     { id: 'project', label: 'Project Manager & Kanban Sprint Board', group: 'Work', icon: <FolderKanban className="w-4 h-4 text-purple-400" />, path: '/app/projects' },
-    { id: 'habit', label: 'Habit Matrix & Streak Grid', group: 'Health', icon: <Flame className="w-4 h-4 text-orange-400" />, path: '/app/habits' },
     { id: 'analytics', label: 'Analytics & Growth Velocity Insights', group: 'Insights', icon: <LineChart className="w-4 h-4 text-purple-400" />, path: '/app/analytics' },
-    { id: 'journal', label: 'AI Reflection Journal & Sentiment', group: 'Reflection', icon: <BookMarked className="w-4 h-4 text-rose-400" />, path: '/app/journal' },
     { id: 'settings', label: 'Account & AI Model Preferences', group: 'System', icon: <Settings className="w-4 h-4 text-gray-400" />, path: '/app/settings' },
   ];
 

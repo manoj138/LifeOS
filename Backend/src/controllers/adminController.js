@@ -2,11 +2,8 @@ const sequelize = require('../config/sqliteDB');
 const User = require('../modals/User');
 const UserPreference = require('../modals/UserPreference');
 const LearningProgress = require('../modals/LearningProgress');
-const Goal = require('../modals/Goal');
 const PlannerTask = require('../modals/PlannerTask');
 const Project = require('../modals/Project');
-const HabitLog = require('../modals/HabitLog');
-const JournalEntry = require('../modals/JournalEntry');
 const JobApplication = require('../modals/JobApplication');
 const { sendSuccess, sendError } = require('../helper/responseHelper');
 
@@ -158,11 +155,8 @@ const deleteCandidate = async (req, res) => {
     const models = [
       UserPreference,
       LearningProgress,
-      Goal,
       PlannerTask,
       Project,
-      HabitLog,
-      JournalEntry,
       JobApplication
     ];
 

@@ -68,12 +68,9 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
       ]
     },
     {
-      title: "Portfolio & Wellness",
+      title: "Portfolio & Growth",
       items: [
         { path: '/app/projects', label: 'Project Portfolio', icon: FolderKanban, badge: null },
-        { path: '/app/goals', label: 'Goals', icon: Target, badge: null },
-        { path: '/app/habits', label: 'Habit Matrix', icon: Flame, badge: null },
-        { path: '/app/journal', label: 'Growth Journal', icon: BookMarked, badge: 'AI' },
         { path: '/app/analytics', label: 'Analytics', icon: LineChart, badge: null },
         { path: '/app/settings', label: 'Settings', icon: Settings, badge: null }
       ]

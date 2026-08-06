@@ -12,7 +12,6 @@ export const FloatingDock = ({ onOpenCommandPalette }) => {
     { id: 'planner', label: 'Daily Time-Blocking', icon: Calendar, path: '/app/planner', color: 'text-indigo-400' },
     { id: 'learning', label: 'MERN Code Studio', icon: Terminal, path: '/app/learning', color: 'text-emerald-400' },
     { id: 'devops', label: 'Hostinger VPS Live Status', icon: Server, path: '/app/devops', color: 'text-blue-400' },
-    { id: 'habits', label: 'Habit Matrix & Streak', icon: Flame, path: '/app/habits', color: 'text-rose-400' },
   ];
 
   return (

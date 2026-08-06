@@ -522,54 +522,7 @@ export const apiService = {
     }
   },
 
-  async createHabit(data) {
-    try {
-      const res = await Api.post('/habits', data);
-      return res.data;
-    } catch (err) {
-      return { success: false, fallback: true };
-    }
-  },
 
-  // Goals
-  async getGoals() {
-    try {
-      const res = await Api.get('/goals');
-      return res.data;
-    } catch (err) {
-      return { success: false, fallback: true };
-    }
-  },
-
-  async createGoal(data) {
-    try {
-      const res = await Api.post('/goals', data);
-      return res.data;
-    } catch (err) {
-      return { success: false, fallback: true };
-    }
-  },
-
-
-
-  // Journal Entries
-  async getJournalEntries() {
-    try {
-      const res = await Api.get('/journal/entries');
-      return res.data;
-    } catch (err) {
-      return { success: false, fallback: true };
-    }
-  },
-
-  async createJournalEntry(data) {
-    try {
-      const res = await Api.post('/journal/entries', data);
-      return res.data;
-    } catch (err) {
-      return { success: false, fallback: true };
-    }
-  },
 
   // Projects
   async getProjects() {

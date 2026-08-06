@@ -18,7 +18,6 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
     const routeTitles = {
       '/app/dashboard': 'Candidate Command Center',
       '/app/planner': 'Daily Timeline & Study Schedule',
-      '/app/goals': 'Career & Engineering Milestones',
       '/app/learning': 'Technical Mastery & Full-Stack Hub',
       '/app/interview': 'AI Teleprompter & Interview Studio',
       '/app/english': 'English Speaking & Fluency Coach',
@@ -26,8 +25,6 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
       '/app/devops': 'DevOps Labs & Hostinger VPS',
       '/app/projects': 'Project Architectural Showcase',
       '/app/jobs': 'Job Application & Hiring Pipeline',
-      '/app/habits': 'Habit Discipline Matrix',
-      '/app/journal': 'AI Reflection & Growth Journal',
       '/app/analytics': 'Growth Velocity & Insights',
       '/app/settings': 'Account & Strategy Settings'
     };
