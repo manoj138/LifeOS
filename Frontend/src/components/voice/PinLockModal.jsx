@@ -100,10 +100,10 @@ export const PinLockModal = () => {
         <motion.div
           animate={isShaking ? { x: [-12, 12, -8, 8, -4, 4, 0] } : {}}
           transition={{ duration: 0.4 }}
-          className="relative w-full max-w-4xl bg-[#0f0f17]/85 border border-purple-500/30 rounded-3xl shadow-[0_0_80px_rgba(168,85,247,0.25)] backdrop-blur-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 border-gradient"
+          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-[#0f0f17]/85 border border-purple-500/30 rounded-3xl shadow-[0_0_80px_rgba(168,85,247,0.25)] backdrop-blur-3xl grid grid-cols-1 lg:grid-cols-12 border-gradient"
         >
           {/* Left Column: Glowing Live Chatbot AI Robot Artwork Showcase */}
-          <div className="lg:col-span-5 p-8 lg:p-10 bg-gradient-to-br from-purple-900/30 via-indigo-950/20 to-transparent border-b lg:border-b-0 lg:border-r border-white/10 flex flex-col justify-between items-center text-center relative">
+          <div className="lg:col-span-5 p-5 sm:p-8 lg:p-10 bg-gradient-to-br from-purple-900/30 via-indigo-950/20 to-transparent border-b lg:border-b-0 lg:border-r border-white/10 flex flex-col justify-between items-center text-center relative">
             <div className="w-full flex items-center justify-between">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-bold text-cyan-300">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400" />

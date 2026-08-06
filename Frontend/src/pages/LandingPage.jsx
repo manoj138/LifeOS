@@ -73,14 +73,14 @@ export const LandingPage = () => {
       <div className="fixed bottom-0 right-1/4 w-[700px] h-[700px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none -z-10 animate-pulse-glow" style={{ animationDelay: '3s' }} />
 
       {/* Top Floating Glass Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-20 bg-[#070709]/80 backdrop-blur-2xl border-b border-white/10 px-6 sm:px-12 flex items-center justify-between">
+      <nav className="fixed top-0 left-0 right-0 z-50 h-20 bg-[#070709]/80 backdrop-blur-2xl border-b border-white/10 px-3 sm:px-12 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 p-0.5 shadow-lg shadow-purple-500/20 flex items-center justify-center">
             <div className="w-full h-full bg-[#0c0c10] rounded-[14px] flex items-center justify-center">
               <Bot className="w-5 h-5 text-cyan-400" />
             </div>
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-white">
+          <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white">
             LifeOS <span className="text-cyan-400 text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30">AI Studio</span>
           </span>
         </Link>
@@ -91,7 +91,7 @@ export const LandingPage = () => {
           <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link to="/auth">
             <Button variant="ghost" size="sm">Sign In</Button>
           </Link>
@@ -102,13 +102,13 @@ export const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-36 pb-16 px-6 sm:px-12 max-w-7xl mx-auto flex flex-col items-center text-center relative">
-        <Badge variant="neon" className="mb-6 px-4 py-1.5 text-sm">
+      <section className="pt-28 sm:pt-36 pb-16 px-3 sm:px-12 max-w-7xl mx-auto flex flex-col items-center text-center relative">
+        <Badge variant="neon" className="mb-6 px-4 py-1.5 text-xs sm:text-sm">
           <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
           <span>Next-Gen Tech Interview & Engineering Learning Platform</span>
         </Badge>
 
-        <h1 className="text-5xl sm:text-7xl font-extrabold text-white tracking-tight leading-[1.1] max-w-5xl">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.1] max-w-5xl">
           Master Modern Tech Skills & <span className="bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent">Crush AI Interviews</span>
         </h1>
 

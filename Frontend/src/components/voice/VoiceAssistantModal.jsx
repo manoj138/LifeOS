@@ -40,13 +40,13 @@ export const VoiceAssistantModal = () => {
   return (
     <AnimatePresence>
       {/* NON-BLOCKING FLOATING CONTAINER */}
-      <div className="fixed bottom-6 right-6 z-[9990] pointer-events-none flex flex-col items-end">
+      <div className="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-[9990] pointer-events-none flex flex-col items-end">
         {/* Floating Voice HUD Capsule */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="pointer-events-auto w-80 sm:w-96 rounded-3xl bg-[#12121a]/95 border border-purple-500/30 p-5 shadow-[0_0_40px_rgba(168,85,247,0.35)] backdrop-blur-2xl text-left space-y-3 overflow-hidden"
+          className="pointer-events-auto max-w-[calc(100vw-1.5rem)] w-80 sm:w-96 rounded-3xl bg-[#12121a]/95 border border-purple-500/30 p-4 sm:p-5 shadow-[0_0_40px_rgba(168,85,247,0.35)] backdrop-blur-2xl text-left space-y-3 overflow-hidden"
         >
           {/* Header Toolbar */}
           <div className="flex items-center justify-between border-b border-white/10 pb-2.5">

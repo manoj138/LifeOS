@@ -168,10 +168,10 @@ export const OnboardingPage = () => {
 
       {/* Main 2-Column Split Area (No full-page scroll) */}
       <div className="flex-1 min-h-0 flex items-center justify-center my-auto w-full max-w-6xl mx-auto py-2 z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center w-full h-full max-h-[82vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center w-full h-full max-h-[90vh] lg:max-h-[82vh]">
           
           {/* Left Column: Pure Floating SVG Illustration */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center h-full text-center space-y-3 p-2">
+          <div className="hidden md:flex lg:col-span-5 flex-col items-center justify-center h-full text-center space-y-3 p-2">
             <div className="w-56 sm:w-72 lg:w-80 h-56 sm:h-72 lg:h-80 relative flex items-center justify-center">
               {/* Soft Ambient Radial Glow Backdrop */}
               <div className="absolute inset-0 rounded-full bg-purple-500/15 blur-3xl animate-pulse" />

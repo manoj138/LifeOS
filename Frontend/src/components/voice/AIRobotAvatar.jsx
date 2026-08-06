@@ -24,13 +24,13 @@ export const AIRobotAvatar = ({ size = 'md', className = '' }) => {
       {isListening && (
         <>
           <div className="absolute inset-0 rounded-full bg-emerald-500/30 animate-ping pointer-events-none" />
-          <div className="absolute -inset-2 rounded-full border border-emerald-400/40 animate-pulse pointer-events-none" />
+          <div className="absolute -inset-0.5 rounded-full border border-emerald-400/40 animate-pulse pointer-events-none" />
         </>
       )}
 
       {/* Pulsing Soundwave Halo when Speaking */}
       {isSpeaking && (
-        <div className="absolute -inset-3 rounded-full bg-gradient-to-tr from-purple-600/40 via-cyan-500/40 to-indigo-500/30 blur-md animate-pulse-glow pointer-events-none" />
+        <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-purple-600/40 via-cyan-500/40 to-indigo-500/30 blur-sm animate-pulse-glow pointer-events-none" />
       )}
 
       {/* 3D Floating Robot Wrapper with Framer Motion Physics */}

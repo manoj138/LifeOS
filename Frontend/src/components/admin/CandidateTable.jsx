@@ -100,8 +100,8 @@ export const CandidateTable = () => {
       </div>
 
       {/* Candidate Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs">
+      <div className="overflow-x-auto custom-scrollbar">
+        <table className="w-full text-left text-xs min-w-[650px]">
           <thead className="bg-white/5 border-b border-white/10 text-gray-400 uppercase tracking-wider">
             <tr>
               <th className="p-3.5 rounded-l-xl">Candidate Name</th>

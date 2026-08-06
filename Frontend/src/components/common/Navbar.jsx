@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, Sparkles, Command, Plus, ChevronRight, SlidersHorizontal } from 'lucide-react';
+import { Search, Bell, Sparkles, Command, Plus, ChevronRight, SlidersHorizontal, Menu } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { VoiceGuiderWidget } from '../voice/VoiceGuiderWidget';
 import { useUser } from '../../context/UserContext';
 import { cn } from '../../utils/cn';
 
-export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
+export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed, onToggleMobileSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [hasUnread, setHasUnread] = useState(true);
@@ -34,21 +34,29 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
   return (
     <header
       className={cn(
-        "fixed top-0 right-0 z-30 h-16 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/10 px-6 flex items-center justify-between transition-all duration-300",
-        isSidebarCollapsed ? "left-[80px]" : "left-[260px]"
+        "fixed top-0 right-0 z-30 h-16 bg-[#09090b]/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-6 flex items-center justify-between transition-all duration-300 left-0",
+        isSidebarCollapsed ? "md:left-[80px]" : "md:left-[260px]"
       )}
     >
-      {/* Left Breadcrumb & Page Title */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-500 font-medium">LifeOS AI</span>
-        <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-        <span className="text-sm font-bold text-white tracking-tight">
+      {/* Left Breadcrumb & Mobile Menu Toggle */}
+      <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 mr-2 sm:mr-4">
+        <button
+          onClick={onToggleMobileSidebar}
+          className="p-2 mr-2 sm:mr-0 shrink-0 rounded-xl bg-white/[0.05] hover:bg-white/10 border border-white/10 text-gray-300 md:hidden transition-colors"
+          title="Open Menu"
+        >
+          <Menu className="w-5 h-5 text-cyan-400" />
+        </button>
+
+        <span className="hidden sm:inline text-xs text-gray-500 font-medium shrink-0">LifeOS AI</span>
+        <ChevronRight className="hidden sm:inline w-3.5 h-3.5 text-gray-600 shrink-0" />
+        <span className="hidden sm:inline-block text-xs sm:text-sm font-bold text-white tracking-tight truncate sm:max-w-xs md:max-w-md">
           {getPageTitle(location.pathname)}
         </span>
       </div>
 
       {/* Right Action Icons & Status */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
         {/* Voice Guider Widget (Candidates Only) */}
         {!isAdmin && <VoiceGuiderWidget />}
 
@@ -82,3 +90,4 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
     </header>
   );
 };
+

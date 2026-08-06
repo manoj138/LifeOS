@@ -39,19 +39,19 @@ export const VoiceGuiderWidget = () => {
   return (
     <div className="relative flex items-center">
       {/* Sleek Fixed-Size AI Voice Capsule (Prevents Layout Shifting) */}
-      <div className="flex items-center gap-2 bg-[#12121a]/90 hover:bg-[#181824] border border-white/15 hover:border-purple-500/50 rounded-full px-3.5 py-1.5 backdrop-blur-2xl shadow-[0_0_20px_rgba(168,85,247,0.25)] transition-all">
+      <div className="flex items-center gap-1.5 sm:gap-2 bg-[#12121a]/90 hover:bg-[#181824] border border-white/15 hover:border-purple-500/50 rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 backdrop-blur-2xl shadow-[0_0_20px_rgba(168,85,247,0.25)] transition-all">
         {/* Animated Mic Orb & Capsule Action */}
         <button
           type="button"
           onClick={handleCapsuleClick}
-          className="flex items-center gap-2 text-left group"
+          className="flex items-center gap-1.5 sm:gap-2 text-left group"
           title={`Click to talk or say "Hey ${aiName}" hands-free`}
         >
           {/* 3D Animated Floating AI Robot Companion Icon */}
           <AIRobotAvatar size="sm" />
 
-          {/* Fixed-Width Label Box (Prevents Layout Shifting & Jitter) */}
-          <div className="w-32 min-w-[128px] max-w-[128px] h-7 flex flex-col justify-center overflow-hidden">
+          {/* Responsive Fixed-Width Label Box (Prevents Layout Shifting & Jitter) */}
+          <div className="w-24 sm:w-32 min-w-[96px] sm:min-w-[128px] max-w-[96px] sm:max-w-[128px] h-7 flex flex-col justify-center overflow-hidden">
             {isSpeaking ? (
               <div className="scale-75 origin-left">
                 <AudioSpectrum isActive={true} barCount={6} />

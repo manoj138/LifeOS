@@ -1697,7 +1697,7 @@ export const AdminCurriculumEditor = () => {
             <GlassCard className="p-6 space-y-4 border border-amber-500/40 bg-amber-950/10">
               <h4 className="text-sm font-bold text-amber-300">Create New DSA Problem</h4>
               <form onSubmit={handleCreateDsaProblem} className="space-y-4">
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <Input
                     label="Problem Title"
                     required
