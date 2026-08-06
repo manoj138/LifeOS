@@ -41,11 +41,14 @@ export const DSAPage = () => {
   ])).filter(Boolean);
 
   const filteredProblems = allProblems.filter((p) => {
-    if (selectedLanguageFilter.toLowerCase() === 'all') return true;
-    return (p.language || 'javascript').toLowerCase() === selectedLanguageFilter.toLowerCase();
+    const matchesLang = selectedLanguageFilter.toLowerCase() === 'all' || (p.language || 'javascript').toLowerCase() === selectedLanguageFilter.toLowerCase();
+    const matchesTopic = selectedTopicFilter === 'All' || !selectedTopicFilter || 
+      (p.title || '').toLowerCase().includes(selectedTopicFilter.toLowerCase()) || 
+      (p.topic || '').toLowerCase().includes(selectedTopicFilter.toLowerCase());
+    return matchesLang && matchesTopic;
   });
 
-  const currentProblem = filteredProblems[activeProblem] || filteredProblems[0] || null;
+  const currentProblem = filteredProblems[activeProblem] || filteredProblems[0] || allProblems[0] || null;
 
   const getLangExtension = (lang) => {
     const l = (lang || 'javascript').toLowerCase();

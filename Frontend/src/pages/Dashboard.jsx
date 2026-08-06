@@ -87,6 +87,49 @@ export const Dashboard = () => {
         </div>
       </LaserBorder>
 
+      {/* Guided Student Action Center: What to Practice Today */}
+      <TiltCard className="p-6 space-y-4 border border-cyan-500/30 bg-gradient-to-r from-blue-950/40 via-[#14141b]/80 to-purple-950/40">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Badge variant="cyan">Student Practice Pathway</Badge>
+              <span className="text-xs text-gray-400 font-mono">Streak: {currentStreak} Days 🔥</span>
+            </div>
+            <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <span>🎯 Today's Recommended Learning & Coding Practice</span>
+            </h3>
+          </div>
+          <Button
+            size="sm"
+            variant="glow"
+            onClick={() => navigate('/app/learning')}
+            leftIcon={<Play className="w-4 h-4 text-emerald-400" />}
+          >
+            Start Today's Lesson & Practice
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider block">Step 1: Core Concept</span>
+            <p className="font-semibold text-white">JavaScript & Async Execution Mechanics</p>
+            <p className="text-gray-400 text-[11px]">Read interactive concept notes & pass mandatory quiz.</p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">Step 2: DSA Challenge</span>
+            <p className="font-semibold text-white">Two Sum & Hash Map Lookup</p>
+            <p className="text-gray-400 text-[11px]">Solve linked LeetCode problem with live execution.</p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider block">Step 3: Interview Q&A</span>
+            <p className="font-semibold text-white">Event Loop & Promises Teleprompter</p>
+            <p className="text-gray-400 text-[11px]">Practice speaking with live AI Teleprompter studio.</p>
+          </div>
+        </div>
+      </TiltCard>
+
       {/* 3D Tilt Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((m, idx) => {

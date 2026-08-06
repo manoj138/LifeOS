@@ -33,6 +33,7 @@ import { FilterPills } from '../components/ui/FilterPills';
 import { EmptyStateCard } from '../components/ui/EmptyStateCard';
 
 export const LearningHub = () => {
+  const navigate = useNavigate();
   const { preferences, user, userProgress, toggleCompletedTopic } = useUser();
 
   // Load saved progress state from UserContext & localStorage on mount
@@ -673,6 +674,8 @@ export const LearningHub = () => {
                   { id: 'project', label: '🛠️ Enterprise Use Case', icon: Briefcase, color: 'text-amber-400' },
                   { id: 'task', label: '🎯 Chapter Challenge', icon: CheckSquare, color: 'text-emerald-400' },
                   { id: 'quiz', label: '❓ Mandatory Quiz', icon: QuizIcon, color: 'text-rose-400' },
+                  { id: 'interview', label: '🗣️ Top Interview Q&A', icon: MessageSquare, color: 'text-purple-400' },
+                  { id: 'dsa', label: '🧩 Linked DSA Problem', icon: Cpu, color: 'text-amber-400' },
                   { id: 'sandbox', label: '🧪 Live Sandbox', icon: Terminal, color: 'text-cyan-400' },
                 ].map((tab) => {
                   const Icon = tab.icon;
@@ -934,6 +937,70 @@ export const LearningHub = () => {
                         ? "Chapter Task Mastered ✓" 
                         : "Submit Task & Unlock Next Chapter 🔓"}
                     </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: TOP INTERVIEW Q&A */}
+              {activeTab === 'interview' && (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-xs text-purple-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-purple-300 flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4 text-purple-400" />
+                        Top Interview Question for {currentLessonData.title}
+                      </h3>
+                      <Badge variant="purple">HR & Tech Favorite</Badge>
+                    </div>
+                    <p className="text-xs font-semibold text-white">
+                      "How would you explain {currentLessonData.title} to an interviewer, and when would you avoid using it?"
+                    </p>
+                    <div className="p-3 bg-black/40 rounded-xl border border-white/10 text-gray-300 text-xs leading-relaxed space-y-1">
+                      <strong className="text-cyan-400 block">💡 Standard High-Scoring Answer:</strong>
+                      <p>{currentLessonData.summary || `Explain the core concept clearly, highlighting performance implications, memory safety, and practical production use cases.`}</p>
+                    </div>
+                    <div className="pt-2 flex justify-end">
+                      <Button
+                        size="xs"
+                        variant="glow"
+                        onClick={() => navigate('/app/interview')}
+                        leftIcon={<Sparkles className="w-3.5 h-3.5 text-cyan-400" />}
+                      >
+                        Practice in Live Teleprompter Studio 🎙️
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: LINKED DSA PROBLEM */}
+              {activeTab === 'dsa' && (
+                <div className="space-y-4 font-sans">
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-amber-300 flex items-center gap-2">
+                        <Cpu className="w-4 h-4 text-amber-400" />
+                        Target DSA Problem linked to {currentLessonData.title}
+                      </h3>
+                      <DifficultyBadge level={currentLessonData.difficulty || 'Beginner'} />
+                    </div>
+                    <p className="text-xs text-gray-200 leading-relaxed">
+                      Practical Algorithmic Problem: Apply <strong>{currentLessonData.title}</strong> principles to solve edge cases and achieve optimized time complexity.
+                    </p>
+                    <div className="p-3 bg-black/50 rounded-xl border border-amber-500/20 font-mono text-xs text-amber-200">
+                      <code>{currentLessonData.starterCode || `// DSA Problem Starter Code\nfunction solveProblem(input) {\n  // Apply ${currentLessonData.title} logic here\n}`}</code>
+                    </div>
+                    <div className="pt-2 flex justify-end">
+                      <Button
+                        size="xs"
+                        variant="primary"
+                        onClick={() => navigate(`/app/dsa?topic=${encodeURIComponent(currentLessonData.title)}`)}
+                        leftIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                        className="bg-amber-600 hover:bg-amber-500 text-white"
+                      >
+                        Solve in DSA Algorithmic Studio 🧩
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
