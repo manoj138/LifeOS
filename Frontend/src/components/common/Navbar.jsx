@@ -26,7 +26,6 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
       '/app/devops': 'DevOps Labs & Hostinger VPS',
       '/app/projects': 'Project Architectural Showcase',
       '/app/jobs': 'Job Application & Hiring Pipeline',
-      '/app/fitness': 'Fitness & Health Tracker',
       '/app/habits': 'Habit Discipline Matrix',
       '/app/journal': 'AI Reflection & Growth Journal',
       '/app/analytics': 'Growth Velocity & Insights',

@@ -39,7 +39,7 @@ export const Dashboard = () => {
     { title: "Target Specialization", value: targetSpecializationScore, suffix: "%", icon: Code2, color: "cyan", change: `${completedTopicsCount} Topics Mastered` },
     { title: "Skill Readiness", value: skillReadinessScore, suffix: "%", icon: MessageSquareCode, color: "purple", change: `${solvedDsaCount} DSA Problems Solved` },
     { title: "Daily Target Commitment", value: preferences?.dailyHours || 4, suffix: " hrs/day", icon: Server, color: "emerald", change: `${preferences?.careerLevel || 'Intermediate'}` },
-    { title: "Habit & Fitness Streak", value: currentStreak, suffix: " Days", icon: Flame, color: "rose", change: preferences?.fitnessGoal || "Build Muscle" },
+    { title: "Learning & Habit Streak", value: currentStreak, suffix: " Days", icon: Flame, color: "rose", change: `${currentStreak} Active Days` },
   ];
 
   const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
@@ -50,7 +50,7 @@ export const Dashboard = () => {
       <SectionHeader
         badge="Personalized Command Center"
         title={`Good Day, ${displayName} ⚡`}
-        subtitle={`${preferences?.targetRole || 'Full-Stack Developer'} • ${preferences?.careerLevel || 'Intermediate'} • Focused on ${preferences?.focusAreas?.slice(0, 3).join(', ') || 'Coding, DevOps & Fitness'}`}
+        subtitle={`${preferences?.targetRole || 'Full-Stack Developer'} • ${preferences?.careerLevel || 'Intermediate'} • Focused on ${preferences?.focusAreas?.slice(0, 3).join(', ') || 'Coding, DevOps & DSA'}`}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => navigate('/app/settings')} leftIcon={<RefreshCw className="w-3.5 h-3.5" />}>

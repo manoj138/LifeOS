@@ -26,7 +26,7 @@ const UserPreference = sequelize.define('UserPreference', {
   },
   focusAreas: {
     type: DataTypes.JSON,
-    defaultValue: ['Coding & DSA', 'DevOps & Cloud', 'English Fluency', 'Fitness & Energy'],
+    defaultValue: ['Coding & DSA', 'DevOps & Cloud', 'English Fluency', 'System Design & Projects'],
   },
   skillLevels: {
     type: DataTypes.JSON,
@@ -39,14 +39,6 @@ const UserPreference = sequelize.define('UserPreference', {
   targetDate: {
     type: DataTypes.STRING,
     defaultValue: '2026-12-31',
-  },
-  fitnessGoal: {
-    type: DataTypes.STRING,
-    defaultValue: 'Build Muscle & Increase Energy',
-  },
-  workoutType: {
-    type: DataTypes.STRING,
-    defaultValue: 'Gym Weightlifting & Strength',
   },
   aiPersona: {
     type: DataTypes.STRING,

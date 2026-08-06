@@ -19,7 +19,6 @@ const DSAPage = lazy(() => import('../pages/DSAPage').then(m => ({ default: m.DS
 const DevOpsPage = lazy(() => import('../pages/DevOpsPage').then(m => ({ default: m.DevOpsPage })));
 const ProjectManager = lazy(() => import('../pages/ProjectManager').then(m => ({ default: m.ProjectManager })));
 const JobTracker = lazy(() => import('../pages/JobTracker').then(m => ({ default: m.JobTracker })));
-const FitnessPage = lazy(() => import('../pages/FitnessPage').then(m => ({ default: m.FitnessPage })));
 const HabitTracker = lazy(() => import('../pages/HabitTracker').then(m => ({ default: m.HabitTracker })));
 const JournalPage = lazy(() => import('../pages/JournalPage').then(m => ({ default: m.JournalPage })));
 const AnalyticsPage = lazy(() => import('../pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
@@ -68,7 +67,6 @@ export const AppRoutes = () => {
             <Route path="devops" element={<DevOpsPage />} />
             <Route path="projects" element={<ProjectManager />} />
             <Route path="jobs" element={<JobTracker />} />
-            <Route path="fitness" element={<FitnessPage />} />
             <Route path="habits" element={<HabitTracker />} />
             <Route path="journal" element={<JournalPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />

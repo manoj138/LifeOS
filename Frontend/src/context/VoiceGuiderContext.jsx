@@ -231,9 +231,6 @@ export const VoiceGuiderProvider = ({ children }) => {
     } else if (cleanQuery.includes('interview') || cleanQuery.includes('इंटरव्ह्यू') || cleanQuery.includes('मुलाखत')) {
       navTarget = '/app/interview';
       reply = language === 'mr' ? 'इंटरव्ह्यू प्रॅप उघडत आहे!' : 'Opening Interview Studio!';
-    } else if (cleanQuery.includes('fitness') || cleanQuery.includes('फिटनेस') || cleanQuery.includes('gym')) {
-      navTarget = '/app/fitness';
-      reply = language === 'mr' ? 'फिटनेस ट्रॅकर उघडत आहे!' : 'Opening Fitness Tracker!';
     } else if (cleanQuery.includes('habit') || cleanQuery.includes('हॅबिट') || cleanQuery.includes('सवयी')) {
       navTarget = '/app/habits';
       reply = language === 'mr' ? 'हॅबिट ट्रॅकर उघडत आहे!' : 'Opening Habit Tracker!';

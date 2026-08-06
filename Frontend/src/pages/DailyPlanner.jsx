@@ -129,7 +129,7 @@ export const DailyPlanner = () => {
               <option value="Interview" className="bg-gray-900">Interview</option>
               <option value="DevOps" className="bg-gray-900">DevOps</option>
               <option value="English" className="bg-gray-900">English</option>
-              <option value="Fitness" className="bg-gray-900">Fitness</option>
+              <option value="Health" className="bg-gray-900">Health</option>
             </select>
             <Button type="submit" variant="primary" leftIcon={<Plus className="w-4 h-4" />}>
               Add Block
@@ -188,7 +188,7 @@ export const DailyPlanner = () => {
                     variant={
                       task.category === 'MERN' ? 'cyan' :
                       task.category === 'Interview' ? 'purple' :
-                      task.category === 'Fitness' ? 'rose' : 'glass'
+                      task.category === 'Health' ? 'rose' : 'glass'
                     }
                   >
                     {task.category}

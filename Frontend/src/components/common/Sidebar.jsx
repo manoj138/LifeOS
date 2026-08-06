@@ -72,7 +72,6 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
       items: [
         { path: '/app/projects', label: 'Project Portfolio', icon: FolderKanban, badge: null },
         { path: '/app/goals', label: 'Goals', icon: Target, badge: null },
-        { path: '/app/fitness', label: 'Fitness Tracker', icon: Dumbbell, badge: null },
         { path: '/app/habits', label: 'Habit Matrix', icon: Flame, badge: null },
         { path: '/app/journal', label: 'Growth Journal', icon: BookMarked, badge: 'AI' },
         { path: '/app/analytics', label: 'Analytics', icon: LineChart, badge: null },

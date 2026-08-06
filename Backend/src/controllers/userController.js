@@ -14,8 +14,6 @@ const saveOnboarding = async (req, res) => {
       skillLevels,
       dailyHours,
       targetDate,
-      fitnessGoal,
-      workoutType,
       aiPersona,
     } = req.body;
 

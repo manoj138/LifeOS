@@ -249,7 +249,7 @@ export const GoalsPage = () => {
               >
                 <option value="Career" className="bg-gray-900">Career</option>
                 <option value="Engineering" className="bg-gray-900">Engineering</option>
-                <option value="Health" className="bg-gray-900">Health & Fitness</option>
+                <option value="Health" className="bg-gray-900">Health & Lifestyle</option>
                 <option value="Finance" className="bg-gray-900">Finance</option>
                 <option value="Personal" className="bg-gray-900">Personal</option>
               </select>

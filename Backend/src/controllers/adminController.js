@@ -5,7 +5,6 @@ const LearningProgress = require('../modals/LearningProgress');
 const Goal = require('../modals/Goal');
 const PlannerTask = require('../modals/PlannerTask');
 const Project = require('../modals/Project');
-const FitnessLog = require('../modals/FitnessLog');
 const HabitLog = require('../modals/HabitLog');
 const JournalEntry = require('../modals/JournalEntry');
 const JobApplication = require('../modals/JobApplication');
@@ -162,7 +161,6 @@ const deleteCandidate = async (req, res) => {
       Goal,
       PlannerTask,
       Project,
-      FitnessLog,
       HabitLog,
       JournalEntry,
       JobApplication

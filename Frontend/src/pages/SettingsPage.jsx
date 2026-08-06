@@ -168,7 +168,7 @@ export const SettingsPage = () => {
                   {displayName} • {preferences?.targetRole || 'Full-Stack Web Developer'}
                 </h2>
                 <p className="text-xs text-gray-300 leading-relaxed">
-                  Level: <span className="text-purple-300 font-semibold">{preferences?.careerLevel}</span> • Daily Target: <span className="text-cyan-300 font-semibold">{preferences?.dailyHours} hrs/day</span> • Fitness: <span className="text-rose-300 font-semibold">{preferences?.fitnessGoal}</span> • AI Coach: <span className="text-amber-300 font-semibold">{preferences?.aiPersona}</span>
+                  Level: <span className="text-purple-300 font-semibold">{preferences?.careerLevel}</span> • Daily Target: <span className="text-cyan-300 font-semibold">{preferences?.dailyHours} hrs/day</span> • AI Coach: <span className="text-amber-300 font-semibold">{preferences?.aiPersona}</span>
                 </p>
               </div>
 

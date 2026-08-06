@@ -24,11 +24,11 @@ const FOCUS_AREAS = [
     color: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
   },
   {
-    id: 'Fitness & Energy',
-    name: 'Fitness, Health & Energy',
-    desc: 'Daily workouts, calorie targets & habit tracking.',
-    icon: Dumbbell,
-    color: 'text-rose-400 border-rose-500/30 bg-rose-500/10',
+    id: 'System Design & Projects',
+    name: 'System Design & Portfolio',
+    desc: 'Architecture patterns, database optimization & portfolio apps.',
+    icon: Clock,
+    color: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
   },
 ];
 

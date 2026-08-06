@@ -9,7 +9,7 @@
 2. **Context & API Single Source of Truth**:
    - User Profile & Preferences: `user?.name`, `user?.email`, `preferences?.targetRole`, `preferences?.skillLevels`, `preferences?.dailyHours`, `preferences?.aiPersona`.
    - Learning & Progress: Dynamically fetched via `LearningProgress` context / API endpoint.
-   - Fitness & Tasks: Dynamically loaded from user logs rather than fixed numbers.
+   - Tasks & Progress: Dynamically loaded from user logs rather than fixed numbers.
 
 3. **Fallback Graceful Handling**:
    - When API / Context data is loading or empty, components must display dynamic fallback placeholders computed from user props or state defaults, never static dummy hardcoded user strings.

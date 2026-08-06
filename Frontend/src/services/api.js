@@ -550,24 +550,7 @@ export const apiService = {
     }
   },
 
-  // Fitness Logs
-  async getFitnessLogs() {
-    try {
-      const res = await Api.get('/fitness/logs');
-      return res.data;
-    } catch (err) {
-      return { success: false, fallback: true };
-    }
-  },
 
-  async createFitnessLog(data) {
-    try {
-      const res = await Api.post('/fitness/logs', data);
-      return res.data;
-    } catch (err) {
-      return { success: false, fallback: true };
-    }
-  },
 
   // Journal Entries
   async getJournalEntries() {

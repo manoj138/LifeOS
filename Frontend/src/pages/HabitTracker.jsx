@@ -286,7 +286,7 @@ export const HabitTracker = () => {
               <option value="Skills" className="bg-gray-900">Skills & Tech</option>
               <option value="DSA" className="bg-gray-900">DSA & Problem Solving</option>
               <option value="Mindset" className="bg-gray-900">Mindset & Reading</option>
-              <option value="Fitness" className="bg-gray-900">Fitness & Health</option>
+              <option value="Health" className="bg-gray-900">Health & Wellness</option>
               <option value="Personal" className="bg-gray-900">Personal Growth</option>
             </select>
           </div>

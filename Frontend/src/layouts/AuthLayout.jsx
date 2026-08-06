@@ -32,7 +32,7 @@ export const AuthLayout = () => {
               Elevate Your Career & Life
             </h2>
             <p className="text-sm text-gray-400 mt-2 max-w-sm">
-              Your Personal AI Coach for MERN Stack, Interview Prep, DSA, DevOps, Fitness & Habit Mastery.
+              Your Personal AI Coach for MERN Stack, Interview Prep, DSA, DevOps & Full-Stack Mastery.
             </p>
           </div>
 

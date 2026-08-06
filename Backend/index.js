@@ -12,7 +12,6 @@ require('./src/modals/LearningProgress');
 require('./src/modals/Goal');
 require('./src/modals/PlannerTask');
 require('./src/modals/Project');
-require('./src/modals/FitnessLog');
 require('./src/modals/HabitLog');
 require('./src/modals/JournalEntry');
 require('./src/modals/CurriculumTopic');
