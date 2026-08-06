@@ -42,13 +42,25 @@ export const Dashboard = () => {
     { title: "Learning & Habit Streak", value: currentStreak, suffix: " Days", icon: Flame, color: "rose", change: `${currentStreak} Active Days` },
   ];
 
+  const [dailyDrillAnswer, setDailyDrillAnswer] = React.useState(null);
+  const dailyQuiz = {
+    question: "What is the primary difference between `map()` and `forEach()` in JavaScript?",
+    options: [
+      "`map()` returns a new array, while `forEach()` returns `undefined`.",
+      "`forEach()` mutates the original array automatically.",
+      "`map()` cannot be used with arrow functions.",
+      "`forEach()` is executed asynchronously."
+    ],
+    correctIndex: 0,
+    explanation: "`map()` creates and returns a new transformed array, whereas `forEach()` executes a side-effect callback without producing a return value."
+  };
   const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
 
   return (
     <div className="space-y-8 pb-12">
       {/* Top Section Header */}
       <SectionHeader
-        badge="Personalized Command Center"
+        badge="Candidate Academy Studio"
         title={`Good Day, ${displayName} ⚡`}
         subtitle={`${preferences?.targetRole || 'Full-Stack Developer'} • ${preferences?.careerLevel || 'Intermediate'} • Focused on ${preferences?.focusAreas?.slice(0, 3).join(', ') || 'Coding, DevOps & DSA'}`}
         actions={
@@ -63,72 +75,131 @@ export const Dashboard = () => {
         }
       />
 
-      {/* Featured AI Morning Briefing */}
-      <LaserBorder className="p-8">
+      {/* Featured AI Continue Active Lesson Hero Card */}
+      <LaserBorder className="p-6 sm:p-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 animate-pulse" />
-              <span>AI Coach Tailored Strategy Active</span>
+          <div className="space-y-3 max-w-2xl">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="cyan">Active Course Track</Badge>
+              <span className="text-xs font-mono text-purple-400 font-bold uppercase">React.js & Full-Stack Mastery</span>
+              <span className="text-xs text-gray-400 font-mono">Streak: {currentStreak} Days 🔥</span>
             </div>
-            <h2 className="text-2xl font-extrabold text-white tracking-tight leading-snug">
-              "Custom roadmap active for {preferences?.targetRole || 'Full-Stack Web Developer'} & {preferences?.aiPersona || 'Motivational Tech Mentor'}."
+
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-snug">
+              📖 Continue Where You Left Off: <span className="text-cyan-300">JavaScript & Event Loop Mechanics</span>
             </h2>
-            <p className="text-sm text-gray-300">
-              Personalized modules calibrated for your {preferences?.skillLevels?.dsa || 'Intermediate'} DSA & {preferences?.skillLevels?.devops || 'Beginner'} DevOps level. Target deadline: <span className="text-purple-300 font-semibold">{preferences?.targetDate || '2026-12-31'}</span>.
-            </p>
+
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-xs text-gray-300">
+                <span>Course Progression: <strong>{completedTopicsCount} Topics Mastered</strong></span>
+                <span className="text-purple-300 font-bold font-mono">{targetSpecializationScore}% Completed</span>
+              </div>
+              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${targetSpecializationScore}%` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="h-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-500 rounded-full"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <Button variant="glow" size="lg" onClick={() => navigate('/app/learning')} leftIcon={<Target className="w-5 h-5" />}>
-              Start Tailored Modules
+            <Button variant="glow" size="lg" onClick={() => navigate('/app/learning')} leftIcon={<Play className="w-5 h-5 text-emerald-400" />}>
+              Resume Practice Track →
             </Button>
           </div>
         </div>
       </LaserBorder>
 
-      {/* Guided Student Action Center: What to Practice Today */}
-      <TiltCard className="p-6 space-y-4 border border-cyan-500/30 bg-gradient-to-r from-blue-950/40 via-[#14141b]/80 to-purple-950/40">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Badge variant="cyan">Student Practice Pathway</Badge>
-              <span className="text-xs text-gray-400 font-mono">Streak: {currentStreak} Days 🔥</span>
+      {/* Guided Student Action Center & Daily Technical Warmup Drill */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <TiltCard className="lg:col-span-2 p-6 space-y-4 border border-cyan-500/30 bg-gradient-to-r from-blue-950/40 via-[#14141b]/80 to-purple-950/40">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Badge variant="cyan">Daily Practice Roadmap</Badge>
+              </div>
+              <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
+                <span>🎯 Recommended Learning & Coding Practice</span>
+              </h3>
             </div>
-            <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <span>🎯 Today's Recommended Learning & Coding Practice</span>
-            </h3>
-          </div>
-          <Button
-            size="sm"
-            variant="glow"
-            onClick={() => navigate('/app/learning')}
-            leftIcon={<Play className="w-4 h-4 text-emerald-400" />}
-          >
-            Start Today's Lesson & Practice
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
-            <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider block">Step 1: Core Concept</span>
-            <p className="font-semibold text-white">JavaScript & Async Execution Mechanics</p>
-            <p className="text-gray-400 text-[11px]">Read interactive concept notes & pass mandatory quiz.</p>
+            <Button
+              size="sm"
+              variant="glow"
+              onClick={() => navigate('/app/learning')}
+              leftIcon={<Play className="w-4 h-4 text-emerald-400" />}
+            >
+              Start Today's Lesson
+            </Button>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
-            <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">Step 2: DSA Challenge</span>
-            <p className="font-semibold text-white">Two Sum & Hash Map Lookup</p>
-            <p className="text-gray-400 text-[11px]">Solve linked LeetCode problem with live execution.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+              <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider block">Step 1: Core Concept</span>
+              <p className="font-semibold text-white">Async Execution Mechanics</p>
+              <p className="text-gray-400 text-[11px]">Read interactive concept notes & pass mandatory quiz.</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">Step 2: DSA Challenge</span>
+              <p className="font-semibold text-white">Two Sum & Hash Map Lookup</p>
+              <p className="text-gray-400 text-[11px]">Solve linked LeetCode problem with live execution.</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+              <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider block">Step 3: Interview Q&A</span>
+              <p className="font-semibold text-white">Event Loop & Teleprompter</p>
+              <p className="text-gray-400 text-[11px]">Practice speaking with live AI Teleprompter studio.</p>
+            </div>
+          </div>
+        </TiltCard>
+
+        {/* Interactive Daily 1-Question Quiz Drill */}
+        <TiltCard className="p-6 space-y-3.5 border border-purple-500/30 bg-purple-950/20">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <span className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Zap className="w-4 h-4 text-amber-400" /> Daily Technical Warmup Drill
+            </span>
+            <Badge variant="purple">1-Click Drill</Badge>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
-            <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider block">Step 3: Interview Q&A</span>
-            <p className="font-semibold text-white">Event Loop & Promises Teleprompter</p>
-            <p className="text-gray-400 text-[11px]">Practice speaking with live AI Teleprompter studio.</p>
+          <p className="text-xs font-semibold text-white leading-relaxed">
+            Q: {dailyQuiz.question}
+          </p>
+
+          <div className="space-y-1.5">
+            {dailyQuiz.options.map((opt, idx) => {
+              const isSelected = dailyDrillAnswer === idx;
+              const isCorrect = idx === dailyQuiz.correctIndex;
+              let style = "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10";
+              if (dailyDrillAnswer !== null) {
+                if (isCorrect) style = "bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold";
+                else if (isSelected) style = "bg-rose-500/20 border-rose-500 text-rose-300 font-bold";
+              }
+
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setDailyDrillAnswer(idx)}
+                  className={`w-full text-left p-2.5 rounded-xl text-[11px] border transition-all flex items-center justify-between ${style}`}
+                >
+                  <span>{opt}</span>
+                  {dailyDrillAnswer !== null && isCorrect && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                </button>
+              );
+            })}
           </div>
-        </div>
-      </TiltCard>
+
+          {dailyDrillAnswer !== null && (
+            <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-[11px] text-purple-200 leading-relaxed animate-fadeIn">
+              <strong>{dailyDrillAnswer === dailyQuiz.correctIndex ? "Correct! 🎉" : "Explanation:"}</strong> {dailyQuiz.explanation}
+            </div>
+          )}
+        </TiltCard>
+      </div>
 
       {/* 3D Tilt Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

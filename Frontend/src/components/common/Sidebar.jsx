@@ -45,14 +45,14 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
   // 100% Isolated Navigation Sections for Candidates / Students
   const CANDIDATE_NAV_SECTIONS = [
     {
-      title: "Command",
+      title: "🚀 Studio Command",
       items: [
         { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
         { path: '/app/planner', label: 'Daily Timeline', icon: Calendar, badge: 'Today' }
       ]
     },
     {
-      title: "Technical Mastery",
+      title: "📚 Core Learning & Labs",
       items: [
         { path: '/app/learning', label: 'Learning Hub', icon: BookOpen, badge: 'MERN' },
         { path: '/app/dsa', label: 'DSA Studio', icon: Code2, badge: 'LeetCode' },
@@ -60,7 +60,7 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
       ]
     },
     {
-      title: "Career & Interviews",
+      title: "🎙️ Placement & Career",
       items: [
         { path: '/app/interview', label: 'Interview Prep', icon: MessageSquareCode, badge: 'AI' },
         { path: '/app/english', label: 'English Coach', icon: Mic, badge: null },
@@ -68,7 +68,7 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
       ]
     },
     {
-      title: "Portfolio & Growth",
+      title: "🏆 Portfolio & Performance",
       items: [
         { path: '/app/projects', label: 'Project Portfolio', icon: FolderKanban, badge: null },
         { path: '/app/analytics', label: 'Analytics', icon: LineChart, badge: null },
