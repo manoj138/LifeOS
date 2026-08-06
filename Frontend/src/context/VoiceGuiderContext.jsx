@@ -265,6 +265,11 @@ export const VoiceGuiderProvider = ({ children }) => {
     if (typeof window === 'undefined') return;
     if (isLocked || voiceStatus === 'SPEAKING') return;
 
+    // Strict Interlock: Do NOT start listening if browser TTS is currently speaking
+    if ('speechSynthesis' in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+      return;
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
@@ -340,7 +345,8 @@ export const VoiceGuiderProvider = ({ children }) => {
         isMicRunningRef.current = false;
         setVoiceStatus('IDLE');
 
-        if (isHandsFreeEnabled && !isLocked && voiceStatus !== 'SPEAKING') {
+        const isBrowserSpeaking = 'speechSynthesis' in window && window.speechSynthesis.speaking;
+        if (isHandsFreeEnabled && !isLocked && voiceStatus !== 'SPEAKING' && !isBrowserSpeaking) {
           setTimeout(() => {
             if (!isMicRunningRef.current && !isLocked) {
               if (startListeningRef.current) startListeningRef.current();

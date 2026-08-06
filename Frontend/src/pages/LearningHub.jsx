@@ -25,6 +25,7 @@ import {
 } from '../utils/learningProgress';
 
 import { useUser } from '../context/UserContext';
+import { useVoiceGuider } from '../context/VoiceGuiderContext';
 import { apiService } from '../services/api';
 import { FormattedMarkdown } from '../components/ui/FormattedMarkdown';
 import { SearchInput } from '../components/ui/SearchInput';
@@ -35,6 +36,7 @@ import { EmptyStateCard } from '../components/ui/EmptyStateCard';
 export const LearningHub = () => {
   const navigate = useNavigate();
   const { preferences, user, userProgress, toggleCompletedTopic } = useUser();
+  const { speakText, stopSpeaking, isSpeaking } = useVoiceGuider();
 
   // Load saved progress state from UserContext & localStorage on mount
   const initialProgress = loadLearningProgress();
@@ -43,19 +45,16 @@ export const LearningHub = () => {
   const [dynamicTopics, setDynamicTopics] = useState(null);
   const [dynamicModules, setDynamicModules] = useState([]);
 
-  // Voice AI & Interactive Features State
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  // Interactive Features State
   const [showCheatSheetModal, setShowCheatSheetModal] = useState(false);
   const [executionOutput, setExecutionOutput] = useState(null);
 
   // Stop speech synthesis when switching topics or unmounting
   useEffect(() => {
     return () => {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      if (stopSpeaking) stopSpeaking();
     };
-  }, []);
+  }, [stopSpeaking]);
 
   useEffect(() => {
     let isMounted = true;
@@ -99,23 +98,13 @@ export const LearningHub = () => {
   const totalXP = completedLessons.length * 100;
   const learningStreak = Math.max(1, Math.min(completedLessons.length, 7));
 
-  // Voice AI Audio Narration
+  // Centralized Voice AI Audio Narration
   const handleToggleVoiceAudio = (textToRead) => {
-    if (!('speechSynthesis' in window)) {
-      alert("Voice speech synthesis is not supported in your browser.");
-      return;
-    }
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+      if (stopSpeaking) stopSpeaking();
     } else {
       const cleanText = (textToRead || '').replace(/[#*`_]/g, '');
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.rate = 0.95;
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(utterance);
-      setIsSpeaking(true);
+      if (speakText) speakText(cleanText);
     }
   };
 
