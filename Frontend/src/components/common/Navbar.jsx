@@ -16,20 +16,20 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
 
   const getPageTitle = (path) => {
     const routeTitles = {
-      '/app/dashboard': 'Dashboard Overview',
-      '/app/planner': 'Daily Planner & Time-Blocking',
-      '/app/goals': 'Life Goals & Milestones',
-      '/app/learning': 'MERN & Fullstack Learning Hub',
-      '/app/interview': 'AI Interview Simulator',
-      '/app/english': 'English Speaking Coach',
-      '/app/dsa': 'DSA Practice & Visualizer',
-      '/app/devops': 'DevOps & Hostinger VPS',
-      '/app/projects': 'Project Manager',
-      '/app/fitness': 'Fitness & Recovery',
-      '/app/habits': 'Habit Tracker Matrix',
-      '/app/journal': 'AI Reflection Journal',
-      '/app/analytics': 'Growth Analytics & Insights',
-      '/app/settings': 'Account & AI Settings'
+      '/app/dashboard': 'Candidate Command Center',
+      '/app/planner': 'Daily Timeline & Study Schedule',
+      '/app/goals': 'Career & Engineering Milestones',
+      '/app/learning': 'Technical Mastery & Full-Stack Hub',
+      '/app/interview': 'AI Teleprompter & Interview Studio',
+      '/app/english': 'English Speaking & Fluency Coach',
+      '/app/dsa': 'DSA Practice & LeetCode Studio',
+      '/app/devops': 'DevOps Labs & Hostinger VPS',
+      '/app/projects': 'Project Architectural Showcase',
+      '/app/fitness': 'Fitness & Health Tracker',
+      '/app/habits': 'Habit Discipline Matrix',
+      '/app/journal': 'AI Reflection & Growth Journal',
+      '/app/analytics': 'Growth Velocity & Insights',
+      '/app/settings': 'Account & Strategy Settings'
     };
     return routeTitles[path] || 'LifeOS AI';
   };

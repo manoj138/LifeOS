@@ -45,35 +45,32 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
   // 100% Isolated Navigation Sections for Candidates / Students
   const CANDIDATE_NAV_SECTIONS = [
     {
-      title: "Core",
+      title: "Command",
       items: [
         { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
-        { path: '/app/planner', label: 'Daily Planner', icon: Calendar, badge: 'Today' },
-        { path: '/app/goals', label: 'Goals', icon: Target, badge: null }
+        { path: '/app/planner', label: 'Daily Timeline', icon: Calendar, badge: 'Today' }
       ]
     },
     {
-      title: "Skills & Career",
+      title: "Technical Mastery",
       items: [
         { path: '/app/learning', label: 'Learning Hub', icon: BookOpen, badge: 'MERN' },
-        { path: '/app/interview', label: 'Interview Prep', icon: MessageSquareCode, badge: 'AI' },
-        { path: '/app/english', label: 'English Coach', icon: Mic, badge: null },
-        { path: '/app/dsa', label: 'DSA Practice', icon: Code2, badge: null },
+        { path: '/app/dsa', label: 'DSA Studio', icon: Code2, badge: 'LeetCode' },
         { path: '/app/devops', label: 'DevOps & VPS', icon: Server, badge: 'Cloud' }
       ]
     },
     {
-      title: "Projects & Work",
+      title: "Interview Simulator",
       items: [
-        { path: '/app/projects', label: 'Project Manager', icon: FolderKanban, badge: null }
+        { path: '/app/interview', label: 'Interview Prep', icon: MessageSquareCode, badge: 'AI' },
+        { path: '/app/english', label: 'English Coach', icon: Mic, badge: null }
       ]
     },
     {
-      title: "Health & Mindset",
+      title: "Portfolio & Progress",
       items: [
-        { path: '/app/fitness', label: 'Fitness', icon: Dumbbell, badge: null },
-        { path: '/app/habits', label: 'Habits', icon: Flame, badge: '🔥 14' },
-        { path: '/app/journal', label: 'Journal', icon: BookMarked, badge: null },
+        { path: '/app/projects', label: 'Project Portfolio', icon: FolderKanban, badge: null },
+        { path: '/app/goals', label: 'Goals', icon: Target, badge: null },
         { path: '/app/analytics', label: 'Analytics', icon: LineChart, badge: null },
         { path: '/app/settings', label: 'Settings', icon: Settings, badge: null }
       ]

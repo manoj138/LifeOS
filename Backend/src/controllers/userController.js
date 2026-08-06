@@ -83,9 +83,51 @@ const resetOnboarding = async (req, res) => {
   }
 };
 
+const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
+    let pref = await UserPreference.findOne({ where: { userId } });
+    if (!pref) {
+      pref = await UserPreference.create({ userId });
+    }
+    return sendSuccess(res, 'User profile retrieved successfully', { user, preferences: pref });
+  } catch (error) {
+    return sendError(res, 'Error retrieving user profile', error, 500);
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, email, ...prefData } = req.body;
+    const userUpdates = {};
+    if (name) userUpdates.name = name;
+    if (email) userUpdates.email = email;
+    if (Object.keys(userUpdates).length > 0) {
+      await User.update(userUpdates, { where: { id: userId } });
+    }
+
+    let pref = await UserPreference.findOne({ where: { userId } });
+    if (!pref) {
+      pref = await UserPreference.create({ userId });
+    }
+    if (Object.keys(prefData).length > 0) {
+      await pref.update(prefData);
+    }
+
+    const updatedUser = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
+    return sendSuccess(res, 'User profile updated successfully', { user: updatedUser, preferences: pref });
+  } catch (error) {
+    return sendError(res, 'Error updating user profile', error, 500);
+  }
+};
+
 module.exports = {
   saveOnboarding,
   getPreferences,
   updatePreferences,
   resetOnboarding,
+  getProfile,
+  updateProfile,
 };

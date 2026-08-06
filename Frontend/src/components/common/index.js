@@ -10,7 +10,7 @@ export { default as Select } from './Select';
 export { default as TextArea } from './TextArea';
 export { default as Tabs } from './Tabs';
 export { Table, DataTable } from './Table';
-export { default as Toast } from './Toast';
+export { ToastProvider, useToast } from './Toast';
 export { default as Tooltip } from './Tooltip';
 export { default as Drawer } from './Drawer';
 export { default as Accordion } from './Accordion';

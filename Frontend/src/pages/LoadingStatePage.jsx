@@ -1,4 +1,5 @@
 import React from 'react';
+import { Bot } from 'lucide-react';
 import { Skeleton } from '../components/ui/Skeleton';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { LottieAnimation } from '../components/ui/LottieAnimation';
@@ -10,6 +11,7 @@ export const LoadingStatePage = () => {
         <LottieAnimation
           src="https://assets2.lottiefiles.com/packages/lf20_mbe2aawl.json"
           className="w-44 h-44 mb-2"
+          fallbackIcon={<Bot className="w-16 h-16 text-purple-400 animate-pulse" />}
         />
         <SectionHeader
           badge="Loading State"
