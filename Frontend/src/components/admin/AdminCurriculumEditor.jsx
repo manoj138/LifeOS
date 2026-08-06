@@ -65,14 +65,42 @@ export const AdminCurriculumEditor = () => {
   const [newInterviewDifficulty, setNewInterviewDifficulty] = useState('Beginner');
 
   const [isAddingDsa, setIsAddingDsa] = useState(false);
+  const [isBulkDsaRawModalOpen, setIsBulkDsaRawModalOpen] = useState(false);
+  const [rawDsaText, setRawDsaText] = useState('');
+  const [rawDsaTopic, setRawDsaTopic] = useState('Arrays');
+  const [rawDsaDifficulty, setRawDsaDifficulty] = useState('Easy');
+  const [rawDsaLanguage, setRawDsaLanguage] = useState('javascript');
+
+  const [customDsaLanguages, setCustomDsaLanguages] = useState(['javascript', 'python', 'java', 'c', 'cpp']);
+  const [isAddingLanguageModal, setIsAddingLanguageModal] = useState(false);
+  const [newLanguageInput, setNewLanguageInput] = useState('');
+
+  const [dsaFilterLanguage, setDsaFilterLanguage] = useState('all');
+  const [dsaSearchQuery, setDsaSearchQuery] = useState('');
+
   const [newDsaTitle, setNewDsaTitle] = useState('');
   const [newDsaTopic, setNewDsaTopic] = useState('Arrays');
   const [newDsaDifficulty, setNewDsaDifficulty] = useState('Easy');
+  const [newDsaLanguage, setNewDsaLanguage] = useState('javascript');
   const [newDsaTimeLimit, setNewDsaTimeLimit] = useState('15m');
   const [newDsaDescription, setNewDsaDescription] = useState('');
   const [newDsaStarterCode, setNewDsaStarterCode] = useState('function solution() {\n  // write code\n}');
   const [newDsaHint, setNewDsaHint] = useState('');
   const [newDsaSolutionCode, setNewDsaSolutionCode] = useState('');
+
+  const handleCreateLanguage = (e) => {
+    e.preventDefault();
+    if (!newLanguageInput.trim()) return;
+    const cleanLang = newLanguageInput.trim().toLowerCase().replace(/[^a-z0-9+#-]+/g, '');
+    if (cleanLang && !customDsaLanguages.includes(cleanLang)) {
+      setCustomDsaLanguages(prev => [...prev, cleanLang]);
+    }
+    setDsaFilterLanguage(cleanLang);
+    setRawDsaLanguage(cleanLang);
+    setNewDsaLanguage(cleanLang);
+    setNewLanguageInput('');
+    setIsAddingLanguageModal(false);
+  };
 
   const [isAddingEnglish, setIsAddingEnglish] = useState(false);
   const [newEngTitle, setNewEngTitle] = useState('');
@@ -302,6 +330,7 @@ export const AdminCurriculumEditor = () => {
       title: newDsaTitle.trim(),
       topic: newDsaTopic,
       difficulty: newDsaDifficulty,
+      language: newDsaLanguage,
       timeLimit: newDsaTimeLimit,
       description: newDsaDescription.trim(),
       starterCode: newDsaStarterCode,
@@ -318,6 +347,21 @@ export const AdminCurriculumEditor = () => {
     }
   };
 
+  const handleBulkImportRawDsa = async () => {
+    if (!rawDsaText.trim()) return;
+    const res = await apiService.bulkImportRawDsa({
+      rawText: rawDsaText,
+      defaultTopic: rawDsaTopic,
+      defaultDifficulty: rawDsaDifficulty,
+      defaultLanguage: rawDsaLanguage,
+    });
+    if (res?.success) {
+      setRawDsaText('');
+      setIsBulkDsaRawModalOpen(false);
+      fetchDsaProblems();
+    }
+  };
+
   const handleDeleteDsaProblem = (id) => {
     setConfirmModal({
       isOpen: true,
@@ -326,6 +370,23 @@ export const AdminCurriculumEditor = () => {
       onConfirm: async () => {
         await apiService.deleteDsaProblem(id);
         fetchDsaProblems();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
+  const handleDeleteDsaLanguage = (langKey, displayLabel) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete DSA Language",
+      message: `Are you sure you want to delete language "${displayLabel}" and all its associated DSA problems?`,
+      onConfirm: async () => {
+        await apiService.deleteDsaLanguage(langKey);
+        setCustomDsaLanguages(prev => prev.filter(l => l.toLowerCase() !== langKey.toLowerCase()));
+        if (dsaFilterLanguage.toLowerCase() === langKey.toLowerCase()) {
+          setDsaFilterLanguage('all');
+        }
+        await fetchDsaProblems();
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
       }
     });
@@ -1493,7 +1554,14 @@ export const AdminCurriculumEditor = () => {
       )}
 
       {/* Domain 3: DSA Problem Bank Manager */}
-      {activeDomain === 'dsa' && (
+      {activeDomain === 'dsa' && (() => {
+        const allDsaLanguages = Array.from(new Set([
+          'javascript', 'python', 'java', 'c', 'cpp',
+          ...customDsaLanguages,
+          ...dsaProblems.map(p => (p.language || 'javascript').toLowerCase())
+        ])).filter(Boolean);
+
+        return (
         <div className="space-y-6 animate-fadeIn">
           <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <div>
@@ -1502,18 +1570,25 @@ export const AdminCurriculumEditor = () => {
                 LeetCode DSA Problem Bank
               </h3>
               <p className="text-xs text-gray-400">
-                Manage algorithm practice problems, starter code templates, AI hints, and solution code.
+                Manage algorithm practice problems across JS, Python, Java, C, C++, starter templates, hints, and solution code.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant="glow"
                 size="sm"
-                onClick={handleBulkSeedDsa}
-                disabled={isAiGenerating}
-                leftIcon={<Sparkles className="w-4 h-4 text-amber-400" />}
+                onClick={() => setIsAddingLanguageModal(!isAddingLanguageModal)}
+                leftIcon={<PlusCircle className="w-4 h-4 text-purple-400" />}
               >
-                {isAiGenerating ? 'Generating...' : '⚡ 1-Click AI Bulk Generate Problems'}
+                + Add Language
+              </Button>
+              <Button
+                variant="glass"
+                size="sm"
+                onClick={() => setIsBulkDsaRawModalOpen(!isBulkDsaRawModalOpen)}
+                leftIcon={<FileText className="w-4 h-4 text-amber-400" />}
+              >
+                📋 Bulk Raw Text Importer
               </Button>
               <Button
                 variant="glass"
@@ -1526,11 +1601,91 @@ export const AdminCurriculumEditor = () => {
             </div>
           </div>
 
+          {/* Quick Add Custom DSA Language Modal */}
+          {isAddingLanguageModal && (
+            <GlassCard className="p-5 border border-purple-500/40 bg-purple-950/20 animate-fadeIn">
+              <form onSubmit={handleCreateLanguage} className="flex items-center gap-3">
+                <div className="flex-1">
+                  <Input
+                    placeholder="e.g. Rust, Go, TypeScript, C#, Ruby, Swift, Kotlin, PHP..."
+                    value={newLanguageInput}
+                    onChange={(e) => setNewLanguageInput(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="button" variant="ghost" size="sm" onClick={() => setIsAddingLanguageModal(false)}>Cancel</Button>
+                <Button type="submit" variant="glow" size="sm">Save New Language</Button>
+              </form>
+            </GlassCard>
+          )}
+
+          {/* Bulk Raw Text DSA Importer Modal */}
+          {isBulkDsaRawModalOpen && (
+            <GlassCard className="p-6 space-y-4 border border-amber-500/40 bg-amber-950/20 animate-fadeIn">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <h4 className="text-sm font-bold text-amber-300 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-amber-400" /> Paste Raw DSA Problems (Bulk Importer)
+                </h4>
+                <button type="button" onClick={() => setIsBulkDsaRawModalOpen(false)} className="text-xs text-gray-400 hover:text-white">Close</button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Target Language</label>
+                  <select
+                    value={rawDsaLanguage}
+                    onChange={(e) => setRawDsaLanguage(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-gray-200 capitalize"
+                  >
+                    {allDsaLanguages.map((lang) => (
+                      <option key={lang} value={lang}>
+                        {lang === 'javascript' ? 'JavaScript (JS)' : lang.toUpperCase()}
+                      </option>
+                    ))}
+                    <option value="general">General / Multi-Lang</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Default Difficulty</label>
+                  <select
+                    value={rawDsaDifficulty}
+                    onChange={(e) => setRawDsaDifficulty(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/15 rounded-xl p-2.5 text-xs text-gray-200"
+                  >
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-xs font-medium text-gray-300">
+                  Paste Raw DSA Problems (Format: Problem title, Hint:, Starter Code:, Solution Code:):
+                </label>
+                <textarea
+                  rows={6}
+                  value={rawDsaText}
+                  onChange={(e) => setRawDsaText(e.target.value)}
+                  placeholder={`Problem: Two Sum Array Hash Table\nFind indices of two numbers that add up to target.\nHint: Use Hash Map for O(N)\nStarter Code: function solution(nums, target) {}\nSolution Code: function solution(nums, target) { return [0, 1]; }\n\nProblem: Valid Anagram Check\nGiven two strings s and t, return true if t is an anagram of s.`}
+                  className="w-full bg-slate-950 border border-amber-500/30 rounded-xl p-3 text-xs font-mono text-amber-200 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button size="sm" variant="glass" onClick={() => setIsBulkDsaRawModalOpen(false)}>Cancel</Button>
+                <Button size="sm" variant="glow" onClick={handleBulkImportRawDsa} leftIcon={<Sparkles className="w-4 h-4 text-amber-400" />}>
+                  ⚡ Auto-Format & Bulk Import DSA Problems
+                </Button>
+              </div>
+            </GlassCard>
+          )}
+
           {isAddingDsa && (
             <GlassCard className="p-6 space-y-4 border border-amber-500/40 bg-amber-950/10">
               <h4 className="text-sm font-bold text-amber-300">Create New DSA Problem</h4>
               <form onSubmit={handleCreateDsaProblem} className="space-y-4">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <Input
                     label="Problem Title"
                     required
@@ -1546,6 +1701,21 @@ export const AdminCurriculumEditor = () => {
                       value={newDsaTopic}
                       onChange={(e) => setNewDsaTopic(e.target.value)}
                     />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">Language</label>
+                    <select
+                      value={newDsaLanguage}
+                      onChange={(e) => setNewDsaLanguage(e.target.value)}
+                      className="w-full bg-[#121218] border border-white/10 rounded-xl px-3 py-2 text-xs text-white capitalize"
+                    >
+                      {allDsaLanguages.map((lang) => (
+                        <option key={lang} value={lang}>
+                          {lang === 'javascript' ? 'JavaScript (JS)' : lang.toUpperCase()}
+                        </option>
+                      ))}
+                      <option value="general">General</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-300 mb-1">Difficulty</label>
@@ -1609,13 +1779,70 @@ export const AdminCurriculumEditor = () => {
             </GlassCard>
           )}
 
+          {/* DSA Language Filters & Search Bar */}
+          <GlassCard className="p-4 space-y-3 bg-slate-950/40 border border-white/10">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-semibold text-gray-400">Filter Language:</span>
+                {['all', ...allDsaLanguages].map((lang) => {
+                  const displayLabel = lang === 'all' ? 'All Languages' : lang === 'javascript' ? 'JavaScript (JS)' : lang.toUpperCase();
+                  const isAll = lang === 'all';
+                  return (
+                    <div
+                      key={lang}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                        dsaFilterLanguage.toLowerCase() === lang.toLowerCase() ? 'bg-amber-600 text-white font-bold shadow-sm' : 'bg-slate-900 text-gray-400 hover:text-white border border-white/5'
+                      }`}
+                      onClick={() => setDsaFilterLanguage(lang)}
+                    >
+                      <span>{displayLabel}</span>
+                      {!isAll && (
+                        <button
+                          type="button"
+                          title={`Delete language ${displayLabel} and its problems`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteDsaLanguage(lang, displayLabel);
+                          }}
+                          className="ml-1 text-gray-400 hover:text-rose-400 p-0.5 rounded transition-colors"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="w-full sm:w-64">
+                <Input
+                  placeholder="Search DSA problems..."
+                  value={dsaSearchQuery}
+                  onChange={(e) => setDsaSearchQuery(e.target.value)}
+                  className="py-1.5 text-xs"
+                />
+              </div>
+            </div>
+          </GlassCard>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {dsaProblems.map((p) => (
+            {dsaProblems
+              .filter((p) => {
+                const matchLang = dsaFilterLanguage === 'all' || (p.language || 'javascript').toLowerCase() === dsaFilterLanguage.toLowerCase();
+                const matchSearch = !dsaSearchQuery.trim() || `${p.title} ${p.topic} ${p.description}`.toLowerCase().includes(dsaSearchQuery.toLowerCase());
+                return matchLang && matchSearch;
+              })
+              .map((p) => (
               <GlassCard key={p.id} className="p-5 space-y-3">
                 <div className="flex items-center justify-between">
-                  <Badge variant={p.difficulty === 'Hard' ? 'rose' : p.difficulty === 'Medium' ? 'amber' : 'emerald'}>
-                    {p.difficulty || 'Easy'}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={p.difficulty === 'Hard' ? 'rose' : p.difficulty === 'Medium' ? 'amber' : 'emerald'}>
+                      {p.difficulty || 'Easy'}
+                    </Badge>
+                    <Badge variant="purple">
+                      {(p.language || 'javascript').toUpperCase()}
+                    </Badge>
+                  </div>
                   <button
                     type="button"
                     onClick={() => handleDeleteDsaProblem(p.id)}
@@ -1626,12 +1853,16 @@ export const AdminCurriculumEditor = () => {
                 </div>
                 <h4 className="text-sm font-bold text-white tracking-tight">{p.title}</h4>
                 <p className="text-xs text-gray-400 line-clamp-2">{p.description}</p>
-                <span className="text-[10px] font-mono text-cyan-400">{p.topic}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-cyan-400">{p.topic}</span>
+                  <span className="text-[10px] font-mono text-gray-500">Target: {p.timeLimit || 'O(N)'}</span>
+                </div>
               </GlassCard>
             ))}
           </div>
         </div>
-      )}
+      );
+    })()}
 
       {/* Domain 4: English Coach Modules Manager */}
       {activeDomain === 'english' && (

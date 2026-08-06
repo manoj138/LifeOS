@@ -322,6 +322,24 @@ export const apiService = {
     }
   },
 
+  async bulkImportRawDsa(data) {
+    try {
+      const res = await Api.post('/dsa/problems/bulk-raw-import', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async deleteDsaLanguage(language) {
+    try {
+      const res = await Api.delete(`/dsa/problems/language/${encodeURIComponent(language)}`);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
   // DevOps Steps
   async getDevopsSteps() {
     try {

@@ -22,6 +22,10 @@ const DsaProblem = sequelize.define('DsaProblem', {
     type: DataTypes.STRING,
     defaultValue: 'O(N)',
   },
+  language: {
+    type: DataTypes.STRING, // 'javascript', 'python', 'java', 'c', 'cpp', 'general'
+    defaultValue: 'javascript',
+  },
   description: {
     type: DataTypes.TEXT,
     allowNull: false,
