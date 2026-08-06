@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Input = ({ 
+export const Input = ({ 
   label, 
   type = 'text', 
   placeholder, 
@@ -8,27 +8,32 @@ const Input = ({
   onChange, 
   name, 
   className = '', 
-  icon: Icon, 
+  icon: Icon,
+  leftIcon,
+  rightIcon, 
   iconPosition = 'left', 
   error,
+  helperText,
   ...props 
 }) => {
   const hasError = Boolean(error);
+  const renderLeftIcon = leftIcon || (Icon && iconPosition === 'left' ? <Icon className="w-4 h-4" /> : null);
+  const renderRightIcon = rightIcon || (Icon && iconPosition === 'right' ? <Icon className="w-4 h-4" /> : null);
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
       {label && (
-        <label className={`text-sm font-medium ml-0.5 transition-colors duration-200 ${
-          hasError ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'
+        <label className={`text-xs font-semibold tracking-tight transition-colors duration-200 ${
+          hasError ? 'text-rose-400' : 'text-gray-300'
         }`}>
           {label}
         </label>
       )}
       
-      <div className="relative group">
-        {Icon && iconPosition === 'left' && (
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200 pointer-events-none">
-            <Icon size={18} />
+      <div className="relative group flex items-center">
+        {renderLeftIcon && (
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-400 transition-colors duration-200 pointer-events-none">
+            {renderLeftIcon}
           </div>
         )}
         
@@ -38,31 +43,34 @@ const Input = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full px-4 py-2.5 bg-white dark:bg-surface-card-dark border rounded-xl outline-none transition-all duration-200 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600 ${
-            Icon && iconPosition === 'left' ? 'pl-11' : ''
+          className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl outline-none transition-all duration-200 text-xs text-gray-100 placeholder:text-gray-500 focus:bg-slate-950 ${
+            renderLeftIcon ? 'pl-10' : ''
           } ${
-            Icon && iconPosition === 'right' ? 'pr-11' : ''
+            renderRightIcon ? 'pr-10' : ''
           } ${
             hasError 
-              ? 'border-red-500 focus:ring-2 focus:ring-red-500/20' 
-              : 'border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
-
+              ? 'border-rose-500/80 focus:border-rose-500 focus:ring-1 focus:ring-rose-500/30' 
+              : 'border-white/15 hover:border-white/25 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30'
           }`}
           {...props}
         />
 
-        {Icon && iconPosition === 'right' && (
-          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200 pointer-events-none">
-            <Icon size={18} />
+        {renderRightIcon && (
+          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-400 transition-colors duration-200 pointer-events-none">
+            {renderRightIcon}
           </div>
         )}
       </div>
 
-      {error && (
-        <p className="text-xs font-medium text-red-500 ml-0.5 mt-0.5">
+      {hasError ? (
+        <p className="text-[11px] font-medium text-rose-400 mt-0.5 animate-fadeIn">
           {error}
         </p>
-      )}
+      ) : helperText ? (
+        <p className="text-[11px] text-gray-400 mt-0.5">
+          {helperText}
+        </p>
+      ) : null}
     </div>
   );
 };

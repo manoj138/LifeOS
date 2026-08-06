@@ -1,19 +1,20 @@
 import React from 'react';
-import { Badge } from '../ui/Badge';
+import { Badge } from './Badge';
 import { cn } from '../../utils/cn';
 
 export const SectionHeader = ({
   badge,
+  badgeVariant = 'neon',
   title,
   subtitle,
   actions,
   className
 }) => {
   return (
-    <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-8", className)}>
-      <div className="space-y-1">
+    <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-8 animate-fadeIn", className)}>
+      <div className="space-y-1.5">
         {badge && (
-          <Badge variant="neon" className="mb-2">
+          <Badge variant={badgeVariant} className="mb-2">
             {badge}
           </Badge>
         )}
@@ -21,17 +22,19 @@ export const SectionHeader = ({
           {title}
         </h1>
         {subtitle && (
-          <p className="text-sm text-gray-400 max-w-2xl">
+          <p className="text-sm text-gray-400 max-w-3xl leading-relaxed font-sans">
             {subtitle}
           </p>
         )}
       </div>
 
       {actions && (
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
           {actions}
         </div>
       )}
     </div>
   );
 };
+
+export default SectionHeader;

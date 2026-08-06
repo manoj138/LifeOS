@@ -1,50 +1,60 @@
 import React from 'react';
 
-const Button = ({ 
+export const Button = ({ 
   children, 
   variant = 'primary', 
   size = 'md', 
   className = '', 
-  icon: Icon, 
+  icon: Icon,
+  leftIcon,
+  rightIcon, 
   iconPosition = 'left', 
-  loading = false, 
+  loading = false,
+  isLoading = false, 
   disabled = false,
   ...props 
 }) => {
-  const baseStyles = "inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none";
+  const isSpinning = loading || isLoading;
+  const renderLeft = leftIcon || (Icon && iconPosition === 'left' ? <Icon className={size === 'xs' || size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} /> : null);
+  const renderRight = rightIcon || (Icon && iconPosition === 'right' ? <Icon className={size === 'xs' || size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} /> : null);
+
+  const baseStyles = "inline-flex items-center justify-center font-bold tracking-tight rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none select-none cursor-pointer";
   
   const variants = {
-    primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20",
-    secondary: "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100",
-    outline: "border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200",
-    ghost: "bg-transparent hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-200",
-
-    danger: "bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20",
+    primary: "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/25 border border-blue-400/20 hover:shadow-blue-500/40",
+    glow: "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-500/30 border border-purple-400/30 hover:shadow-purple-500/50",
+    glass: "bg-white/[0.05] hover:bg-white/[0.1] text-gray-200 hover:text-white border border-white/10 hover:border-white/20 backdrop-blur-md",
+    neon: "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold shadow-lg shadow-emerald-500/30 border border-emerald-300/40 hover:shadow-emerald-500/50",
+    secondary: "bg-slate-800 hover:bg-slate-700 text-gray-200 border border-white/10 shadow-sm",
+    outline: "border border-white/20 hover:border-purple-500 hover:text-purple-300 text-gray-300 bg-transparent backdrop-blur-sm",
+    ghost: "bg-transparent hover:bg-white/10 text-gray-300 hover:text-white",
+    danger: "bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white shadow-lg shadow-rose-500/30 border border-rose-400/20",
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-xs gap-1.5",
-    md: "px-5 py-2.5 text-sm gap-2",
-    lg: "px-7 py-3.5 text-base gap-2.5",
-    xl: "px-9 py-4 text-lg gap-3",
+    xs: "px-2.5 py-1 text-xs gap-1.5 rounded-lg",
+    sm: "px-3.5 py-1.5 text-xs gap-1.5 rounded-xl",
+    md: "px-5 py-2.5 text-sm gap-2 rounded-xl",
+    lg: "px-7 py-3.5 text-base gap-2.5 rounded-2xl",
+    xl: "px-9 py-4 text-lg gap-3 rounded-2xl",
   };
 
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
-      disabled={disabled || loading}
+      className={`${baseStyles} ${variants[variant] || variants.primary} ${sizes[size] || sizes.md} ${className}`}
+      disabled={disabled || isSpinning}
       {...props}
     >
-      {loading ? (
-        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+      {isSpinning ? (
+        <svg className="animate-spin h-4 w-4 text-current" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
       ) : (
         <>
-          {Icon && iconPosition === 'left' && <Icon size={size === 'sm' ? 14 : size === 'lg' ? 20 : 18} />}
+          {renderLeft}
           {children}
-          {Icon && iconPosition === 'right' && <Icon size={size === 'sm' ? 14 : size === 'lg' ? 20 : 18} />}
+          {renderRight}
         </>
       )}
     </button>

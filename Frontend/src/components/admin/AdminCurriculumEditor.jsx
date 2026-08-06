@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Edit3, Save, Sparkles, Check, Code2, Layers, Server, Binary, Terminal, CheckCircle2, RefreshCw, AlertCircle, Trash2, ListOrdered, CheckSquare, PlusCircle, FileText } from 'lucide-react';
-import { GlassCard } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
-import { Input } from '../ui/Input';
+import { GlassCard, Button, Badge, Input, ConfirmModal } from '../common';
 import { apiService } from '../../services/api';
 import { FormattedMarkdown } from '../ui/FormattedMarkdown';
-import ConfirmModal from '../common/ConfirmModal';
 
 const ICON_MAP = {
   Code2,
@@ -1782,44 +1778,23 @@ export const AdminCurriculumEditor = () => {
           {/* DSA Language Filters & Search Bar */}
           <GlassCard className="p-4 space-y-3 bg-slate-950/40 border border-white/10">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-semibold text-gray-400">Filter Language:</span>
-                {['all', ...allDsaLanguages].map((lang) => {
-                  const displayLabel = lang === 'all' ? 'All Languages' : lang === 'javascript' ? 'JavaScript (JS)' : lang.toUpperCase();
-                  const isAll = lang === 'all';
-                  return (
-                    <div
-                      key={lang}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                        dsaFilterLanguage.toLowerCase() === lang.toLowerCase() ? 'bg-amber-600 text-white font-bold shadow-sm' : 'bg-slate-900 text-gray-400 hover:text-white border border-white/5'
-                      }`}
-                      onClick={() => setDsaFilterLanguage(lang)}
-                    >
-                      <span>{displayLabel}</span>
-                      {!isAll && (
-                        <button
-                          type="button"
-                          title={`Delete language ${displayLabel} and its problems`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteDsaLanguage(lang, displayLabel);
-                          }}
-                          className="ml-1 text-gray-400 hover:text-rose-400 p-0.5 rounded transition-colors"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              <FilterPills
+                label="Filter Language:"
+                options={['all', ...allDsaLanguages].map(lang => ({
+                  value: lang,
+                  label: lang === 'all' ? 'All Languages' : lang === 'javascript' ? 'JavaScript (JS)' : lang.toUpperCase()
+                }))}
+                activeValue={dsaFilterLanguage}
+                onSelect={(val) => setDsaFilterLanguage(val)}
+                onDelete={(langKey, labelText) => handleDeleteDsaLanguage(langKey, labelText)}
+              />
 
               <div className="w-full sm:w-64">
-                <Input
+                <SearchInput
                   placeholder="Search DSA problems..."
                   value={dsaSearchQuery}
                   onChange={(e) => setDsaSearchQuery(e.target.value)}
-                  className="py-1.5 text-xs"
+                  onClear={() => setDsaSearchQuery('')}
                 />
               </div>
             </div>

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Code2, Cpu, CheckCircle2, Play, ArrowRight, Sparkles, Terminal, HelpCircle, Eye, EyeOff } from 'lucide-react';
-import { SectionHeader } from '../components/common/SectionHeader';
+import { SectionHeader, Badge, Button, GlassCard, EmptyState } from '../components/common';
 import { TiltCard } from '../components/ui/TiltCard';
 import { CodeEditor } from '../components/ui/CodeEditor';
 import { DifficultyBadge } from '../components/ui/DifficultyBadge';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
 import { useUser } from '../context/UserContext';
 import { apiService } from '../services/api';
 
