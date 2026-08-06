@@ -218,8 +218,29 @@ export const UserProvider = ({ children }) => {
     }).catch((err) => console.log('Backend sync offline fallback active.'));
   };
 
+  const loginUser = (userData, preferencesData) => {
+    setUser(userData || null);
+    const prefs = preferencesData || DEFAULT_PREFERENCES;
+    setPreferences(prefs);
+    const isCompleted = Boolean(prefs?.onboardingCompleted);
+    setOnboardingCompleted(isCompleted);
+    if (userData) {
+      localStorage.setItem('lifeos_session', JSON.stringify({
+        user: userData,
+        preferences: prefs,
+        onboardingCompleted: isCompleted,
+      }));
+    }
+  };
+
   const updatePreferences = (newPrefs) => {
-    setPreferences((prev) => ({ ...(prev || {}), ...newPrefs }));
+    setPreferences((prev) => {
+      const updated = { ...(prev || {}), ...newPrefs };
+      if (newPrefs && newPrefs.onboardingCompleted !== undefined) {
+        setOnboardingCompleted(Boolean(newPrefs.onboardingCompleted));
+      }
+      return updated;
+    });
   };
 
   const updateUserProfile = (newProfile) => {
@@ -257,6 +278,7 @@ export const UserProvider = ({ children }) => {
         toggleCompletedTask,
         logWorkout,
         completeOnboarding,
+        loginUser,
         updatePreferences,
         updateUserProfile,
         resetOnboarding,

@@ -15,7 +15,7 @@ export const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
-  const { onboardingCompleted, completeOnboarding, resetOnboarding, updateUserProfile, updatePreferences } = useUser();
+  const { onboardingCompleted, completeOnboarding, loginUser, resetOnboarding, updateUserProfile, updatePreferences } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,26 +44,23 @@ export const AuthPage = () => {
         }
 
         const userData = res.data.user;
+        const prefData = res.data.preferences || {};
 
         if (userData?.role === 'admin') {
           completeOnboarding({
             user: userData,
-            preferences: res.data.preferences || { targetRole: 'System Administrator', careerLevel: 'Admin Console' },
+            preferences: { targetRole: 'System Administrator', careerLevel: 'Admin Console', onboardingCompleted: true, ...prefData },
           });
           navigate('/app/admin');
         } else {
-          updateUserProfile(userData);
-          if (res.data.preferences) {
-            updatePreferences(res.data.preferences);
-          }
-
-          const hasCompletedOnboarding = res.data.preferences?.onboardingCompleted || false;
-
           if (activeTab === 'register') {
+            loginUser(userData, { ...prefData, onboardingCompleted: false });
             resetOnboarding();
             navigate('/onboarding');
           } else {
-            if (!hasCompletedOnboarding && !onboardingCompleted) {
+            loginUser(userData, prefData);
+            const hasCompletedOnboarding = Boolean(prefData.onboardingCompleted);
+            if (!hasCompletedOnboarding) {
               navigate('/onboarding');
             } else {
               navigate('/app/dashboard');
@@ -93,7 +90,7 @@ export const AuthPage = () => {
       </div>
 
       {/* Auth Toggle Tabs */}
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-2">
         <Tabs
           tabs={[
             { id: 'login', label: 'Sign In' },
@@ -102,6 +99,17 @@ export const AuthPage = () => {
           activeTab={activeTab}
           onChange={setActiveTab}
         />
+        <button
+          type="button"
+          onClick={() => {
+            setEmail('admin@lifeos.ai');
+            setPassword('admin@123');
+            if (activeTab === 'register') setName('System Admin');
+          }}
+          className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold underline flex items-center gap-1 cursor-pointer transition-colors mt-1"
+        >
+          ⚡ Auto-fill Admin Credentials (admin@lifeos.ai)
+        </button>
       </div>
 
 
@@ -183,12 +191,11 @@ export const AuthPage = () => {
           variant="glass"
           size="sm"
           onClick={() => {
-            updateUserProfile({ name: 'GitHub Developer', email: 'dev@github.com', role: 'candidate' });
-            if (!onboardingCompleted) {
-              navigate('/onboarding');
-            } else {
-              navigate('/app/dashboard');
-            }
+            loginUser(
+              { name: 'GitHub Developer', email: 'dev@github.com', role: 'candidate' },
+              { targetRole: 'Full Stack Engineer', onboardingCompleted: true }
+            );
+            navigate('/app/dashboard');
           }}
           leftIcon={<Github className="w-4 h-4" />}
         >
@@ -199,12 +206,11 @@ export const AuthPage = () => {
           variant="glass"
           size="sm"
           onClick={() => {
-            updateUserProfile({ name: 'Google Developer', email: 'user@gmail.com', role: 'candidate' });
-            if (!onboardingCompleted) {
-              navigate('/onboarding');
-            } else {
-              navigate('/app/dashboard');
-            }
+            loginUser(
+              { name: 'Google Developer', email: 'user@gmail.com', role: 'candidate' },
+              { targetRole: 'Full Stack Engineer', onboardingCompleted: true }
+            );
+            navigate('/app/dashboard');
           }}
           leftIcon={<Chrome className="w-4 h-4 text-rose-400" />}
         >
