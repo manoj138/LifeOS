@@ -234,7 +234,7 @@ export const apiService = {
 
   async generateSingleTopicAi(topicTitle, moduleId = 'js', level = 'Beginner') {
     try {
-      const res = await Api.post('/curriculum/generate-topic', { topicTitle, moduleId, level });
+      const res = await Api.post('/curriculum/topics/generate-ai', { topicTitle, moduleId, level });
       return res.data;
     } catch (err) {
       return { success: false, fallback: true };
@@ -243,7 +243,7 @@ export const apiService = {
 
   async bulkGenerateSequence({ moduleId, level, topicTitles }) {
     try {
-      const res = await Api.post('/curriculum/bulk-generate-sequence', { moduleId, level, topicTitles });
+      const res = await Api.post('/curriculum/topics/bulk-generate-sequence', { moduleId, level, topicTitles });
       return res.data;
     } catch (err) {
       return { success: false, fallback: true };
