@@ -32,7 +32,7 @@ const STEP_SVG_MAP = {
   3: { svg: graduationLightSvg, title: 'Graduation Timeline', subtitle: 'Academic status & milestones', scaleClass: 'scale-120' },
   4: { svg: workingSvg, title: 'Industry Experience', subtitle: 'Company background & work history', scaleClass: 'scale-115' },
   5: { svg: codingSvg, title: 'Flagship Portfolio Project', subtitle: 'Architecting primary showcase software', scaleClass: 'scale-115' },
-  6: { svg: windowLayoutSvg, title: 'Secondary Apps & Profiles', subtitle: 'Connecting developer handles', scaleClass: 'scale-110' },
+  6: { svg: windowLayoutSvg, title: 'Secondary Portfolio Apps', subtitle: 'Showcasing additional engineering projects', scaleClass: 'scale-110' },
   7: { svg: targetCommercialSvg, title: 'Target Specialization', subtitle: 'Calibrating target engineering role', scaleClass: 'scale-120' },
   8: { svg: codingSvg, title: 'Technical Skill Assessment', subtitle: 'Focusing AI drills on weak areas', scaleClass: 'scale-115' },
   9: { svg: timingSvg, title: 'Daily Routine & Timeline', subtitle: 'Establishing daily commitment', scaleClass: 'scale-125' },

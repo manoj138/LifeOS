@@ -71,6 +71,7 @@ export const InterviewPrep = () => {
 
   const userName = user?.name || user?.email?.split('@')[0] || 'Candidate';
   const targetRole = preferences?.targetRole || 'Full-Stack Web Developer';
+  const careerLevel = preferences?.careerLevel || 'Intermediate';
   const cityState = preferences?.cityState || preferences?.location || 'Pune, India';
   const degree = preferences?.degree || preferences?.education || 'B.E. Computer Science';
   const collegeName = preferences?.collegeName || 'COEP Technological University';
