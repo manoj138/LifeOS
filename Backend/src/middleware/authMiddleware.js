@@ -24,4 +24,14 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
+const adminMiddleware = async (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return sendError(res, 'Access denied. Administrative privileges required.', null, 403);
+  }
+  next();
+};
+
 module.exports = authMiddleware;
+module.exports.authMiddleware = authMiddleware;
+module.exports.adminMiddleware = adminMiddleware;
+

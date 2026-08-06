@@ -89,16 +89,16 @@ export const apiService = {
     }
   },
 
-  async pinLogin(pin) {
+  async pinLogin(email, pin) {
     try {
-      const res = await Api.post('/auth/pin-login', { pin });
+      const res = await Api.post('/auth/pin-login', { email, pin });
       const result = res.data;
       if (result.data?.token) {
         sessionStore(result.data.token, result.data.user);
       }
       return result;
     } catch (err) {
-      const message = err.response?.data?.message || 'Invalid PIN entered.';
+      const message = err.response?.data?.message || 'Invalid Email or PIN entered.';
       return { success: false, message };
     }
   },

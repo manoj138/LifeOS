@@ -98,19 +98,19 @@ const login = async (req, res) => {
 
 const pinLogin = async (req, res) => {
   try {
-    const { pin } = req.body;
+    const { email, pin } = req.body;
 
-    if (!pin) {
-      return sendError(res, 'PIN is required', null, 400);
+    if (!email || !pin) {
+      return sendError(res, 'Email and PIN are required for PIN verification', null, 400);
     }
 
     const user = await User.findOne({
-      where: { pin },
+      where: { email: email.trim().toLowerCase(), pin: String(pin).trim() },
       include: [{ model: UserPreference, as: 'preferences' }],
     });
 
     if (!user) {
-      return sendError(res, 'Invalid PIN', null, 401);
+      return sendError(res, 'Invalid Email or PIN combination', null, 401);
     }
 
     const token = generateToken(user.id);

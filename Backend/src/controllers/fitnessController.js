@@ -3,7 +3,7 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getFitnessLogs = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     let log = await FitnessLog.findOne({ where: { userId } });
     if (!log) {
       log = await FitnessLog.create({ userId });
@@ -16,7 +16,7 @@ const getFitnessLogs = async (req, res) => {
 
 const updateFitnessLog = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     let log = await FitnessLog.findOne({ where: { userId } });
     if (!log) {
       log = await FitnessLog.create({ userId });

@@ -3,7 +3,7 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getHabits = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const habits = await HabitLog.findAll({ where: { userId } });
     return sendSuccess(res, 'Habits fetched', habits);
   } catch (error) {
@@ -14,7 +14,8 @@ const getHabits = async (req, res) => {
 const checkinHabit = async (req, res) => {
   try {
     const { id } = req.params;
-    const habit = await HabitLog.findByPk(id);
+    const userId = req.user.id;
+    const habit = await HabitLog.findOne({ where: { id, userId } });
     if (!habit) return sendError(res, 'Habit not found', null, 404);
 
     const newCompleted = !habit.completedToday;

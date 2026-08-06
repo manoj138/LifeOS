@@ -3,7 +3,7 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getTasks = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const tasks = await PlannerTask.findAll({ where: { userId } });
     return sendSuccess(res, 'Planner tasks fetched', tasks);
   } catch (error) {
@@ -13,7 +13,7 @@ const getTasks = async (req, res) => {
 
 const createTask = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const { title, start, end, category, energy } = req.body;
     const newTask = await PlannerTask.create({
       id: `t_${Date.now()}`,
@@ -34,7 +34,8 @@ const createTask = async (req, res) => {
 const toggleTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const task = await PlannerTask.findByPk(id);
+    const userId = req.user.id;
+    const task = await PlannerTask.findOne({ where: { id, userId } });
     if (!task) return sendError(res, 'Task not found', null, 404);
 
     await task.update({ completed: !task.completed });
@@ -47,7 +48,8 @@ const toggleTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const task = await PlannerTask.findByPk(id);
+    const userId = req.user.id;
+    const task = await PlannerTask.findOne({ where: { id, userId } });
     if (task) await task.destroy();
     return sendSuccess(res, 'Task deleted successfully');
   } catch (error) {

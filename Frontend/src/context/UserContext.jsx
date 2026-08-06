@@ -99,6 +99,11 @@ export const UserProvider = ({ children }) => {
           apiService.getLearningProgress()
         ]);
 
+        if (profileRes?.success === false && (profileRes?.message === 'Unauthorized access' || profileRes?.message === 'User no longer exists')) {
+          if (isMounted) clearAllLocalState();
+          return;
+        }
+
         if (isMounted) {
           if (profileRes?.success && profileRes.data) {
             const fetchedUser = {

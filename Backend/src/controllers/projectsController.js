@@ -3,7 +3,7 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getProjects = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const projects = await Project.findAll({ where: { userId } });
     return sendSuccess(res, 'Projects fetched', projects);
   } catch (error) {
@@ -13,7 +13,7 @@ const getProjects = async (req, res) => {
 
 const createProject = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const { title, description, techStack } = req.body;
     const newProj = await Project.create({
       id: `p_${Date.now()}`,

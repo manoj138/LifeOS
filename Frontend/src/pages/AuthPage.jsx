@@ -190,12 +190,30 @@ export const AuthPage = () => {
         <Button
           variant="glass"
           size="sm"
-          onClick={() => {
-            loginUser(
-              { name: 'GitHub Developer', email: 'dev@github.com', role: 'candidate' },
-              { targetRole: 'Full Stack Engineer', onboardingCompleted: true }
-            );
-            navigate('/app/dashboard');
+          onClick={async () => {
+            setIsLoading(true);
+            setErrorMsg('');
+            try {
+              let res = await apiService.login('dev@github.com', 'social_github_sec_2026');
+              if (!res?.success) {
+                res = await apiService.register({
+                  name: 'GitHub Learner',
+                  email: 'dev@github.com',
+                  password: 'social_github_sec_2026',
+                });
+              }
+              setIsLoading(false);
+              if (res?.success && res.data) {
+                if (res.data.token) localStorage.setItem('lifeos_auth_token', res.data.token);
+                loginUser(res.data.user, res.data.preferences || {});
+                navigate('/app/dashboard');
+              } else {
+                setErrorMsg(res?.message || 'Social sign-in failed.');
+              }
+            } catch (err) {
+              setIsLoading(false);
+              setErrorMsg('Backend connection failed during social sign-in.');
+            }
           }}
           leftIcon={<Github className="w-4 h-4" />}
         >
@@ -205,12 +223,30 @@ export const AuthPage = () => {
         <Button
           variant="glass"
           size="sm"
-          onClick={() => {
-            loginUser(
-              { name: 'Google Developer', email: 'user@gmail.com', role: 'candidate' },
-              { targetRole: 'Full Stack Engineer', onboardingCompleted: true }
-            );
-            navigate('/app/dashboard');
+          onClick={async () => {
+            setIsLoading(true);
+            setErrorMsg('');
+            try {
+              let res = await apiService.login('learner@gmail.com', 'social_google_sec_2026');
+              if (!res?.success) {
+                res = await apiService.register({
+                  name: 'Google Learner',
+                  email: 'learner@gmail.com',
+                  password: 'social_google_sec_2026',
+                });
+              }
+              setIsLoading(false);
+              if (res?.success && res.data) {
+                if (res.data.token) localStorage.setItem('lifeos_auth_token', res.data.token);
+                loginUser(res.data.user, res.data.preferences || {});
+                navigate('/app/dashboard');
+              } else {
+                setErrorMsg(res?.message || 'Social sign-in failed.');
+              }
+            } catch (err) {
+              setIsLoading(false);
+              setErrorMsg('Backend connection failed during social sign-in.');
+            }
           }}
           leftIcon={<Chrome className="w-4 h-4 text-rose-400" />}
         >

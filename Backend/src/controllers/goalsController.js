@@ -3,7 +3,7 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getGoals = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const goals = await Goal.findAll({ where: { userId } });
     return sendSuccess(res, 'Goals fetched successfully', goals);
   } catch (error) {
@@ -13,7 +13,7 @@ const getGoals = async (req, res) => {
 
 const createGoal = async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const { title, deadline, category, milestones } = req.body;
     const newGoal = await Goal.create({
       id: `g_${Date.now()}`,

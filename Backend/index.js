@@ -169,8 +169,7 @@ const startServer = async () => {
     await sequelize.sync();
     console.log('✅ SQLite Database Models synced successfully.');
     
-    // Auto-repair any outdated AI topics in database.sqlite
-    repairOutdatedTopics().catch(err => console.warn('Background repair notice:', err.message));
+    // Note: Background repair script available in src/scripts/repairOutdatedTopics.js if explicitly requested by admin
   } catch (err) {
     console.error('❌ Database sync notice:', err.message);
   }
