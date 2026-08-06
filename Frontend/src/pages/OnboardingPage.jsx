@@ -192,7 +192,7 @@ export const OnboardingPage = () => {
             </div>
 
             {/* Profile Summary Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-white/10 backdrop-blur-md text-[10px] text-gray-300 shadow-lg">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0c0c10]/90 border border-white/10 backdrop-blur-md text-[10px] text-gray-300 shadow-lg">
               <UserCheck className="w-3 h-3 text-purple-400" />
               <span className="font-bold text-white">{formData.name || 'Learner'}</span>
               {formData.cityState && <span className="text-gray-400">• {formData.cityState}</span>}
