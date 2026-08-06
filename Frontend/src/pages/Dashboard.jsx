@@ -21,7 +21,7 @@ export const Dashboard = () => {
   const { user, preferences, userProgress, resetOnboarding } = useUser();
 
   React.useEffect(() => {
-    if (user?.role === 'admin' || user?.email?.toLowerCase().includes('admin')) {
+    if (user?.role === 'admin') {
       navigate('/app/admin', { replace: true });
     }
   }, [user, navigate]);

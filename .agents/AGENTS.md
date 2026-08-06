@@ -39,3 +39,23 @@
 2. **Always Provide an Implementation Plan Before Execution**:
    - For every user request or prompt, Antigravity MUST first create an `implementation_plan.md` artifact detailing the proposed changes, design decisions, and verification steps.
    - Antigravity MUST NOT make code changes or run state-modifying shell commands until the user explicitly approves the implementation plan.
+
+
+## 🎨 UI Design System & Style Consistency Rule
+
+1. **Strict Design Tokens & Surface Standard**:
+   - Page Container Background: ALWAYS `#070709` (`bg-[#070709]`). Do NOT use arbitrary dark shades (`bg-slate-900`, `bg-black`, `bg-zinc-950`).
+   - Cards & Glass Surfaces: Use `<Card>` or `<GlassCard>` from `components/ui/Card.jsx` (`bg-[#14141b]/80` or `bg-white/[0.03]`, `backdrop-blur-xl`, `border-white/10`).
+   - Brand Accent Gradients: Blue-Indigo-Purple (`from-blue-600 via-indigo-600 to-purple-600`) & Neon Cyan (`#06b6d4`).
+
+2. **Standardized Reusable Primitives**:
+   - Buttons: ALWAYS use `<Button>` from `components/ui/Button.jsx` (`primary`, `secondary`, `glass`, `ghost`, `outline`, `danger`). Do NOT write raw custom `<button>` Tailwind classes in page components.
+   - Badges & Status: ALWAYS use `<Badge>` or `<DifficultyBadge>` from `components/ui/`.
+   - Inputs & Search: ALWAYS use `<Input>` or `<SearchInput>` from `components/ui/`.
+   - Navigation Tabs: ALWAYS use `<Tabs>` from `components/ui/Tabs.jsx`.
+
+3. **Typography Standards**:
+   - Page Titles: `text-2xl sm:text-3xl font-extrabold text-white tracking-tight`
+   - Section Subtitles: `text-xs sm:text-sm text-gray-400 font-medium`
+   - Card Titles: `text-base font-bold text-white`
+
