@@ -1,6 +1,6 @@
 import React from "react";
 
-const Table = ({
+export const Table = ({
   columns = [],
   data = [],
   className = "",
@@ -10,36 +10,36 @@ const Table = ({
 }) => {
   return (
     <div
-      className={`w-full overflow-x-auto rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm ${className}`}
+      className={`w-full overflow-x-auto rounded-3xl border border-white/10 bg-[#0d0d14]/80 backdrop-blur-2xl shadow-2xl ${className}`}
     >
       <table className="w-full text-left border-collapse" {...props}>
-        <thead className="bg-gray-50/80 dark:bg-gray-800/50 backdrop-blur-md sticky top-0 z-10">
+        <thead className="bg-white/[0.03] backdrop-blur-md sticky top-0 z-10">
           <tr>
             {columns.map((col, idx) => (
               <th
                 key={idx}
-                className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-slate-800"
+                className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-white/10"
               >
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
+        <tbody className="divide-y divide-white/5">
           {data.length > 0 ? (
             data.map((row, rowIdx) => (
               <tr
                 key={rowIdx}
                 className={`
-                  transition-colors
-                  ${hoverable ? "hover:bg-blue-50/30 dark:hover:bg-blue-900/5" : ""}
-                  ${striped && rowIdx % 2 !== 0 ? "bg-gray-50/30 dark:bg-gray-800/10" : "bg-white dark:bg-surface-card-dark"}
+                  transition-colors duration-200
+                  ${hoverable ? "hover:bg-white/[0.04]" : ""}
+                  ${striped && rowIdx % 2 !== 0 ? "bg-white/[0.02]" : "bg-transparent"}
                 `}
               >
                 {columns.map((col, colIdx) => (
                   <td
                     key={colIdx}
-                    className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300"
+                    className="px-6 py-4 text-xs font-medium text-gray-200"
                   >
                     {col.render
                       ? col.render(row[col.accessor], rowIdx, row)
@@ -52,7 +52,7 @@ const Table = ({
             <tr>
               <td
                 colSpan={columns.length}
-                className="px-6 py-12 text-center text-gray-400 italic bg-white dark:bg-surface-card-dark"
+                className="px-6 py-12 text-center text-xs text-gray-400 italic bg-transparent"
               >
                 No data available
               </td>
@@ -61,6 +61,31 @@ const Table = ({
         </tbody>
       </table>
     </div>
+  );
+};
+
+export const DataTable = ({
+  columns = [],
+  data = [],
+  searchQuery = '',
+  className = ''
+}) => {
+  const filteredData = data.filter((row) => {
+    if (!searchQuery.trim()) return true;
+    const searchLower = searchQuery.toLowerCase();
+    return Object.values(row).some(
+      (val) => val && String(val).toLowerCase().includes(searchLower)
+    );
+  });
+
+  return (
+    <Table
+      columns={columns}
+      data={filteredData}
+      className={className}
+      hoverable
+      striped
+    />
   );
 };
 

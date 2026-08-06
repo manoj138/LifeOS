@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Plus, Clock, CheckCircle2, Flame, Sparkles, ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Volume2, Trash2 } from 'lucide-react';
-import { SectionHeader } from '../components/common/SectionHeader';
-import { GlassCard } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
-import { Input } from '../components/ui/Input';
+import { SectionHeader, Button, Badge, Input, GlassCard, PomodoroTimer } from '../components/common';
 import { useUser } from '../context/UserContext';
 import { apiService } from '../services/api';
 
@@ -225,86 +221,7 @@ export const DailyPlanner = () => {
         {/* Pomodoro Timer & Energy Breakdown Sidebar */}
         <div className="space-y-6">
           {/* Integrated Pomodoro Focus Widget */}
-          <GlassCard className="p-6 space-y-5 border-purple-500/30">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-purple-300 flex items-center gap-2">
-                <Flame className="w-4 h-4 text-rose-500" />
-                Focus Pomodoro Timer
-              </span>
-              <button
-                onClick={playPomodoroChime}
-                title="Test Audio Chime"
-                className="p-1 rounded text-gray-400 hover:text-cyan-300 transition-colors"
-              >
-                <Volume2 className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Mode Switcher */}
-            <div className="grid grid-cols-3 gap-1 bg-white/5 p-1 rounded-xl text-xs font-semibold">
-              <button
-                onClick={() => switchPomodoroMode('work')}
-                className={`py-1.5 rounded-lg transition-all ${
-                  pomodoroMode === 'work' ? 'bg-purple-500 text-white shadow' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                Focus (25m)
-              </button>
-              <button
-                onClick={() => switchPomodoroMode('shortBreak')}
-                className={`py-1.5 rounded-lg transition-all ${
-                  pomodoroMode === 'shortBreak' ? 'bg-cyan-500 text-gray-950 font-bold shadow' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                Short (5m)
-              </button>
-              <button
-                onClick={() => switchPomodoroMode('longBreak')}
-                className={`py-1.5 rounded-lg transition-all ${
-                  pomodoroMode === 'longBreak' ? 'bg-indigo-500 text-white shadow' : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                Long (15m)
-              </button>
-            </div>
-
-            {/* Circular / Large Timer Display */}
-            <div className="text-center py-4 space-y-2">
-              <div className="text-5xl font-extrabold font-mono tracking-tight text-white drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                {formatTime(timeLeft)}
-              </div>
-              <p className="text-xs text-gray-400">
-                {pomodoroMode === 'work' ? '🧠 Deep Work Sprint' : '☕ Relax & Recharge'}
-              </p>
-
-              {/* Progress Line */}
-              <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden mt-3">
-                <div
-                  className="h-full bg-gradient-to-r from-cyan-400 to-purple-500 transition-all duration-500"
-                  style={{ width: `${timerProgress}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Timer Actions */}
-            <div className="flex items-center justify-center gap-3">
-              <Button
-                variant={isRunning ? 'secondary' : 'primary'}
-                onClick={() => setIsRunning(!isRunning)}
-                leftIcon={isRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                className="w-32"
-              >
-                {isRunning ? 'Pause' : 'Start'}
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => switchPomodoroMode(pomodoroMode)}
-                leftIcon={<RotateCcw className="w-4 h-4" />}
-              >
-                Reset
-              </Button>
-            </div>
-          </GlassCard>
+          <PomodoroTimer onTimerComplete={playPomodoroChime} />
 
           {/* AI Energy Breakdown Card */}
           <GlassCard className="p-6 space-y-4">
