@@ -4,12 +4,10 @@ const { generateTopicContent } = require('../helper/aiGenerator');
 
 const sortTopicsNaturally = (topics) => {
   return [...topics].sort((a, b) => {
-    // Extract leading number or keyword index if present
     const getNum = (item) => {
       const text = `${item.title || ''} ${item.topicName || ''}`.trim();
       const match = text.match(/^(\d+)[\.\)]/);
       if (match) return parseInt(match[1], 10);
-      if (/introduction|getting started|setup|basics|overview/i.test(text)) return 1;
       return null;
     };
 
@@ -22,8 +20,8 @@ const sortTopicsNaturally = (topics) => {
     if (numA !== null && numB === null) return -1;
     if (numA === null && numB !== null) return 1;
 
-    const orderA = a.order || 999;
-    const orderB = b.order || 999;
+    const orderA = Number.isInteger(a.order) ? a.order : 999;
+    const orderB = Number.isInteger(b.order) ? b.order : 999;
     if (orderA !== orderB) return orderA - orderB;
 
     return new Date(a.createdAt) - new Date(b.createdAt);
@@ -61,7 +59,6 @@ const updateTopic = async (req, res) => {
     let topic = await CurriculumTopic.findByPk(id);
 
     if (!topic) {
-      // Auto-create if new topic
       topic = await CurriculumTopic.create({
         id,
         moduleId: req.body.moduleId || 'js',
@@ -100,7 +97,6 @@ const generateSingleTopicWithAI = async (req, res) => {
       existingTopic = await CurriculumTopic.findByPk(topicId);
     }
 
-    // Strictly prioritize topicTitle typed in the input box if provided by user
     const titleToGenerate = (topicTitle && typeof topicTitle === 'string' && topicTitle.trim().length > 0)
       ? topicTitle.trim()
       : (existingTopic ? (existingTopic.topicName || existingTopic.title) : null);
@@ -151,7 +147,7 @@ const bulkGenerateSequence = async (req, res) => {
     if (Array.isArray(topicTitles)) {
       titlesList = topicTitles.filter(t => typeof t === 'string' && t.trim().length > 0);
     } else if (typeof topicTitles === 'string') {
-      titlesList = topicTitles.split('\n').map(t => t.replace(/^\d+[\.\)]\s*/, '').trim()).filter(Boolean);
+      titlesList = topicTitles.split('\n').map(t => t.trim()).filter(Boolean);
     }
 
     if (titlesList.length === 0) {
@@ -164,35 +160,36 @@ const bulkGenerateSequence = async (req, res) => {
     for (let i = 0; i < titlesList.length; i += BATCH_SIZE) {
       const batchTitles = titlesList.slice(i, i + BATCH_SIZE);
       const batchResults = await Promise.all(
-        batchTitles.map(async (title, idx) => {
+        batchTitles.map(async (rawTitle, idx) => {
           const globalIdx = i + idx;
+          const cleanTitle = rawTitle.replace(/^\d+[\.\)]\s*/, '').trim();
+          const numberedTitle = `${globalIdx + 1}. ${cleanTitle}`;
           const topicId = `${moduleId}-${Date.now()}-${globalIdx}`;
           try {
-            const content = await generateTopicContent(title, moduleId, level);
+            const content = await generateTopicContent(cleanTitle, moduleId, level);
 
-            // Upsert: Check if topic already exists for this module & title
             let existingTopic = await CurriculumTopic.findOne({
-              where: { moduleId: moduleId, topicName: title }
+              where: { moduleId: moduleId, topicName: cleanTitle }
             });
             if (!existingTopic) {
               existingTopic = await CurriculumTopic.findOne({
-                where: { moduleId: moduleId, title: title }
+                where: { moduleId: moduleId, title: numberedTitle }
               });
             }
 
             const payload = {
               moduleId: moduleId,
-              title: content.title || title,
-              topicName: title,
+              title: numberedTitle,
+              topicName: cleanTitle,
               level: level,
               order: globalIdx + 1,
               conceptExplanation: content.conceptExplanation || '',
               codeSnippet: content.codeSnippet || '',
               projectApplication: content.projectApplication || '',
               quizQuestions: content.quizQuestions || [],
-              taskTitle: content.taskTitle || `Task: ${title}`,
-              taskDescription: content.taskDescription || `Complete the practical coding exercise for ${title}`,
-              starterCode: content.starterCode || `// Write your code for ${title}\n`,
+              taskTitle: content.taskTitle || `Task: ${cleanTitle}`,
+              taskDescription: content.taskDescription || `Complete the practical coding exercise for ${cleanTitle}`,
+              starterCode: content.starterCode || `// Write your code for ${cleanTitle}\n`,
               solutionCriteria: content.solutionCriteria || `Return valid result object.`,
             };
 
@@ -206,7 +203,7 @@ const bulkGenerateSequence = async (req, res) => {
               });
             }
           } catch (err) {
-            console.error(`Error generating topic ${title}:`, err);
+            console.error(`Error generating topic ${rawTitle}:`, err);
             return null;
           }
         })
@@ -218,6 +215,34 @@ const bulkGenerateSequence = async (req, res) => {
     return sendSuccess(res, `Successfully generated ${generatedTopics.length} topics in sequence`, generatedTopics);
   } catch (error) {
     return sendError(res, 'Error generating curriculum sequence', error, 500);
+  }
+};
+
+const reorderTopicsSequentially = async (req, res) => {
+  try {
+    const { moduleId } = req.body;
+    if (!moduleId) {
+      return sendError(res, 'moduleId is required', null, 400);
+    }
+    const topics = await CurriculumTopic.findAll({ where: { moduleId } });
+    const sorted = sortTopicsNaturally(topics);
+
+    for (let i = 0; i < sorted.length; i++) {
+      const topic = sorted[i];
+      const rawTitle = topic.title || topic.topicName || '';
+      const cleanTitle = rawTitle.replace(/^\d+[\.\)]\s*/, '').trim();
+      const numberedTitle = `${i + 1}. ${cleanTitle}`;
+      await topic.update({
+        order: i + 1,
+        title: numberedTitle,
+        topicName: cleanTitle
+      });
+    }
+
+    const updatedTopics = await CurriculumTopic.findAll({ where: { moduleId }, order: [['order', 'ASC']] });
+    return sendSuccess(res, `Successfully re-indexed ${updatedTopics.length} topics sequentially`, updatedTopics);
+  } catch (error) {
+    return sendError(res, 'Error re-ordering curriculum topics', error, 500);
   }
 };
 
@@ -251,6 +276,7 @@ module.exports = {
   updateTopic,
   generateSingleTopicWithAI,
   bulkGenerateSequence,
+  reorderTopicsSequentially,
   deleteTopic,
   repairAllOutdatedTopics,
 };

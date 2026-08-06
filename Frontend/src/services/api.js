@@ -250,6 +250,15 @@ export const apiService = {
     }
   },
 
+  async reorderCurriculumTopics(moduleId) {
+    try {
+      const res = await Api.post('/curriculum/topics/reorder', { moduleId });
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
   // Job Applications
   async getJobApplications() {
     try {

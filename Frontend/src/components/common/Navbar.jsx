@@ -51,18 +51,6 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
         </span>
       </div>
 
-      {/* Center Search Bar Trigger (Cmd+K) */}
-      <button
-        onClick={onOpenCommandPalette}
-        className="hidden md:flex items-center gap-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 px-4 py-2 rounded-xl text-sm text-gray-400 hover:text-white transition-all w-80 shadow-inner group"
-      >
-        <Search className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition-colors" />
-        <span className="truncate">Search commands, tools...</span>
-        <span className="ml-auto text-xs font-mono bg-white/10 px-2 py-0.5 rounded text-gray-300 border border-white/10">
-          ⌘K
-        </span>
-      </button>
-
       {/* Right Action Icons & Status */}
       <div className="flex items-center gap-3">
         {/* Voice Guider Widget (Candidates Only) */}
@@ -73,16 +61,6 @@ export const Navbar = ({ onOpenCommandPalette, isSidebarCollapsed }) => {
           <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
           <span>AI Active</span>
         </div>
-
-        {/* Quick Action Button */}
-        <Button
-          size="sm"
-          variant="primary"
-          leftIcon={<Plus className="w-4 h-4" />}
-          onClick={onOpenCommandPalette}
-        >
-          Quick Action
-        </Button>
 
         {/* Notifications Button */}
         <button

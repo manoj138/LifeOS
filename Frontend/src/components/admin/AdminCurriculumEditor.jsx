@@ -919,6 +919,22 @@ export const AdminCurriculumEditor = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Existing Topics ({filteredTopics.length})</label>
+              {filteredTopics.length > 0 && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setIsLoadingTopics(true);
+                    await apiService.reorderCurriculumTopics(selectedModule);
+                    await fetchTopics();
+                    setIsLoadingTopics(false);
+                  }}
+                  className="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 transition-all"
+                  title="Re-index all topics sequentially from 1 to N in DB"
+                >
+                  <RefreshCw className="w-3 h-3 text-cyan-400" />
+                  <span>Re-index 1..N</span>
+                </button>
+              )}
             </div>
             <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
               {isLoadingTopics ? (
@@ -931,7 +947,7 @@ export const AdminCurriculumEditor = () => {
                   No topics in database yet for this module.
                 </div>
               ) : (
-                filteredTopics.map((t, idx) => (
+                filteredTopics.map((t) => (
                   <div key={t.id} className="flex items-center gap-1 group">
                     <button
                       type="button"
@@ -945,7 +961,7 @@ export const AdminCurriculumEditor = () => {
                           : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
                       }`}
                     >
-                      <span className="truncate">{idx + 1}. {t.title}</span>
+                      <span className="truncate">{t.title || t.topicName}</span>
                       {t.taskTitle && <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
                     </button>
                     <button

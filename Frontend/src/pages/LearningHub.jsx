@@ -32,6 +32,7 @@ import { SearchInput } from '../components/ui/SearchInput';
 import { DifficultyBadge } from '../components/ui/DifficultyBadge';
 import { FilterPills } from '../components/ui/FilterPills';
 import { EmptyStateCard } from '../components/ui/EmptyStateCard';
+import { useNavigate } from 'react-router-dom';
 
 export const LearningHub = () => {
   const navigate = useNavigate();
@@ -149,7 +150,6 @@ export const LearningHub = () => {
             const text = `${item.title || ''} ${item.topicName || ''}`.trim();
             const match = text.match(/^(\d+)[\.\)]/);
             if (match) return parseInt(match[1], 10);
-            if (/introduction|getting started|setup|basics|overview/i.test(text)) return 1;
             return null;
           };
           const numA = getNum(a);
@@ -641,8 +641,6 @@ export const LearningHub = () => {
                   >
                     📥 Cheat Sheet
                   </Button>
-
-                  <Badge variant="cyan" className="shrink-0">Topic {currentLessonData.id}</Badge>
                 </div>
               </div>
 
@@ -658,7 +656,7 @@ export const LearningHub = () => {
                       onClick={() => setShowCheatSheetModal(false)}
                       className="text-xs text-gray-400 hover:text-white"
                     >
-                      Close
+Close
                     </button>
                   </div>
                   <div className="p-4 rounded-xl bg-slate-950 border border-white/10 font-mono text-xs text-cyan-200 leading-relaxed whitespace-pre-line max-h-60 overflow-y-auto">
@@ -673,16 +671,15 @@ export const LearningHub = () => {
               )}
 
               {/* Reader View Selector Tabs */}
-              <div className="flex items-center gap-2 border-b border-white/10 pb-3 overflow-x-auto">
+              <div className="flex items-center gap-2 border-b border-white/10 pb-3 overflow-x-auto no-scrollbar">
                 {[
-                  { id: 'concept', label: '📖 Concept & Analogy', icon: BookOpen, color: 'text-cyan-400' },
-                  { id: 'code', label: '⚡ Bad vs Good Code', icon: Code2, color: 'text-emerald-400' },
-                  { id: 'project', label: '🛠️ Enterprise Use Case', icon: Briefcase, color: 'text-amber-400' },
-                  { id: 'task', label: '🎯 Chapter Challenge', icon: CheckSquare, color: 'text-emerald-400' },
-                  { id: 'quiz', label: '❓ Mandatory Quiz', icon: QuizIcon, color: 'text-rose-400' },
-                  { id: 'interview', label: '🗣️ Top Interview Q&A', icon: MessageSquare, color: 'text-purple-400' },
-                  { id: 'dsa', label: '🧩 Linked DSA Problem', icon: Cpu, color: 'text-amber-400' },
-                  { id: 'sandbox', label: '🧪 Live Sandbox', icon: Terminal, color: 'text-cyan-400' },
+                  { id: 'concept', label: '1. 📖 Concept & Analogy', icon: BookOpen, color: 'text-cyan-400' },
+                  { id: 'code', label: '2. ⚡ Bad vs Good Code', icon: Code2, color: 'text-emerald-400' },
+                  { id: 'project', label: '3. 🛠️ Enterprise Use Case', icon: Briefcase, color: 'text-amber-400' },
+                  { id: 'task', label: '4. 🎯 Challenge & Sandbox', icon: CheckSquare, color: 'text-emerald-400' },
+                  { id: 'quiz', label: '5. ❓ Mandatory Quiz', icon: QuizIcon, color: 'text-rose-400' },
+                  { id: 'interview', label: '6. 🗣️ Top Interview Q&A', icon: MessageSquare, color: 'text-purple-400' },
+                  { id: 'dsa', label: '7. 🧩 Linked DSA Problem', icon: Cpu, color: 'text-amber-400' },
                 ].map((tab) => {
                   const Icon = tab.icon;
                   const isSelected = activeTab === tab.id;
@@ -764,6 +761,19 @@ export const LearningHub = () => {
                           </div>
                         </div>
                       )}
+
+                      {/* Next Step Action Button */}
+                      <div className="pt-4 border-t border-white/10 flex justify-end">
+                        <Button
+                          variant="glow"
+                          size="sm"
+                          onClick={() => setActiveTab('code')}
+                          leftIcon={<ArrowRight className="w-4 h-4 text-cyan-400" />}
+                          className="bg-gradient-to-r from-cyan-600 to-blue-600 shadow-lg shadow-cyan-600/20"
+                        >
+                          Next Step: Bad vs Good Code ⚡ →
+                        </Button>
+                      </div>
                     </div>
                   )}
 
@@ -822,211 +832,244 @@ export const LearningHub = () => {
                           <pre className="overflow-x-auto p-3 bg-black/60 rounded-lg"><code>{currentLessonData.code}</code></pre>
                         </div>
                       ) : null}
+
+                      {/* Next Step Action Button */}
+                      <div className="pt-4 border-t border-white/10 flex justify-end">
+                        <Button
+                          variant="glow"
+                          size="sm"
+                          onClick={() => setActiveTab('project')}
+                          leftIcon={<ArrowRight className="w-4 h-4 text-emerald-400" />}
+                          className="bg-gradient-to-r from-emerald-600 to-teal-600 shadow-lg shadow-emerald-600/20"
+                        >
+                          Next Step: Enterprise Use Case 🛠️ →
+                        </Button>
+                      </div>
                     </div>
                   )}
 
-              {/* TAB 3: REAL-WORLD ENTERPRISE USE CASE */}
-              {activeTab === 'project' && (
-                <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-200 leading-relaxed font-sans whitespace-pre-line">
-                    <h3 className="font-bold text-emerald-300 mb-1 flex items-center gap-2 text-sm">
-                      <Briefcase className="w-4 h-4" /> How Enterprise MERN & DevOps Apps Use This:
-                    </h3>
-                    {currentLessonData.useCases}
-                  </div>
-                </div>
-              )}
+                  {/* TAB 3: REAL-WORLD ENTERPRISE USE CASE */}
+                  {activeTab === 'project' && (
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-200 leading-relaxed font-sans whitespace-pre-line">
+                        <h3 className="font-bold text-emerald-300 mb-1 flex items-center gap-2 text-sm">
+                          <Briefcase className="w-4 h-4" /> How Enterprise MERN & DevOps Apps Use This:
+                        </h3>
+                        {currentLessonData.useCases}
+                      </div>
 
-              {/* TAB 4: MANDATORY SELF-QUIZ & QA */}
-              {activeTab === 'quiz' && (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <QuizIcon className="w-4 h-4 text-purple-400" /> Mandatory Quiz Verification for {currentLessonData.title}
-                  </h3>
+                      {/* Next Step Action Button */}
+                      <div className="pt-4 border-t border-white/10 flex justify-end">
+                        <Button
+                          variant="glow"
+                          size="sm"
+                          onClick={() => setActiveTab('task')}
+                          leftIcon={<ArrowRight className="w-4 h-4 text-amber-400" />}
+                          className="bg-gradient-to-r from-amber-600 to-orange-600 shadow-lg shadow-amber-600/20"
+                        >
+                          Next Step: Challenge & Sandbox 🎯 →
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
-                  <p className="text-xs text-amber-300 font-semibold bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl">
-                    ⚠️ You must answer all quiz questions correctly to unlock completion and advance to the next topic!
-                  </p>
+                  {/* TAB 4: CHAPTER TASK & CODING CHALLENGE */}
+                  {activeTab === 'task' && (
+                    <div className="space-y-4 font-sans">
+                      <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-200 space-y-2">
+                        <h3 className="text-sm font-bold text-emerald-300 flex items-center gap-2">
+                          <CheckSquare className="w-4 h-4 text-emerald-400" />
+                          {currentLessonData.taskTitle || `Chapter Task: ${currentLessonData.title}`}
+                        </h3>
+                        <p className="text-xs text-gray-300 leading-relaxed">
+                          {currentLessonData.taskDescription}
+                        </p>
+                      </div>
 
-                  {currentLessonData.quiz && currentLessonData.quiz.length > 0 ? (
-                    currentLessonData.quiz.map((q, qIdx) => {
-                      const selectedOpt = quizAnswers[qIdx];
-                      const isSubmitted = selectedOpt !== undefined;
-                      const isCorrect = selectedOpt === q.correctIndex;
+                      <div className="space-y-2">
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                          Task Solution Criteria:
+                        </span>
+                        <p className="text-xs font-mono text-cyan-300 bg-black/40 p-3 rounded-xl border border-cyan-500/30">
+                          {currentLessonData.solutionCriteria}
+                        </p>
+                      </div>
 
-                      return (
-                        <div key={qIdx} className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-3">
-                          <p className="text-xs font-bold text-white">Q{qIdx + 1}: {q.question}</p>
-                          <div className="space-y-2">
-                            {q.options.map((opt, optIdx) => {
-                              let btnStyle = "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10";
-                              if (isSubmitted) {
-                                if (optIdx === q.correctIndex) {
-                                  btnStyle = "bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold";
-                                } else if (optIdx === selectedOpt) {
-                                  btnStyle = "bg-rose-500/20 border-rose-500 text-rose-300 font-bold";
-                                }
-                              }
+                      <div className="space-y-2">
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                          <Terminal className="w-4 h-4 text-cyan-400" /> Live Interactive Practice Sandbox:
+                        </span>
+                        <CodeEditor
+                          initialFiles={[
+                            { name: "task_solution.js", lang: "javascript", code: currentLessonData.starterCode || currentLessonData.code || `// Complete task code here\n` }
+                          ]}
+                        />
+                      </div>
 
-                              return (
-                                <button
-                                  key={optIdx}
-                                  onClick={() => setQuizAnswers({ ...quizAnswers, [qIdx]: optIdx })}
-                                  className={`w-full text-left p-3 rounded-lg text-xs border transition-all flex items-center justify-between ${btnStyle}`}
-                                >
-                                  <span>{opt}</span>
-                                  {isSubmitted && optIdx === q.correctIndex && (
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
+                      {/* Next Step Action Button */}
+                      <div className="pt-4 border-t border-white/10 flex justify-end">
+                        <Button
+                          variant="glow"
+                          size="sm"
+                          onClick={() => setActiveTab('quiz')}
+                          leftIcon={<ArrowRight className="w-4 h-4 text-rose-400" />}
+                          className="bg-gradient-to-r from-rose-600 to-purple-600 shadow-lg shadow-rose-600/20"
+                        >
+                          Next Step: Mandatory Quiz ❓ →
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
-                          {isSubmitted && (
-                            <div className={`p-3 rounded-lg text-xs leading-relaxed ${isCorrect ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'}`}>
-                              <strong>{isCorrect ? "Correct! 🎉" : "Explanation:"}</strong> {q.explanation}
+                  {/* TAB 5: MANDATORY SELF-QUIZ & QA */}
+                  {activeTab === 'quiz' && (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                        <QuizIcon className="w-4 h-4 text-purple-400" /> Mandatory Quiz Verification for {currentLessonData.title}
+                      </h3>
+
+                      <p className="text-xs text-amber-300 font-semibold bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl">
+                        ⚠️ You must answer all quiz questions correctly to unlock completion and advance to the next topic!
+                      </p>
+
+                      {currentLessonData.quiz && currentLessonData.quiz.length > 0 ? (
+                        currentLessonData.quiz.map((q, qIdx) => {
+                          const selectedOpt = quizAnswers[qIdx];
+                          const isSubmitted = selectedOpt !== undefined;
+                          const isCorrect = selectedOpt === q.correctIndex;
+
+                          return (
+                            <div key={qIdx} className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-3">
+                              <p className="text-xs font-bold text-white">Q{qIdx + 1}: {q.question}</p>
+                              <div className="space-y-2">
+                                {q.options.map((opt, optIdx) => {
+                                  let btnStyle = "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10";
+                                  if (isSubmitted) {
+                                    if (optIdx === q.correctIndex) {
+                                      btnStyle = "bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold";
+                                    } else if (optIdx === selectedOpt) {
+                                      btnStyle = "bg-rose-500/20 border-rose-500 text-rose-300 font-bold";
+                                    }
+                                  }
+
+                                  return (
+                                    <button
+                                      key={optIdx}
+                                      onClick={() => setQuizAnswers({ ...quizAnswers, [qIdx]: optIdx })}
+                                      className={`w-full text-left p-3 rounded-lg text-xs border transition-all flex items-center justify-between ${btnStyle}`}
+                                    >
+                                      <span>{opt}</span>
+                                      {isSubmitted && optIdx === q.correctIndex && (
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {isSubmitted && (
+                                <div className={`p-3 rounded-lg text-xs leading-relaxed ${isCorrect ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'}`}>
+                                  <strong>{isCorrect ? "Correct! 🎉" : "Explanation:"}</strong> {q.explanation}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="text-xs text-gray-400">No quiz questions generated for this topic yet.</p>
+                          );
+                        })
+                      ) : (
+                        <p className="text-xs text-gray-400">No quiz questions generated for this topic yet.</p>
+                      )}
+                      <div className="pt-4 border-t border-white/10 flex justify-end">
+                        <Button
+                          variant="glow"
+                          size="sm"
+                          onClick={() => setActiveTab('interview')}
+                          leftIcon={<ArrowRight className="w-4 h-4 text-purple-400" />}
+                          className="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-600/20"
+                        >
+                          Next Step: Top Interview Q&A 🗣️ →
+                        </Button>
+                      </div>
+                    </div>
                   )}
-                </div>
-              )}
 
-              {/* TAB: CHAPTER TASK & CODING CHALLENGE */}
-              {activeTab === 'task' && (
-                <div className="space-y-4 font-sans">
-                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-200 space-y-2">
-                    <h3 className="text-sm font-bold text-emerald-300 flex items-center gap-2">
-                      <CheckSquare className="w-4 h-4 text-emerald-400" />
-                      {currentLessonData.taskTitle || `Chapter Task: ${currentLessonData.title}`}
-                    </h3>
-                    <p className="text-xs text-gray-300 leading-relaxed">
-                      {currentLessonData.taskDescription}
-                    </p>
-                  </div>
+                  {/* TAB 6: TOP INTERVIEW Q&A */}
+                  {activeTab === 'interview' && (
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-xs text-purple-200 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-bold text-purple-300 flex items-center gap-2">
+                            <MessageSquare className="w-4 h-4 text-purple-400" />
+                            Top Interview Question for {currentLessonData.title}
+                          </h3>
+                          <Badge variant="purple">HR & Tech Favorite</Badge>
+                        </div>
+                        <p className="text-xs font-semibold text-white">
+                          "How would you explain {currentLessonData.title} to an interviewer, and when would you avoid using it?"
+                        </p>
+                        <div className="p-3 bg-black/40 rounded-xl border border-white/10 text-gray-300 text-xs leading-relaxed space-y-1">
+                          <strong className="text-cyan-400 block">💡 Standard High-Scoring Answer:</strong>
+                          <p>{currentLessonData.summary || `Explain the core concept clearly, highlighting performance implications, memory safety, and practical production use cases.`}</p>
+                        </div>
+                        <div className="pt-2 flex justify-end">
+                          <Button
+                            size="xs"
+                            variant="glow"
+                            onClick={() => navigate('/app/interview')}
+                            leftIcon={<Sparkles className="w-3.5 h-3.5 text-cyan-400" />}
+                          >
+                            Practice in Live Teleprompter Studio 🎙️
+                          </Button>
+                        </div>
+                      </div>
 
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                      Task Solution Criteria:
-                    </span>
-                    <p className="text-xs font-mono text-cyan-300 bg-black/40 p-3 rounded-xl border border-cyan-500/30">
-                      {currentLessonData.solutionCriteria}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                      Starter Code Boilerplate:
-                    </span>
-                    <CodeEditor
-                      initialFiles={[
-                        { name: "task_solution.js", lang: "javascript", code: currentLessonData.starterCode || currentLessonData.code || `// Complete task code here\n` }
-                      ]}
-                    />
-                  </div>
-
-                  <div className="pt-2 flex justify-end">
-                    <Button
-                      variant="glow"
-                      size="sm"
-                      onClick={markCompleteWithQuizCheck}
-                      disabled={!isCurrentTopicUnlocked}
-                      leftIcon={<CheckCircle2 className="w-4 h-4 text-emerald-300" />}
-                      className="bg-gradient-to-r from-emerald-600 to-teal-600"
-                    >
-                      {completedLessons.includes(currentLessonData.id) 
-                        ? "Chapter Task Mastered ✓" 
-                        : "Submit Task & Unlock Next Chapter 🔓"}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB: TOP INTERVIEW Q&A */}
-              {activeTab === 'interview' && (
-                <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-xs text-purple-200 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-purple-300 flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4 text-purple-400" />
-                        Top Interview Question for {currentLessonData.title}
-                      </h3>
-                      <Badge variant="purple">HR & Tech Favorite</Badge>
+                      {/* Next Step Action Button */}
+                      <div className="pt-4 border-t border-white/10 flex justify-end">
+                        <Button
+                          variant="glow"
+                          size="sm"
+                          onClick={() => setActiveTab('dsa')}
+                          leftIcon={<ArrowRight className="w-4 h-4 text-amber-400" />}
+                          className="bg-gradient-to-r from-amber-600 to-purple-600 shadow-lg shadow-amber-600/20"
+                        >
+                          Next Step: Linked DSA Problem 🧩 →
+                        </Button>
+                      </div>
                     </div>
-                    <p className="text-xs font-semibold text-white">
-                      "How would you explain {currentLessonData.title} to an interviewer, and when would you avoid using it?"
-                    </p>
-                    <div className="p-3 bg-black/40 rounded-xl border border-white/10 text-gray-300 text-xs leading-relaxed space-y-1">
-                      <strong className="text-cyan-400 block">💡 Standard High-Scoring Answer:</strong>
-                      <p>{currentLessonData.summary || `Explain the core concept clearly, highlighting performance implications, memory safety, and practical production use cases.`}</p>
-                    </div>
-                    <div className="pt-2 flex justify-end">
-                      <Button
-                        size="xs"
-                        variant="glow"
-                        onClick={() => navigate('/app/interview')}
-                        leftIcon={<Sparkles className="w-3.5 h-3.5 text-cyan-400" />}
-                      >
-                        Practice in Live Teleprompter Studio 🎙️
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {/* TAB: LINKED DSA PROBLEM */}
-              {activeTab === 'dsa' && (
-                <div className="space-y-4 font-sans">
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-amber-300 flex items-center gap-2">
-                        <Cpu className="w-4 h-4 text-amber-400" />
-                        Target DSA Problem linked to {currentLessonData.title}
-                      </h3>
-                      <DifficultyBadge level={currentLessonData.difficulty || 'Beginner'} />
+                  {/* TAB 7: LINKED DSA PROBLEM */}
+                  {activeTab === 'dsa' && (
+                    <div className="space-y-4 font-sans">
+                      <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-bold text-amber-300 flex items-center gap-2">
+                            <Cpu className="w-4 h-4 text-amber-400" />
+                            Target DSA Problem linked to {currentLessonData.title}
+                          </h3>
+                          <DifficultyBadge level={currentLessonData.difficulty || 'Beginner'} />
+                        </div>
+                        <p className="text-xs text-gray-200 leading-relaxed">
+                          Practical Algorithmic Problem: Apply <strong>{currentLessonData.title}</strong> principles to solve edge cases and achieve optimized time complexity.
+                        </p>
+                        <div className="p-3 bg-black/50 rounded-xl border border-amber-500/20 font-mono text-xs text-amber-200">
+                          <code>{currentLessonData.starterCode || `// DSA Problem Starter Code\nfunction solveProblem(input) {\n  // Apply ${currentLessonData.title} logic here\n}`}</code>
+                        </div>
+                        <div className="pt-2 flex justify-end">
+                          <Button
+                            size="xs"
+                            variant="primary"
+                            onClick={() => navigate(`/app/dsa?topic=${encodeURIComponent(currentLessonData.title)}`)}
+                            leftIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                            className="bg-amber-600 hover:bg-amber-500 text-white"
+                          >
+                            Solve in DSA Algorithmic Studio 🧩
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-200 leading-relaxed">
-                      Practical Algorithmic Problem: Apply <strong>{currentLessonData.title}</strong> principles to solve edge cases and achieve optimized time complexity.
-                    </p>
-                    <div className="p-3 bg-black/50 rounded-xl border border-amber-500/20 font-mono text-xs text-amber-200">
-                      <code>{currentLessonData.starterCode || `// DSA Problem Starter Code\nfunction solveProblem(input) {\n  // Apply ${currentLessonData.title} logic here\n}`}</code>
-                    </div>
-                    <div className="pt-2 flex justify-end">
-                      <Button
-                        size="xs"
-                        variant="primary"
-                        onClick={() => navigate(`/app/dsa?topic=${encodeURIComponent(currentLessonData.title)}`)}
-                        leftIcon={<ArrowRight className="w-3.5 h-3.5" />}
-                        className="bg-amber-600 hover:bg-amber-500 text-white"
-                      >
-                        Solve in DSA Algorithmic Studio 🧩
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 6: LIVE SANDBOX */}
-              {activeTab === 'sandbox' && (
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-                    <Terminal className="w-4 h-4" /> Practice Workspace for {currentLessonData.title}
-                  </h3>
-
-                  <CodeEditor
-                    initialFiles={[
-                      { name: "practice.js", lang: "javascript", code: currentLessonData.code || `console.log("Practicing ${currentLessonData.title}");` }
-                    ]}
-                  />
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+                  )}
+                </motion.div>
+              </AnimatePresence>
 
               {/* Action Bar */}
               <div className="pt-4 border-t border-white/10 flex items-center justify-between">
