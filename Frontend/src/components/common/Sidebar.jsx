@@ -60,17 +60,21 @@ export const Sidebar = ({ isCollapsed, onToggle }) => {
       ]
     },
     {
-      title: "Interview Simulator",
+      title: "Career & Interviews",
       items: [
         { path: '/app/interview', label: 'Interview Prep', icon: MessageSquareCode, badge: 'AI' },
-        { path: '/app/english', label: 'English Coach', icon: Mic, badge: null }
+        { path: '/app/english', label: 'English Coach', icon: Mic, badge: null },
+        { path: '/app/jobs', label: 'Job Applications', icon: Briefcase, badge: 'Pipeline' }
       ]
     },
     {
-      title: "Portfolio & Progress",
+      title: "Portfolio & Wellness",
       items: [
         { path: '/app/projects', label: 'Project Portfolio', icon: FolderKanban, badge: null },
         { path: '/app/goals', label: 'Goals', icon: Target, badge: null },
+        { path: '/app/fitness', label: 'Fitness Tracker', icon: Dumbbell, badge: null },
+        { path: '/app/habits', label: 'Habit Matrix', icon: Flame, badge: null },
+        { path: '/app/journal', label: 'Growth Journal', icon: BookMarked, badge: 'AI' },
         { path: '/app/analytics', label: 'Analytics', icon: LineChart, badge: null },
         { path: '/app/settings', label: 'Settings', icon: Settings, badge: null }
       ]

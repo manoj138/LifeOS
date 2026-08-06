@@ -99,17 +99,6 @@ export const AuthPage = () => {
           activeTab={activeTab}
           onChange={setActiveTab}
         />
-        <button
-          type="button"
-          onClick={() => {
-            setEmail('admin@lifeos.ai');
-            setPassword('admin@123');
-            if (activeTab === 'register') setName('System Admin');
-          }}
-          className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold underline flex items-center gap-1 cursor-pointer transition-colors mt-1"
-        >
-          ⚡ Auto-fill Admin Credentials (admin@lifeos.ai)
-        </button>
       </div>
 
 
