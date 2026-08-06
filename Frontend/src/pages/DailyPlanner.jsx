@@ -33,34 +33,26 @@ export const DailyPlanner = () => {
   const [newTaskStart, setNewTaskStart] = useState('09:00 AM');
   const [newTaskEnd, setNewTaskEnd] = useState('10:00 AM');
 
-  // Pomodoro Timer State
-  const [pomodoroMode, setPomodoroMode] = useState('work'); // 'work' | 'shortBreak' | 'longBreak'
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
-  const [isRunning, setIsRunning] = useState(false);
-
-
-  // Pomodoro countdown effect
-  useEffect(() => {
-    let timer = null;
-    if (isRunning && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0 && isRunning) {
-      setIsRunning(false);
-      playPomodoroChime();
+  // Web Audio API Synthesized Chime Audio Generator
+  const playPomodoroChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {
+      console.log('Audio chime synthesis:', e);
     }
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [isRunning, timeLeft]);
-
-  const switchPomodoroMode = (mode) => {
-    setPomodoroMode(mode);
-    setIsRunning(false);
-    if (mode === 'work') setTimeLeft(25 * 60);
-    else if (mode === 'shortBreak') setTimeLeft(5 * 60);
-    else if (mode === 'longBreak') setTimeLeft(15 * 60);
   };
 
   const toggleTask = (id) => {
@@ -98,9 +90,6 @@ export const DailyPlanner = () => {
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((t) => t.completed).length;
   const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
-  const totalPomodoroTime = pomodoroMode === 'work' ? 25 * 60 : pomodoroMode === 'shortBreak' ? 5 * 60 : 15 * 60;
-  const timerProgress = Math.round(((totalPomodoroTime - timeLeft) / totalPomodoroTime) * 100);
 
   const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
 

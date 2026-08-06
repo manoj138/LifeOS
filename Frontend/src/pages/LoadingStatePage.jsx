@@ -1,18 +1,15 @@
 import React from 'react';
-import { Bot } from 'lucide-react';
+import { Bot, Sparkles } from 'lucide-react';
 import { Skeleton } from '../components/ui/Skeleton';
 import { SectionHeader } from '../components/common/SectionHeader';
-import { LottieAnimation } from '../components/ui/LottieAnimation';
 
 export const LoadingStatePage = () => {
   return (
     <div className="space-y-8 pb-12 text-center">
       <div className="py-6 flex flex-col items-center justify-center">
-        <LottieAnimation
-          src="https://assets2.lottiefiles.com/packages/lf20_mbe2aawl.json"
-          className="w-44 h-44 mb-2"
-          fallbackIcon={<Bot className="w-16 h-16 text-purple-400 animate-pulse" />}
-        />
+        <div className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-cyan-500/20 to-purple-600/20 border border-purple-500/30 flex items-center justify-center text-cyan-400 mb-4 shadow-xl shadow-purple-500/10 animate-pulse">
+          <Bot className="w-12 h-12 text-cyan-400" />
+        </div>
         <SectionHeader
           badge="Loading State"
           title="Synthesizing AI Workspace..."

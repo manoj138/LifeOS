@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen, CheckCircle2, Play, ArrowRight, Sparkles, Terminal,
   ChevronRight, Lock, HelpCircle, MessageSquare, Code2, RefreshCw, Award,
@@ -666,181 +667,154 @@ export const LearningHub = () => {
 
               {/* Reader View Selector Tabs */}
               <div className="flex items-center gap-2 border-b border-white/10 pb-3 overflow-x-auto">
-                <button
-                  onClick={() => setActiveTab('concept')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    activeTab === 'concept'
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-cyan-400" /> 📖 Concept & Analogy
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('code')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    activeTab === 'code'
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Code2 className="w-3.5 h-3.5 text-emerald-400" /> ⚡ Bad vs Good Code
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('project')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    activeTab === 'project'
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Briefcase className="w-3.5 h-3.5 text-amber-400" /> 🛠️ Enterprise Use Case
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('task')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    activeTab === 'task'
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <CheckSquare className="w-3.5 h-3.5 text-emerald-400" /> 🎯 Chapter Task & Challenge
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('quiz')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    activeTab === 'quiz'
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <QuizIcon className="w-3.5 h-3.5 text-rose-400" /> ❓ Mandatory Quiz & QA
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('sandbox')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    activeTab === 'sandbox'
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Terminal className="w-3.5 h-3.5 text-cyan-400" /> 🧪 Live Sandbox
-                </button>
+                {[
+                  { id: 'concept', label: '📖 Concept & Analogy', icon: BookOpen, color: 'text-cyan-400' },
+                  { id: 'code', label: '⚡ Bad vs Good Code', icon: Code2, color: 'text-emerald-400' },
+                  { id: 'project', label: '🛠️ Enterprise Use Case', icon: Briefcase, color: 'text-amber-400' },
+                  { id: 'task', label: '🎯 Chapter Challenge', icon: CheckSquare, color: 'text-emerald-400' },
+                  { id: 'quiz', label: '❓ Mandatory Quiz', icon: QuizIcon, color: 'text-rose-400' },
+                  { id: 'sandbox', label: '🧪 Live Sandbox', icon: Terminal, color: 'text-cyan-400' },
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  const isSelected = activeTab === tab.id;
+                  return (
+                    <motion.button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`relative px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                        isSelected ? 'text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      {isSelected && (
+                        <motion.div
+                          layoutId="activeSubTabIndicator"
+                          className="absolute inset-0 bg-gradient-to-r from-purple-600/40 to-cyan-500/30 border border-purple-500/40 rounded-xl shadow-lg shadow-purple-500/10 -z-10"
+                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        />
+                      )}
+                      <Icon className={`w-3.5 h-3.5 ${tab.color}`} />
+                      <span>{tab.label}</span>
+                    </motion.button>
+                  );
+                })}
               </div>
 
-              {/* TAB 1: CONCEPT & ANALOGY */}
-              {activeTab === 'concept' && (
-                <div className="space-y-5">
-                  {/* 💡 Concept Overview */}
-                  <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 text-xs text-cyan-200 font-medium leading-relaxed flex items-start gap-3">
-                    <Lightbulb className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="block text-cyan-300 font-bold mb-0.5">💡 Core Goal & Beginner Summary:</strong>
-                      {currentLessonData.summary}
-                    </div>
-                  </div>
-
-                  {/* 🏠 Everyday Analogy */}
-                  {currentLessonData.analogy && (
-                    <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/25 text-xs text-purple-200 leading-relaxed font-sans whitespace-pre-line">
-                      {currentLessonData.analogy}
-                    </div>
-                  )}
-
-                  {/* 📖 Step-by-Step Technical Guide */}
-                  {currentLessonData.notes && (
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-purple-400" />
-                        Step-by-Step Execution Mechanics
-                      </h3>
-                      <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-                        <FormattedMarkdown content={currentLessonData.notes} />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab + (currentLessonData?.id || 0)}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  {/* TAB 1: CONCEPT & ANALOGY */}
+                  {activeTab === 'concept' && (
+                    <div className="space-y-5">
+                      {/* 💡 Concept Overview */}
+                      <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 text-xs text-cyan-200 font-medium leading-relaxed flex items-start gap-3">
+                        <Lightbulb className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="block text-cyan-300 font-bold mb-0.5">💡 Core Goal & Beginner Summary:</strong>
+                          {currentLessonData.summary}
+                        </div>
                       </div>
-                    </div>
-                  )}
 
-                  {/* 🎯 Core Takeaways */}
-                  {currentLessonData.keyTakeaways && (
-                    <div className="space-y-2">
-                      <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-                        <CheckSquare className="w-4 h-4" /> Essential Points to Remember
-                      </h3>
-                      <div className="space-y-1.5">
-                        {currentLessonData.keyTakeaways.map((kt, i) => (
-                          <div key={i} className="flex items-start gap-2 text-xs text-gray-200 p-2.5 rounded-xl bg-white/5 border border-white/10">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                            <span>{kt}</span>
+                      {/* 🏠 Everyday Analogy */}
+                      {currentLessonData.analogy && (
+                        <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/25 text-xs text-purple-200 leading-relaxed font-sans whitespace-pre-line">
+                          {currentLessonData.analogy}
+                        </div>
+                      )}
+
+                      {/* 📖 Step-by-Step Technical Guide */}
+                      {currentLessonData.notes && (
+                        <div className="space-y-2">
+                          <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-purple-400" />
+                            Step-by-Step Execution Mechanics
+                          </h3>
+                          <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                            <FormattedMarkdown content={currentLessonData.notes} />
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                        </div>
+                      )}
 
-              {/* TAB 2: CODE COMPARISON & LIVE RUNNER */}
-              {activeTab === 'code' && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-300">
-                      Understanding <strong>bad practices vs recommended code</strong> is the fastest way to write bug-free applications:
-                    </p>
-                    {currentLessonData.code && (
-                      <Button
-                        size="xs"
-                        variant="glow"
-                        onClick={() => handleRunLiveCode(currentLessonData.goodCode || currentLessonData.code)}
-                        leftIcon={<Play className="w-3.5 h-3.5 text-emerald-400" />}
-                      >
-                        ⚡ Execute Live Code
-                      </Button>
-                    )}
-                  </div>
-
-                  {executionOutput && (
-                    <div className="p-4 rounded-xl bg-slate-950 border border-emerald-500/40 font-mono text-xs text-emerald-300 space-y-2 animate-fadeIn">
-                      <div className="flex items-center justify-between text-[11px] text-gray-400 border-b border-white/10 pb-1">
-                        <span className="flex items-center gap-1.5 font-bold text-emerald-400">
-                          <Terminal className="w-3.5 h-3.5" /> Live Terminal Console Output
-                        </span>
-                        <button type="button" onClick={() => setExecutionOutput(null)} className="hover:text-white">Clear</button>
-                      </div>
-                      <pre className="whitespace-pre-wrap">{executionOutput}</pre>
+                      {/* 🎯 Core Takeaways */}
+                      {currentLessonData.keyTakeaways && (
+                        <div className="space-y-2">
+                          <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                            <CheckSquare className="w-4 h-4" /> Essential Points to Remember
+                          </h3>
+                          <div className="space-y-1.5">
+                            {currentLessonData.keyTakeaways.map((kt, i) => (
+                              <div key={i} className="flex items-start gap-2 text-xs text-gray-200 p-2.5 rounded-xl bg-white/5 border border-white/10">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                                <span>{kt}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
-                  {currentLessonData.badCode && currentLessonData.goodCode ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 space-y-2 font-mono text-xs text-rose-300">
-                        <span className="text-[11px] font-bold text-rose-400 uppercase flex items-center gap-1.5">
-                          <AlertTriangle className="w-4 h-4" /> ❌ Incorrect (Unoptimized Pattern):
-                        </span>
-                        <pre className="overflow-x-auto p-2.5 bg-black/40 rounded-lg"><code>{currentLessonData.badCode}</code></pre>
+                  {/* TAB 2: CODE COMPARISON & LIVE RUNNER */}
+                  {activeTab === 'code' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-gray-300">
+                          Understanding <strong>bad practices vs recommended code</strong> is the fastest way to write bug-free applications:
+                        </p>
+                        {currentLessonData.code && (
+                          <Button
+                            size="xs"
+                            variant="glow"
+                            onClick={() => handleRunLiveCode(currentLessonData.goodCode || currentLessonData.code)}
+                            leftIcon={<Play className="w-3.5 h-3.5 text-emerald-400" />}
+                          >
+                            ⚡ Execute Live Code
+                          </Button>
+                        )}
                       </div>
 
-                      <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-2 font-mono text-xs text-emerald-300">
-                        <span className="text-[11px] font-bold text-emerald-400 uppercase flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4" /> ✅ Recommended (Production Pattern):
-                        </span>
-                        <pre className="overflow-x-auto p-2.5 bg-black/40 rounded-lg"><code>{currentLessonData.goodCode}</code></pre>
-                      </div>
+                      {executionOutput && (
+                        <div className="p-4 rounded-xl bg-slate-950 border border-emerald-500/40 font-mono text-xs text-emerald-300 space-y-2 animate-fadeIn">
+                          <div className="flex items-center justify-between text-[11px] text-gray-400 border-b border-white/10 pb-1">
+                            <span className="flex items-center gap-1.5 font-bold text-emerald-400">
+                              <Terminal className="w-3.5 h-3.5" /> Live Terminal Console Output
+                            </span>
+                            <button type="button" onClick={() => setExecutionOutput(null)} className="hover:text-white">Clear</button>
+                          </div>
+                          <pre className="whitespace-pre-wrap">{executionOutput}</pre>
+                        </div>
+                      )}
+
+                      {currentLessonData.badCode && currentLessonData.goodCode ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 space-y-2 font-mono text-xs text-rose-300">
+                            <span className="text-[11px] font-bold text-rose-400 uppercase flex items-center gap-1.5">
+                              <AlertTriangle className="w-4 h-4" /> ❌ Incorrect (Unoptimized Pattern):
+                            </span>
+                            <pre className="overflow-x-auto p-2.5 bg-black/40 rounded-lg"><code>{currentLessonData.badCode}</code></pre>
+                          </div>
+
+                          <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-2 font-mono text-xs text-emerald-300">
+                            <span className="text-[11px] font-bold text-emerald-400 uppercase flex items-center gap-1.5">
+                              <CheckCircle2 className="w-4 h-4" /> ✅ Recommended (Production Pattern):
+                            </span>
+                            <pre className="overflow-x-auto p-2.5 bg-black/40 rounded-lg"><code>{currentLessonData.goodCode}</code></pre>
+                          </div>
+                        </div>
+                      ) : currentLessonData.code ? (
+                        <div className="p-4 rounded-xl bg-slate-950/80 border border-purple-500/30 font-mono text-xs text-cyan-300 space-y-2">
+                          <span className="text-[11px] font-bold text-purple-400 uppercase block">
+                            ⚡ Code Implementation Template:
+                          </span>
+                          <pre className="overflow-x-auto p-3 bg-black/60 rounded-lg"><code>{currentLessonData.code}</code></pre>
+                        </div>
+                      ) : null}
                     </div>
-                  ) : currentLessonData.code ? (
-                    <div className="p-4 rounded-xl bg-slate-950/80 border border-purple-500/30 font-mono text-xs text-cyan-300 space-y-2">
-                      <span className="text-[11px] font-bold text-purple-400 uppercase block">
-                        ⚡ Code Implementation Template:
-                      </span>
-                      <pre className="overflow-x-auto p-3 bg-black/60 rounded-lg"><code>{currentLessonData.code}</code></pre>
-                    </div>
-                  ) : null}
-                </div>
-              )}
+                  )}
 
               {/* TAB 3: REAL-WORLD ENTERPRISE USE CASE */}
               {activeTab === 'project' && (
@@ -964,7 +938,7 @@ export const LearningHub = () => {
                 </div>
               )}
 
-              {/* TAB 5: LIVE SANDBOX */}
+              {/* TAB 6: LIVE SANDBOX */}
               {activeTab === 'sandbox' && (
                 <div className="space-y-3">
                   <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
@@ -978,6 +952,8 @@ export const LearningHub = () => {
                   />
                 </div>
               )}
+            </motion.div>
+          </AnimatePresence>
 
               {/* Action Bar */}
               <div className="pt-4 border-t border-white/10 flex items-center justify-between">

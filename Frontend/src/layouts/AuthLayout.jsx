@@ -2,15 +2,16 @@ import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Bot, Sparkles } from 'lucide-react';
 import aiRobotVectorArtSvg from '../assets/graident-ai-robot-vectorart/Ai Robot Vector Art.svg';
+import { SplineHero } from '../components/illustrations/SplineHero';
 
 export const AuthLayout = () => {
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[#070709] flex items-center justify-center p-6 relative overflow-hidden">
       {/* Ambient background glowing light nodes */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
-      <div className="w-full max-w-5xl bg-[#121218]/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2">
+      <div className="w-full max-w-5xl bg-[#14141b]/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2">
         {/* Left Side: Branding Showcase */}
         <div className="p-8 lg:p-12 flex flex-col justify-between bg-gradient-to-br from-blue-900/20 via-purple-900/10 to-transparent border-r border-white/10 relative">
           <Link to="/" className="flex items-center gap-3 w-fit">
@@ -24,13 +25,9 @@ export const AuthLayout = () => {
             </span>
           </Link>
 
-          <div className="my-6 flex flex-col items-center text-center relative">
+          <div className="my-4 flex flex-col items-center text-center relative">
             <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 via-cyan-500/20 to-pink-500/20 rounded-full blur-2xl pointer-events-none animate-pulse-glow" />
-            <img
-              src={aiRobotVectorArtSvg}
-              alt="LifeOS AI Robot Mentor"
-              className="w-full max-w-xs h-auto my-4 drop-shadow-[0_10px_30px_rgba(168,85,247,0.4)] transform hover:scale-105 transition-transform duration-300 relative z-10"
-            />
+            <SplineHero className="w-full h-[240px] my-2 relative z-10" />
             <h2 className="text-2xl font-extrabold text-white tracking-tight">
               Elevate Your Career & Life
             </h2>

@@ -10,6 +10,7 @@ import { TiltCard } from '../components/ui/TiltCard';
 import { LaserBorder } from '../components/ui/LaserBorder';
 import { Badge } from '../components/ui/Badge';
 import { HeroSVG } from '../components/illustrations/HeroSVG';
+import { SplineHero } from '../components/illustrations/SplineHero';
 import { AnimatedCounter } from '../components/ui/AnimatedCounter';
 import { useUser } from '../context/UserContext';
 
@@ -135,9 +136,9 @@ export const LandingPage = () => {
           </Button>
         </div>
 
-        {/* Hero Hologram Matrix */}
+        {/* Hero Interactive 3D Spline Matrix */}
         <div className="mt-12 w-full max-w-4xl">
-          <HeroSVG className="w-full h-auto" />
+          <SplineHero className="w-full h-[450px] sm:h-[550px]" />
         </div>
       </section>
 
