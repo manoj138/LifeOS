@@ -12,7 +12,7 @@ import { AudioSpectrum } from '../components/ui/AudioSpectrum';
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
-  const { user, preferences, resetOnboarding, clearAllLocalState } = useUser();
+  const { user, preferences, updatePreferences, updateUserProfile, resetOnboarding, clearAllLocalState } = useUser();
   const [selectedModel, setSelectedModel] = useState('gpt4o');
 
   const handleReRunOnboarding = () => {
@@ -68,6 +68,36 @@ export const SettingsPage = () => {
     { id: 'gemini15', name: 'Google Gemini 1.5 Pro', desc: 'Ultra long 1M token context for codebase analysis.', badge: 'Fast' },
   ];
 
+  // Developer Profile State for Teleprompter & System Settings
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || '',
+    cityState: preferences?.cityState || 'Pune, Maharashtra',
+    degree: preferences?.degree || 'B.E. / B.Tech Computer Science',
+    collegeName: preferences?.collegeName || 'COEP Technological University',
+    educationStatus: preferences?.educationStatus || 'Completed',
+    targetRole: preferences?.targetRole || 'Full-Stack Web Developer',
+    companyName: preferences?.companyName || '',
+    experienceRole: preferences?.experienceRole || '',
+    experienceDuration: preferences?.experienceDuration || '',
+    companyTechStack: preferences?.companyTechStack || '',
+    project1Name: preferences?.project1Name || 'E-Commerce Platform',
+    project1Desc: preferences?.project1Desc || 'Full-stack application with payment processing & inventory tracking.',
+    project2Name: preferences?.project2Name || 'RoyalESeva Document Portal Hub',
+    project2Desc: preferences?.project2Desc || 'Digital vendor document processing workflow.',
+  });
+
+  const [profileSaved, setProfileSaved] = useState(false);
+
+  const handleSaveDeveloperProfile = (e) => {
+    e.preventDefault();
+    if (profileForm.name) {
+      updateUserProfile({ name: profileForm.name });
+    }
+    updatePreferences(profileForm);
+    setProfileSaved(true);
+    setTimeout(() => setProfileSaved(false), 2500);
+  };
+
   const displayName = user?.name || user?.email?.split('@')[0] || 'Member';
 
   return (
@@ -103,6 +133,148 @@ export const SettingsPage = () => {
             Re-run Onboarding Setup
           </Button>
         </div>
+      </GlassCard>
+
+      {/* Live Developer Profile & Teleprompter Data Editor */}
+      <GlassCard className="p-6 border-purple-500/30 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <User className="w-5 h-5 text-purple-400" />
+              Edit Developer Profile & Teleprompter Script
+            </h3>
+            <p className="text-xs text-gray-400">
+              Update your personal details, degree, internship responsibilities, and projects anytime to keep your self-introduction script fresh.
+            </p>
+          </div>
+
+          {profileSaved && (
+            <Badge variant="emerald" size="sm" icon={Check}>
+              Saved & Teleprompter Updated!
+            </Badge>
+          )}
+        </div>
+
+        <form onSubmit={handleSaveDeveloperProfile} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Input
+              label="Full Candidate Name"
+              placeholder="e.g. Manoj Mansing Chougule"
+              value={profileForm.name}
+              onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+            />
+
+            <Input
+              label="City & State"
+              placeholder="e.g. Mangle, Maharashtra"
+              value={profileForm.cityState}
+              onChange={(e) => setProfileForm({ ...profileForm, cityState: e.target.value })}
+            />
+
+            <Input
+              label="Target Role"
+              placeholder="e.g. MERN Stack Developer"
+              value={profileForm.targetRole}
+              onChange={(e) => setProfileForm({ ...profileForm, targetRole: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Input
+              label="Degree / Specialization"
+              placeholder="e.g. B.Tech in Computer Science Engineering"
+              value={profileForm.degree}
+              onChange={(e) => setProfileForm({ ...profileForm, degree: e.target.value })}
+            />
+
+            <Input
+              label="University / College Name"
+              placeholder="e.g. Dr. D. Y. Patil Agriculture and Technical University"
+              value={profileForm.collegeName}
+              onChange={(e) => setProfileForm({ ...profileForm, collegeName: e.target.value })}
+            />
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-300 mb-1.5">Education Status</label>
+              <select
+                className="w-full bg-[#121218] border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"
+                value={profileForm.educationStatus}
+                onChange={(e) => setProfileForm({ ...profileForm, educationStatus: e.target.value })}
+              >
+                <option value="Pursuing">Pursuing Degree</option>
+                <option value="Completed">Completed / Graduated</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+            <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider">Internship & Experience Details</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Input
+                label="Company Name"
+                placeholder="e.g. CloudRegex Infotech"
+                value={profileForm.companyName}
+                onChange={(e) => setProfileForm({ ...profileForm, companyName: e.target.value })}
+              />
+
+              <Input
+                label="Internship Role"
+                placeholder="e.g. Junior Software Developer Intern"
+                value={profileForm.experienceRole}
+                onChange={(e) => setProfileForm({ ...profileForm, experienceRole: e.target.value })}
+              />
+
+              <Input
+                label="Duration / Period"
+                placeholder="e.g. 11 Months"
+                value={profileForm.experienceDuration}
+                onChange={(e) => setProfileForm({ ...profileForm, experienceDuration: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-purple-300">Project 1 Name & Overview</label>
+              <Input
+                placeholder="e.g. E-Commerce Platform"
+                value={profileForm.project1Name}
+                onChange={(e) => setProfileForm({ ...profileForm, project1Name: e.target.value })}
+                className="mb-2"
+              />
+              <textarea
+                rows={2}
+                placeholder="Project 1 overview & features worked on..."
+                value={profileForm.project1Desc}
+                onChange={(e) => setProfileForm({ ...profileForm, project1Desc: e.target.value })}
+                className="w-full bg-[#121218] border border-white/15 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-cyan-300">Project 2 Name & Overview</label>
+              <Input
+                placeholder="e.g. RoyalESeva Document Portal Hub"
+                value={profileForm.project2Name}
+                onChange={(e) => setProfileForm({ ...profileForm, project2Name: e.target.value })}
+                className="mb-2"
+              />
+              <textarea
+                rows={2}
+                placeholder="Project 2 overview & module work..."
+                value={profileForm.project2Desc}
+                onChange={(e) => setProfileForm({ ...profileForm, project2Desc: e.target.value })}
+                className="w-full bg-[#121218] border border-white/15 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <Button variant="primary" type="submit" leftIcon={<Sparkles className="w-4 h-4" />}>
+              Save Profile & Update Teleprompter
+            </Button>
+          </div>
+        </form>
       </GlassCard>
 
 

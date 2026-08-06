@@ -97,6 +97,67 @@ export const InterviewPrep = () => {
   const weakDsaStr = Array.isArray(preferences?.weakDsaTopics) ? preferences.weakDsaTopics.join(', ') : 'Dynamic Programming';
   const weakDevopsStr = Array.isArray(preferences?.weakDevopsTopics) ? preferences.weakDevopsTopics.join(', ') : 'Kubernetes';
 
+  // 1. Dynamic Education Phrasing
+  const eduPhrasing = (eduStatus === 'Completed' || eduStatus === 'Graduated')
+    ? `I completed my ${degree} from ${collegeName}.`
+    : `I am currently pursuing my ${degree} from ${collegeName}.`;
+
+  // 2. Dynamic Work Experience Phrasing
+  const isCurrentlyWorking = hasExp && (preferences?.experienceStatus === 'Currently Working' || !preferences?.experienceDuration || preferences?.experienceDuration?.includes('Present'));
+  const expParagraph = hasExp
+    ? (isCurrentlyWorking
+        ? `Currently, I am working as a ${expRole} at ${companyName}, where I have been working on full-stack web applications, RESTful APIs, database integration, authentication, and dynamic user interfaces.`
+        : `I worked as a ${expRole} at ${companyName} for ${expDuration}, where I focused on full-stack web applications, RESTful APIs, database integration, authentication, and dynamic user interfaces.`)
+    : `I am actively building full-stack web applications, focusing on RESTful APIs, database integration, authentication, and dynamic user interfaces.`;
+
+  // 3. Dynamic Projects Breakdown
+  const secondaryProjsList = Array.isArray(preferences?.secondaryProjects) && preferences.secondaryProjects.length > 0
+    ? preferences.secondaryProjects
+    : [{ title: proj2Name, desc: proj2Desc, tagline: preferences?.project2Tagline, techStack: proj2Tech }];
+
+  const totalProjCount = 1 + secondaryProjsList.length;
+  const countWords = ['one', 'two', 'three', 'four', 'five', 'six'];
+  const projCountWord = countWords[totalProjCount - 1] || `${totalProjCount}`;
+
+  const proj1Text = `My first project was ${proj1Name}, which included ${proj1Desc}${preferences?.project1Tagline ? `. I worked on features such as ${preferences.project1Tagline}` : ''}.`;
+
+  const secondaryProjTexts = secondaryProjsList.map((p, idx) => {
+    const ordinals = ['second', 'third', 'fourth', 'fifth'];
+    const ordinal = ordinals[idx] || `project #${idx + 2}`;
+    const pTitle = p.title || p.name || `Project ${idx + 2}`;
+    const pDesc = p.desc || p.description || 'Full-stack web portal for document & workflow management.';
+    const pTagline = p.tagline ? ` In this project, ${p.tagline}.` : '';
+    return `My ${ordinal} project was ${pTitle}, ${pDesc}.${pTagline}`;
+  }).join('\n\n');
+
+  const skillsListStr = Array.isArray(preferences?.focusAreas) && preferences.focusAreas.length > 0
+    ? preferences.focusAreas.join(', ')
+    : 'JavaScript, SQL, Git, GitHub, Postman, and Tailwind CSS';
+
+  const fullScript = `Good morning, sir/madam.
+
+My name is ${userName}, and I am from ${cityState}.
+
+${eduPhrasing}
+
+I am a ${targetRole} with hands-on experience in developing full-stack web applications using ${expTech || 'MongoDB, Express.js, React.js, and Node.js'}.
+
+${expParagraph}
+
+During my ${hasExp ? 'internship' : 'portfolio development'}, I worked on ${projCountWord} major projects.
+
+${proj1Text}
+
+${secondaryProjTexts}
+
+Through these projects, I have strengthened my skills in ${targetRole} development, REST API integration, database management, authentication, and dynamic web application development.
+
+I am also comfortable with ${skillsListStr}.
+
+My goal is to continuously improve my technical and problem-solving skills and contribute to building scalable and impactful software solutions.
+
+Thank you for giving me the opportunity to introduce myself.`;
+
   const selfIntroData = {
     name: userName,
     location: cityState,
@@ -105,22 +166,7 @@ export const InterviewPrep = () => {
     skills: preferences?.focusAreas || ["React.js", "Node.js", "System Architecture", "DevOps & Cloud", "DSA Algorithms"],
     proj1: proj1Name,
     proj2: proj2Name,
-    fullScript: `Good morning, sir/madam. My name is ${userName}. I am based out of ${cityState}. I hold a ${degree} degree from ${collegeName} (${eduStatus} - ${eduTimeline}). My primary technical goal is to excel as a ${targetRole}.
-
-${hasExp ? `Professional Work Experience:
-I have prior hands-on industry experience working at ${companyName} as a ${expRole} for ${expDuration}, where I utilized ${expTech} to build scalable software.` : `Career Readiness:
-I am an ambitious fresher focused on software engineering principles, clean code design, and data structures.`}
-
-Portfolio Projects Showcase:
-1. ${proj1Name} (Tech Stack: ${proj1Tech}):
-   ${proj1Desc}
-2. ${proj2Name} (Tech Stack: ${proj2Tech}):
-   ${proj2Desc}
-
-Technical Focus & Continuous Improvement:
-I actively practice problem solving with a commitment of ${preferences?.dailyHours || 4} hours daily. I am currently strengthening my expertise in core engineering concepts, specifically targeting ${weakDsaStr} in DSA and ${weakDevopsStr} in DevOps infrastructure.
-
-Thank you for giving me this opportunity to introduce myself.`
+    fullScript: fullScript
   };
 
   // Follow-Up Questions derived from candidate's tailored intro
@@ -336,18 +382,12 @@ Thank you for giving me this opportunity to introduce myself.`
                   </div>
                 </div>
 
-                <div className="p-6 rounded-2xl bg-[#09090d] border border-white/15 text-sm text-gray-200 leading-relaxed font-sans max-h-96 overflow-y-auto space-y-4">
-                  <p className="text-cyan-300 font-semibold">{selfIntroData.fullScript.split('\n\n')[0]}</p>
-                  <p>{selfIntroData.fullScript.split('\n\n')[1]}</p>
-                  <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/30 space-y-2">
-                    <span className="text-xs font-bold text-purple-300 uppercase tracking-wider">Major Project Highlights:</span>
-                    <ul className="space-y-1 text-xs text-gray-300">
-                      <li>• <strong>E-Commerce Platform:</strong> User, Seller, Admin panels, coupons, dynamic shipping fee calculation.</li>
-                      <li>• <strong>RoyalESeva Document Portal Hub:</strong> Vendor Module & Digital Document processing workflow.</li>
-                    </ul>
-                  </div>
-                  <p>{selfIntroData.fullScript.split('\n\n')[3]}</p>
-                  <p className="text-emerald-400 font-semibold">{selfIntroData.fullScript.split('\n\n')[4]}</p>
+                <div className="p-6 rounded-2xl bg-[#08080c]/90 border border-purple-500/30 text-sm sm:text-base text-gray-100 leading-relaxed font-sans max-h-[420px] overflow-y-auto space-y-4 shadow-[inset_0_2px_15px_rgba(0,0,0,0.8)] backdrop-blur-xl custom-scrollbar">
+                  {selfIntroData.fullScript.split('\n\n').map((paragraph, pIdx) => (
+                    <p key={pIdx} className="text-gray-200 font-normal leading-relaxed tracking-wide">
+                      {paragraph}
+                    </p>
+                  ))}
                 </div>
               </div>
 
