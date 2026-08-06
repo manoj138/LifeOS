@@ -52,12 +52,12 @@ const getAdminMetrics = async (req, res) => {
       roleCounts[role] = (roleCounts[role] || 0) + 1;
 
       // Skill level
-      const levelRaw = pref.careerLevel ? pref.careerLevel.split(' ')[0] : 'Intermediate';
+      const levelRaw = (typeof pref.careerLevel === 'string' && pref.careerLevel) ? pref.careerLevel.split(' ')[0] : 'Intermediate';
       const level = ['Beginner', 'Intermediate', 'Advanced'].includes(levelRaw) ? levelRaw : 'Intermediate';
       skillCounts[level] = (skillCounts[level] || 0) + 1;
 
       // Daily hours
-      const hours = pref.dailyHours || 4;
+      const hours = Number(pref.dailyHours) || 4;
       if (hours <= 1) commitmentCounts['1 Hour / day'] += 1;
       else if (hours <= 2) commitmentCounts['2 Hours / day'] += 1;
       else if (hours <= 5) commitmentCounts['4 Hours / day'] += 1;
@@ -92,7 +92,8 @@ const getAdminMetrics = async (req, res) => {
       dailyCommitmentDistribution,
     });
   } catch (error) {
-    return sendError(res, 'Error fetching admin metrics', error, 500);
+    console.error("❌ getAdminMetrics Error:", error);
+    return sendError(res, 'Error fetching admin metrics', error.message || error, 500);
   }
 };
 
@@ -120,7 +121,7 @@ const getCandidates = async (req, res) => {
       // Dynamic Readiness Score calculation
       const onboardingScore = pref.onboardingCompleted ? 40 : 10;
       const topicsScore = Math.min(50, completedTopics * 10);
-      const hoursScore = Math.min(10, (pref.dailyHours || 1) * 2.5);
+      const hoursScore = Math.min(10, (Number(pref.dailyHours) || 1) * 2.5);
       const readinessScore = Math.min(100, Math.round(onboardingScore + topicsScore + hoursScore));
 
       const streak = pref.onboardingCompleted ? Math.max(1, completedTopics) : 0;
@@ -132,8 +133,8 @@ const getCandidates = async (req, res) => {
         email: u.email,
         role: u.role,
         targetRole: pref.targetRole || 'Full-Stack Web Developer',
-        skillLevel: pref.careerLevel ? pref.careerLevel.split(' ')[0] : 'Intermediate',
-        dailyHours: pref.dailyHours || 4,
+        skillLevel: (typeof pref.careerLevel === 'string' && pref.careerLevel) ? pref.careerLevel.split(' ')[0] : 'Intermediate',
+        dailyHours: Number(pref.dailyHours) || 4,
         readinessScore,
         streak,
         completedTopics,
@@ -144,7 +145,8 @@ const getCandidates = async (req, res) => {
 
     return sendSuccess(res, 'Candidates list retrieved', candidates);
   } catch (error) {
-    return sendError(res, 'Error fetching candidates list', error, 500);
+    console.error("❌ getCandidates Error:", error);
+    return sendError(res, 'Error fetching candidates list', error.message || error, 500);
   }
 };
 

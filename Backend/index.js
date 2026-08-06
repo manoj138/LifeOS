@@ -125,6 +125,36 @@ const ensureTablesExist = async () => {
   }
 };
 
+const ensureDsaColumns = async () => {
+  try {
+    await sequelize.query(`ALTER TABLE DsaProblems ADD COLUMN language TEXT DEFAULT 'javascript';`);
+    console.log(`✅ Added missing column language to DsaProblems table.`);
+  } catch (err) {
+    // Ignore if column already exists
+  }
+};
+
+const ensurePreferenceColumns = async () => {
+  const textCols = [
+    'cityState', 'aiLanguage', 'degree', 'collegeName', 'collegeCity', 'educationStatus',
+    'currentSemester', 'graduationPeriod', 'hasExperience', 'experienceType', 'companyName',
+    'experienceRole', 'experienceDuration', 'companyTechStack', 'project1Name', 'project1Tagline',
+    'project1Desc', 'project1TechStack', 'project1Link', 'project2Name', 'project2Desc',
+    'project2TechStack', 'leetcodeHandle', 'githubHandle', 'linkedinUrl', 'targetCompanyTier',
+    'weakDsaTopics', 'weakDevopsTopics', 'preferredTimeSlot'
+  ];
+  for (const col of textCols) {
+    try {
+      await sequelize.query(`ALTER TABLE UserPreferences ADD COLUMN ${col} TEXT;`);
+    } catch (err) {
+      // Ignore if exists
+    }
+  }
+  try {
+    await sequelize.query(`ALTER TABLE UserPreferences ADD COLUMN onboardingCompleted INTEGER DEFAULT 0;`);
+  } catch (err) {}
+};
+
 // Database Sync & Server Start
 const { repairOutdatedTopics } = require('./src/scripts/repairOutdatedTopics');
 
@@ -134,6 +164,8 @@ const startServer = async () => {
     await ensureTablesExist();
     await ensureModuleColumns();
     await ensureTopicColumns();
+    await ensureDsaColumns();
+    await ensurePreferenceColumns();
     await sequelize.sync();
     console.log('✅ SQLite Database Models synced successfully.');
     
