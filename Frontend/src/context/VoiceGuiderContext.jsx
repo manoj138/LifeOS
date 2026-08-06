@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiService } from '../services/api';
 
 const VoiceGuiderContext = createContext(null);
 
@@ -61,19 +62,42 @@ export const VoiceGuiderProvider = ({ children }) => {
   const speechRate = voicePersonality === 'coach' ? 1.15 : voicePersonality === 'mentor' ? 0.95 : 1.0;
   const speechPitch = voicePersonality === 'coach' ? 1.1 : voicePersonality === 'mentor' ? 0.9 : 1.0;
 
-  // Data persistence states
-  const [pendingTasks, setPendingTasks] = useState([
-    { id: 1, title: 'Complete React Advanced State Management', time: '11:00 AM' },
-    { id: 2, title: 'System Design Interview Practice', time: '03:00 PM' }
-  ]);
+  // Real Dynamic Data persistence states
+  const [pendingTasks, setPendingTasks] = useState([]);
+  const [habits, setHabits] = useState([]);
+  const [userGoals, setUserGoals] = useState([]);
 
-  const [habits, setHabits] = useState([
-    { id: 1, title: 'Drink 3 Liters Water', streak: 5 }
-  ]);
+  // Dynamically fetch live user tasks & goals on mount / unlock
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLiveVoiceData = async () => {
+      try {
+        const [tasksRes, goalsRes, habitsRes] = await Promise.all([
+          apiService.getPlannerTasks(),
+          apiService.getGoals(),
+          apiService.getHabits()
+        ]);
+        if (isMounted) {
+          if (tasksRes?.success && Array.isArray(tasksRes.data)) {
+            setPendingTasks(tasksRes.data.filter((t) => !t.completed));
+          }
+          if (goalsRes?.success && Array.isArray(goalsRes.data)) {
+            setUserGoals(goalsRes.data);
+          }
+          if (habitsRes?.success && Array.isArray(habitsRes.data)) {
+            setHabits(habitsRes.data);
+          }
+        }
+      } catch (err) {
+        console.warn('Voice data dynamic fetch notice:', err.message);
+      }
+    };
 
-  const [userGoals, setUserGoals] = useState([
-    { id: 1, title: 'Master MERN Fullstack & Hostinger VPS', status: 'In Progress' }
-  ]);
+    if (!isLocked) {
+      fetchLiveVoiceData();
+    }
+    return () => { isMounted = false; };
+  }, [isLocked]);
 
 
   // Safe Microphone Stopper

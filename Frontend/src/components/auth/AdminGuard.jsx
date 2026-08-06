@@ -5,7 +5,7 @@ import { useUser } from '../../context/UserContext';
 export const AdminGuard = () => {
   const { user } = useUser();
 
-  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
+  const isAdmin = user?.role === 'admin';
 
   if (!user) {
     return <Navigate to="/auth" replace />;

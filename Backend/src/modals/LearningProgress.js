@@ -24,6 +24,10 @@ const LearningProgress = sequelize.define('LearningProgress', {
     type: DataTypes.JSON,
     defaultValue: ['js-0'],
   },
+  solvedDsaProblems: {
+    type: DataTypes.JSON,
+    defaultValue: [],
+  },
   passedQuizzes: {
     type: DataTypes.JSON,
     defaultValue: {},

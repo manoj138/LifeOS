@@ -23,7 +23,6 @@ export const AuthPage = () => {
     setErrorMsg('');
 
     const inputEmail = email.trim().toLowerCase();
-    const isAdminRole = inputEmail === 'admin@lifeos.ai' || inputEmail.startsWith('admin');
 
     try {
       let res;
@@ -44,15 +43,11 @@ export const AuthPage = () => {
           localStorage.setItem('lifeos_auth_token', res.data.token);
         }
 
-        const userData = res.data.user || {
-          name: name.trim() || inputEmail.split('@')[0],
-          email: inputEmail,
-          role: isAdminRole ? 'admin' : 'candidate',
-        };
+        const userData = res.data.user;
 
-        if (isAdminRole || userData.role === 'admin') {
+        if (userData?.role === 'admin') {
           completeOnboarding({
-            user: { ...userData, role: 'admin' },
+            user: userData,
             preferences: res.data.preferences || { targetRole: 'System Administrator', careerLevel: 'Admin Console' },
           });
           navigate('/app/admin');
@@ -62,33 +57,25 @@ export const AuthPage = () => {
             updatePreferences(res.data.preferences);
           }
 
+          const hasCompletedOnboarding = res.data.preferences?.onboardingCompleted || false;
+
           if (activeTab === 'register') {
             resetOnboarding();
             navigate('/onboarding');
           } else {
-            if (!onboardingCompleted) {
+            if (!hasCompletedOnboarding && !onboardingCompleted) {
               navigate('/onboarding');
             } else {
               navigate('/app/dashboard');
             }
           }
         }
-      } else if (res?.fallback) {
-        const fallbackToken = res.data?.token || 'lifeos_offline_jwt_token_' + Date.now();
-        localStorage.setItem('lifeos_auth_token', fallbackToken);
-        const userData = { name: name.trim() || inputEmail.split('@')[0], email: inputEmail, role: isAdminRole ? 'admin' : 'candidate' };
-        updateUserProfile(userData);
-        if (isAdminRole) navigate('/app/admin');
-        else navigate(onboardingCompleted ? '/app/dashboard' : '/onboarding');
       } else {
-        setErrorMsg(res?.message || 'Authentication failed. Please check credentials.');
+        setErrorMsg(res?.message || 'Authentication failed. Please check your credentials.');
       }
     } catch (err) {
       setIsLoading(false);
-      const fallbackToken = 'lifeos_offline_jwt_token_' + Date.now();
-      localStorage.setItem('lifeos_auth_token', fallbackToken);
-      updateUserProfile({ name: name.trim() || inputEmail.split('@')[0], email: inputEmail, role: 'candidate' });
-      navigate('/app/dashboard');
+      setErrorMsg('Server connection error. Please ensure backend is running.');
     }
   };
 

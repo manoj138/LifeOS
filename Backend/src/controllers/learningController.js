@@ -28,19 +28,62 @@ const completeLesson = async (req, res) => {
       progress = await LearningProgress.create({ userId });
     }
 
-    const currentLessons = progress.completedLessons || [];
-    if (!currentLessons.includes(lessonId)) {
-      const updatedLessons = [...currentLessons, lessonId];
-      await progress.update({ completedLessons: updatedLessons });
+    let currentLessons = progress.completedLessons || [];
+    if (typeof currentLessons === 'string') {
+      try { currentLessons = JSON.parse(currentLessons); } catch (e) { currentLessons = []; }
     }
 
-    return sendSuccess(res, 'Lesson marked complete', progress);
+    let updatedLessons = [...currentLessons];
+    if (updatedLessons.includes(lessonId)) {
+      updatedLessons = updatedLessons.filter((id) => id !== lessonId);
+    } else {
+      updatedLessons.push(lessonId);
+    }
+
+    await progress.update({ completedLessons: updatedLessons });
+
+    return sendSuccess(res, 'Lesson completion status updated', progress);
   } catch (error) {
     return sendError(res, 'Error updating lesson completion', error, 500);
+  }
+};
+
+const toggleSolvedDsa = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { dsaId } = req.body;
+
+    if (!dsaId) {
+      return sendError(res, 'dsaId is required', null, 400);
+    }
+
+    let progress = await LearningProgress.findOne({ where: { userId } });
+    if (!progress) {
+      progress = await LearningProgress.create({ userId });
+    }
+
+    let currentSolved = progress.solvedDsaProblems || [];
+    if (typeof currentSolved === 'string') {
+      try { currentSolved = JSON.parse(currentSolved); } catch (e) { currentSolved = []; }
+    }
+
+    let updatedSolved = [...currentSolved];
+    if (updatedSolved.includes(dsaId)) {
+      updatedSolved = updatedSolved.filter((id) => id !== dsaId);
+    } else {
+      updatedSolved.push(dsaId);
+    }
+
+    await progress.update({ solvedDsaProblems: updatedSolved });
+
+    return sendSuccess(res, 'DSA problem solved status updated', progress);
+  } catch (error) {
+    return sendError(res, 'Error updating DSA problem status', error, 500);
   }
 };
 
 module.exports = {
   getProgress,
   completeLesson,
+  toggleSolvedDsa,
 };

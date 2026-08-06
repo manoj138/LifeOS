@@ -174,8 +174,17 @@ export const DSAPage = () => {
                   {currentProblem.description}
                 </p>
 
-                {/* Guided Actions (Hint & Solution Toggles) */}
-                <div className="flex items-center gap-3 pt-2">
+                {/* Guided Actions (Hint, Solution Toggles & Mark Solved) */}
+                <div className="flex items-center gap-3 pt-2 flex-wrap">
+                  <Button
+                    size="xs"
+                    variant={userProgress?.solvedDsaIds?.includes(currentProblem.id) ? "glow" : "glass"}
+                    onClick={() => toggleSolvedDsa(currentProblem.id)}
+                    leftIcon={<CheckCircle2 className={`w-3.5 h-3.5 ${userProgress?.solvedDsaIds?.includes(currentProblem.id) ? 'text-emerald-400' : 'text-gray-400'}`} />}
+                  >
+                    {userProgress?.solvedDsaIds?.includes(currentProblem.id) ? "✓ Solved & Mastered" : "Mark Problem Solved"}
+                  </Button>
+
                   <Button
                     size="xs"
                     variant="glass"

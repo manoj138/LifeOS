@@ -27,16 +27,17 @@ const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const userRole = email.includes('admin') ? 'admin' : 'candidate';
     const newUser = await User.create({
-      name: name || 'Manoj Kumar',
+      name: name || 'Member',
       email,
       password: hashedPassword,
       pin: pin || '1234',
-      role: email.includes('admin') ? 'admin' : 'user',
+      role: userRole,
     });
 
     // Create associated preferences & learning progress records
-    await UserPreference.create({ userId: newUser.id });
+    const preferences = await UserPreference.create({ userId: newUser.id });
     await LearningProgress.create({ userId: newUser.id });
 
     const token = generateToken(newUser.id);
@@ -49,6 +50,7 @@ const register = async (req, res) => {
         email: newUser.email,
         role: newUser.role,
       },
+      preferences,
     }, 201);
   } catch (error) {
     return sendError(res, 'Error creating account', error, 500);

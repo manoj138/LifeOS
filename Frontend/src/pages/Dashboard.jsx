@@ -18,7 +18,7 @@ import { useUser } from '../context/UserContext';
 
 export const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, preferences, resetOnboarding } = useUser();
+  const { user, preferences, userProgress, resetOnboarding } = useUser();
 
   React.useEffect(() => {
     if (user?.role === 'admin' || user?.email?.toLowerCase().includes('admin')) {
@@ -27,13 +27,17 @@ export const Dashboard = () => {
   }, [user, navigate]);
 
   const onboardingDone = preferences?.onboardingCompleted || false;
-  const targetSpecializationScore = onboardingDone ? 85 : 40;
-  const skillReadinessScore = onboardingDone ? 90 : 45;
-  const currentStreak = user?.streak || (onboardingDone ? 7 : 0);
+  const completedTopicsCount = userProgress?.completedTopicIds?.length || 0;
+  const solvedDsaCount = userProgress?.solvedDsaIds?.length || 0;
+
+  const targetSpecializationScore = Math.min(100, Math.max(15, Math.round((completedTopicsCount / 15) * 100)));
+  const skillReadinessScore = Math.min(100, Math.max(20, Math.round((solvedDsaCount / 10) * 100)));
+  const overallReadiness = Math.min(100, Math.round((targetSpecializationScore + skillReadinessScore) / 2));
+  const currentStreak = Math.max(1, Math.min(7, completedTopicsCount + solvedDsaCount));
 
   const stats = [
-    { title: "Target Specialization", value: targetSpecializationScore, suffix: "%", icon: Code2, color: "cyan", change: preferences?.targetRole || "Full-Stack Web Dev" },
-    { title: "Skill Readiness", value: skillReadinessScore, suffix: "%", icon: MessageSquareCode, color: "purple", change: `${preferences?.skillLevels?.dsa || 'Intermediate'} Level` },
+    { title: "Target Specialization", value: targetSpecializationScore, suffix: "%", icon: Code2, color: "cyan", change: `${completedTopicsCount} Topics Mastered` },
+    { title: "Skill Readiness", value: skillReadinessScore, suffix: "%", icon: MessageSquareCode, color: "purple", change: `${solvedDsaCount} DSA Problems Solved` },
     { title: "Daily Target Commitment", value: preferences?.dailyHours || 4, suffix: " hrs/day", icon: Server, color: "emerald", change: `${preferences?.careerLevel || 'Intermediate'}` },
     { title: "Habit & Fitness Streak", value: currentStreak, suffix: " Days", icon: Flame, color: "rose", change: preferences?.fitnessGoal || "Build Muscle" },
   ];
@@ -172,9 +176,9 @@ export const Dashboard = () => {
 
           <TiltCard className="p-6 flex flex-col items-center text-center">
             <h3 className="text-lg font-bold text-white tracking-tight mb-4">Overall Candidate Readiness</h3>
-            <ProgressRing progress={95} size={160} strokeWidth={12} showText={true} />
+            <ProgressRing progress={overallReadiness} size={160} strokeWidth={12} showText={true} />
             <p className="text-xs text-gray-400 mt-4 max-w-xs">
-              Interview pitch verified with major project highlights.
+              Dynamically evaluated based on completed curriculum topics & DSA problem solves.
             </p>
           </TiltCard>
         </div>

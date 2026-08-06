@@ -9,7 +9,9 @@ export const OnboardingGuard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!onboardingCompleted) {
+  const isAdmin = user?.role === 'admin';
+
+  if (!isAdmin && !onboardingCompleted) {
     return <Navigate to="/onboarding" replace />;
   }
 

@@ -70,10 +70,8 @@ export const apiService = {
       }
       return result;
     } catch (err) {
-      console.warn('Backend API unreachable, using local fallback:', err.message);
-      const fallbackToken = 'lifeos_offline_jwt_token_' + Date.now();
-      sessionStore(fallbackToken, { name: data.name, email: data.email });
-      return { success: true, fallback: true, data: { token: fallbackToken } };
+      const message = err.response?.data?.message || 'Failed to connect to authentication server.';
+      return { success: false, message };
     }
   },
 
@@ -86,10 +84,8 @@ export const apiService = {
       }
       return result;
     } catch (err) {
-      console.warn('Backend API unreachable, using local fallback:', err.message);
-      const fallbackToken = 'lifeos_offline_jwt_token_' + Date.now();
-      sessionStore(fallbackToken, { email });
-      return { success: true, fallback: true, data: { token: fallbackToken } };
+      const message = err.response?.data?.message || 'Invalid email or password.';
+      return { success: false, message };
     }
   },
 
@@ -102,10 +98,8 @@ export const apiService = {
       }
       return result;
     } catch (err) {
-      console.warn('Backend API unreachable, using local fallback:', err.message);
-      const fallbackToken = 'lifeos_offline_jwt_token_' + Date.now();
-      sessionStore(fallbackToken, { email: 'user@lifeos.ai' });
-      return { success: true, fallback: true, data: { token: fallbackToken } };
+      const message = err.response?.data?.message || 'Invalid PIN entered.';
+      return { success: false, message };
     }
   },
 
@@ -139,6 +133,34 @@ export const apiService = {
   async updatePreferences(data) {
     try {
       const res = await Api.put('/user/preferences', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  // Learning Progress Sync
+  async getLearningProgress() {
+    try {
+      const res = await Api.get('/learning/progress');
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async completeLesson(lessonId) {
+    try {
+      const res = await Api.post('/learning/complete-lesson', { lessonId });
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
+  },
+
+  async toggleSolvedDsa(dsaId) {
+    try {
+      const res = await Api.post('/learning/toggle-dsa', { dsaId });
       return res.data;
     } catch (err) {
       return { success: false, fallback: true };

@@ -32,9 +32,9 @@ import { FilterPills } from '../components/ui/FilterPills';
 import { EmptyStateCard } from '../components/ui/EmptyStateCard';
 
 export const LearningHub = () => {
-  const { preferences, user } = useUser();
+  const { preferences, user, userProgress, toggleCompletedTopic } = useUser();
 
-  // Load saved progress state from localStorage on mount
+  // Load saved progress state from UserContext & localStorage on mount
   const initialProgress = loadLearningProgress();
 
   const [activeModule, setActiveModule] = useState(initialProgress.lastActiveModule || 'js');
@@ -269,6 +269,9 @@ export const LearningHub = () => {
       const newCompleted = [...completedLessons, currentLessonData.id];
       setCompletedLessons(newCompleted);
       setPassedQuizzes({ ...passedQuizzes, [currentLessonData.id]: 100 });
+      if (toggleCompletedTopic) {
+        toggleCompletedTopic(currentLessonData.id);
+      }
 
       // Check if this completes the entire current level (Beginner/Intermediate)
       const currentLevel = currentLessonData.difficulty;

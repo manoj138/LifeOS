@@ -4,40 +4,40 @@ import { apiService } from '../services/api';
 const UserContext = createContext(null);
 
 const DEFAULT_PREFERENCES = {
-  targetRole: 'Full-Stack Web Developer',
-  careerLevel: 'Intermediate (1-3 yrs experience)',
-  focusAreas: ['Coding & DSA', 'DevOps & Cloud', 'English Fluency', 'System Architecture'],
+  targetRole: '',
+  careerLevel: '',
+  focusAreas: [],
   skillLevels: {
-    dsa: 'Intermediate',
+    dsa: 'Beginner',
     devops: 'Beginner',
-    english: 'Intermediate'
+    english: 'Beginner'
   },
-  cityState: 'Pune, Maharashtra',
+  cityState: '',
   aiLanguage: 'English',
-  degree: 'B.E. / B.Tech Computer Science',
-  collegeName: 'COEP Technological University',
-  collegeCity: 'Pune',
-  educationStatus: 'Completed',
-  graduationPeriod: '6 Months Ago (2025 Batch)',
+  degree: '',
+  collegeName: '',
+  collegeCity: '',
+  educationStatus: '',
+  graduationPeriod: '',
   hasExperience: 'No',
   experienceType: 'Fresher',
   companyName: '',
   experienceRole: '',
   experienceDuration: '',
   companyTechStack: '',
-  project1Name: 'E-Commerce Platform with Stripe & Coupon Engine',
-  project1Tagline: 'Scalable Full-Stack E-Commerce Engine',
-  project1Desc: 'Full-stack application with real-time payment processing, coupon algorithms & inventory tracking.',
-  project1TechStack: 'React, Node.js, Express, MongoDB, Docker',
-  project2Name: 'LifeOS AI Teleprompter & Learning Studio',
-  project2Desc: 'AI-assisted speech coach, voice command interpreter & autonomous learning dashboard.',
-  project2TechStack: 'React, Web Speech API, Express, SQLite',
-  targetCompanyTier: 'High-Growth Product Startups (Series A-C)',
-  weakDsaTopics: ['Dynamic Programming', 'Graphs & BFS/DFS'],
-  weakDevopsTopics: ['Kubernetes Clusters', 'CI/CD Pipelines (GitHub Actions)'],
-  dailyHours: 4,
-  preferredTimeSlot: 'Night Owl (8 PM - 12 AM)',
-  targetDate: '2026-12-31',
+  project1Name: '',
+  project1Tagline: '',
+  project1Desc: '',
+  project1TechStack: '',
+  project2Name: '',
+  project2Desc: '',
+  project2TechStack: '',
+  targetCompanyTier: 'Product Startups',
+  weakDsaTopics: [],
+  weakDevopsTopics: [],
+  dailyHours: 2,
+  preferredTimeSlot: 'Flexible',
+  targetDate: '',
   aiPersona: 'Motivational Tech Mentor',
   voiceCoachName: 'Antigravity AI',
   voiceCoachSpeed: '1.0x',
@@ -85,6 +85,68 @@ export const UserProvider = ({ children }) => {
     };
   });
 
+  // Initial Backend API Data Fetch & Sync
+  useEffect(() => {
+    let isMounted = true;
+    const syncBackendData = async () => {
+      const token = localStorage.getItem('lifeos_auth_token');
+      if (!token) return;
+
+      try {
+        const [profileRes, prefRes, progRes] = await Promise.all([
+          apiService.getProfile(),
+          apiService.getPreferences(),
+          apiService.getLearningProgress()
+        ]);
+
+        if (isMounted) {
+          if (profileRes?.success && profileRes.data) {
+            const fetchedUser = {
+              id: profileRes.data.id,
+              name: profileRes.data.name,
+              email: profileRes.data.email,
+              role: profileRes.data.role,
+            };
+            setUser(fetchedUser);
+            if (profileRes.data.preferences) {
+              setPreferences((prev) => ({ ...(prev || {}), ...profileRes.data.preferences }));
+              if (profileRes.data.preferences.onboardingCompleted) {
+                setOnboardingCompleted(true);
+              }
+            }
+          }
+
+          if (prefRes?.success && prefRes.data) {
+            setPreferences((prev) => ({ ...(prev || {}), ...prefRes.data }));
+            if (prefRes.data.onboardingCompleted) {
+              setOnboardingCompleted(true);
+            }
+          }
+
+          if (progRes?.success && progRes.data) {
+            const completed = Array.isArray(progRes.data.completedLessons)
+              ? progRes.data.completedLessons
+              : [];
+            const solvedDsa = Array.isArray(progRes.data.solvedDsaProblems)
+              ? progRes.data.solvedDsaProblems
+              : [];
+
+            setUserProgress((prev) => ({
+              ...prev,
+              completedTopicIds: completed,
+              solvedDsaIds: solvedDsa
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn('Backend initial sync notice:', err.message);
+      }
+    };
+
+    syncBackendData();
+    return () => { isMounted = false; };
+  }, []);
+
   // Sync active login session to localStorage for F5 refresh persistence
   useEffect(() => {
     if (user) {
@@ -107,6 +169,8 @@ export const UserProvider = ({ children }) => {
         : [...current, topicId];
       return { ...prev, completedTopicIds: updated };
     });
+
+    apiService.completeLesson(topicId).catch((err) => console.warn('Lesson toggle API sync notice:', err.message));
   };
 
   const toggleSolvedDsa = (dsaId) => {
@@ -117,6 +181,8 @@ export const UserProvider = ({ children }) => {
         : [...current, dsaId];
       return { ...prev, solvedDsaIds: updated };
     });
+
+    apiService.toggleSolvedDsa(dsaId).catch((err) => console.warn('DSA toggle API sync notice:', err.message));
   };
 
   const toggleCompletedTask = (taskId) => {
