@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mic, MicOff, Volume2, Sparkles, BookOpen, MessageSquare, CheckCircle2, PlayCircle, RefreshCw, Award, Bot, Target, Zap, ArrowRight, Check, X, Layers, Flame, RotateCcw } from 'lucide-react';
+import { Mic, MicOff, Volume2, Sparkles, BookOpen, MessageSquare, CheckCircle2, PlayCircle, RefreshCw, Award, Bot, Target, Zap, ArrowRight, Check, X, Layers, Flame, RotateCcw, Heart, Smile } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
@@ -15,7 +15,7 @@ export const EnglishPage = () => {
   const { startListening, stopListening, userTranscript, speakText } = useVoiceGuider();
 
   const [activeTab, setActiveTab] = useState('duolingo'); // 'duolingo' | 'speech'
-  const [activeSkillLevel, setActiveSkillLevel] = useState('Intermediate');
+  const [activeLevelIdx, setActiveLevelIdx] = useState(0);
   const [selectedOptionIdx, setSelectedOptionIdx] = useState(null);
 
   const [modules, setModules] = useState([]);
@@ -62,55 +62,121 @@ export const EnglishPage = () => {
     return () => { isMounted = false; };
   }, []);
 
-  // Duolingo Daily Drills Bank
-  const dailyWords = {
-    Beginner: {
-      word: 'Scalability',
-      phonetic: '/skeɪləˈbɪləti/',
-      definition: 'The capability of a system or application to handle growing amounts of traffic efficiently.',
-      exampleSentence: 'Our MERN stack backend ensures high scalability under heavy user traffic.'
+  // 4-Level Beginner-to-Confidence Growth Ladder Data
+  const beginnerLadder = [
+    {
+      levelNumber: 1,
+      levelTitle: 'Level 1: Daily Essential Phrases',
+      badge: 'Zero-to-Hero Level 1',
+      phrases: [
+        {
+          english: 'Could you please repeat that?',
+          marathi: 'कृपया तुम्ही ते पुन्हा सांगू शकाल का?',
+          context: 'Used when you did not hear or understand what the speaker said.',
+          pronunciationTip: 'Could you please re-peat that?'
+        },
+        {
+          english: 'I am currently working on a React project.',
+          marathi: 'मी सध्या एका रिएक्ट प्रोजेक्टवर काम करत आहे.',
+          context: 'Used when describing your current development focus.',
+          pronunciationTip: 'I am cur-rent-ly work-ing on a React pro-ject.'
+        },
+        {
+          english: 'Thank you for giving me this opportunity.',
+          marathi: 'मला ही संधी दिल्याबद्दल धन्यवाद.',
+          context: 'Used at the beginning or conclusion of an interview.',
+          pronunciationTip: 'Thank you for giv-ing me this op-por-tu-ni-ty.'
+        }
+      ]
     },
-    Intermediate: {
-      word: 'Asynchronous',
-      phonetic: '/eɪˈsɪŋkrənəs/',
-      definition: 'Execution that occurs independently of the main program flow without blocking execution.',
-      exampleSentence: 'JavaScript handles database I/O asynchronously using Promises and Async/Await.'
+    {
+      levelNumber: 2,
+      levelTitle: 'Level 2: Office & Daily Greetings',
+      badge: 'Level 2',
+      phrases: [
+        {
+          english: 'Good morning! It is a pleasure to meet you.',
+          marathi: 'शुभ प्रभात! तुम्हाला भेटून खूप आनंद झाला.',
+          context: 'Used when greeting interviewers or new team members.',
+          pronunciationTip: 'Good morn-ing! It is a plea-sure to meet you.'
+        },
+        {
+          english: 'Let me walk you through the key features.',
+          marathi: 'मी तुम्हाला मुख्य फीचर्सबद्दल थोडक्यात सांगतो.',
+          context: 'Used when starting a project demo or code walkthrough.',
+          pronunciationTip: 'Let me walk you through the key fea-tures.'
+        }
+      ]
     },
-    Executive: {
-      word: 'Idempotent',
-      phonetic: '/ˌaɪdɛmˈpoʊtənt/',
-      definition: 'An HTTP method or operation that produces the same result no matter how many times it is executed.',
-      exampleSentence: 'REST API PUT and DELETE requests must be idempotent to prevent duplicate data side-effects.'
+    {
+      levelNumber: 3,
+      levelTitle: 'Level 3: Project & Tech Phrasing',
+      badge: 'Level 3',
+      phrases: [
+        {
+          english: 'Our Express API connects to MongoDB database securely.',
+          marathi: 'आपले एक्सप्रेस एपीआय मोंगोडीबी डेटाबेसशी सुरक्षितपणे जोडलेले आहे.',
+          context: 'Used when explaining backend database architecture.',
+          pronunciationTip: 'Our Ex-press API con-nects to Mongo-DB date-a-base se-cure-ly.'
+        },
+        {
+          english: 'I used Tailwind CSS to build a responsive user interface.',
+          marathi: 'मी सर्व उपकरणांवर चांगल्या दिसणाऱ्या डिझाईनसाठी Tailwind CSS वापरले.',
+          context: 'Used when describing frontend styling and responsiveness.',
+          pronunciationTip: 'I used Tail-wind CSS to build a re-spon-sive user in-ter-face.'
+        }
+      ]
+    },
+    {
+      levelNumber: 4,
+      levelTitle: 'Level 4: Job Interview Confidence',
+      badge: 'Level 4 Mastery',
+      phrases: [
+        {
+          english: 'I solved this issue by checking server console logs.',
+          marathi: 'मी सर्व्हर कन्सोल लॉग्ज तपासून ही अडचण सोडवली.',
+          context: 'Used when explaining your systematic debugging process.',
+          pronunciationTip: 'I solved this is-sue by check-ing ser-ver con-sole logs.'
+        },
+        {
+          english: 'I am passionate about learning new web technologies daily.',
+          marathi: 'मला रोज नवीन वेब टेक्नॉलॉजी शिकण्याची आवड आहे.',
+          context: 'Used when expressing your continuous learning mindset.',
+          pronunciationTip: 'I am pas-sion-ate a-bout learn-ing new web tech-nol-o-gies day-ly.'
+        }
+      ]
     }
-  };
+  ];
+
+  const currentLevelData = beginnerLadder[activeLevelIdx] || beginnerLadder[0];
 
   const sentenceDrill = {
-    question: "Complete the Sentence: 'We need to __________ the database queries to reduce response time.'",
+    question: 'Complete the sentence: "I ______ working on a full-stack website project."',
     options: [
-      "optimize (अचूक पर्याय)",
-      "optimizing",
-      "optimizer",
-      "optimized"
+      "am",
+      "is",
+      "are",
+      "were"
     ],
     correctIdx: 0,
-    explanation: "After modal verbs or infinitive 'to', use the base form of the verb ('to optimize')."
+    explanation: "Great job! 🎉 Always use 'am' with 'I' in present continuous tense."
   };
 
   const commonMistakes = [
     {
-      wrong: 'I am having 3 years of experience in MERN stack.',
-      correct: 'I have 3 years of experience in MERN stack development.',
-      reason: 'Use simple present tense ("I have") for permanent states or experience, not present continuous ("I am having").'
+      wrong: 'I am having 3 years of experience in coding.',
+      correct: 'I have 3 years of experience in coding.',
+      reason: 'Use simple present tense ("I have") for permanent states or experience instead of "I am having".'
     },
     {
-      wrong: 'I am agree with your architecture decision.',
-      correct: 'I agree with your architecture decision.',
+      wrong: 'I am agree with you.',
+      correct: 'I agree with you.',
       reason: '"Agree" is already a verb. Do not add "am" before it.'
     },
     {
-      wrong: 'Myself Manoj, I am a software developer.',
-      correct: 'My name is Manoj, and I am a Full-Stack Developer.',
-      reason: 'Avoid starting introductions with "Myself". Use "My name is" or "I am" for professional introductions.'
+      wrong: 'Myself Manoj, I am a developer.',
+      correct: 'My name is Manoj, and I am a software developer.',
+      reason: 'Avoid starting professional introductions with "Myself". Use "My name is" or "I am".'
     }
   ];
 
@@ -136,14 +202,12 @@ export const EnglishPage = () => {
     }
   };
 
-  const activeWord = dailyWords[activeSkillLevel] || dailyWords.Intermediate;
-
   return (
     <div className="space-y-8 pb-12">
       <SectionHeader
-        badge="Fluency & Technical Communication Studio"
-        title="English Speaking & Interview Communication Coach"
-        subtitle={`Calibrated for ${preferences?.targetRole || 'Full-Stack Developer'} • Master executive pronunciation, technical vocabulary, and fluent self-expression.`}
+        badge="Zero-to-Hero English Communication Studio"
+        title="English Speaking & Confidence Builder"
+        subtitle="Master executive pronunciation, technical vocabulary, and confident English communication."
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
@@ -152,7 +216,7 @@ export const EnglishPage = () => {
               onClick={() => setActiveTab('duolingo')}
               leftIcon={<Target className="w-4 h-4 text-cyan-400" />}
             >
-              Daily Duolingo Drills
+              🎯 Daily Duolingo Drills
             </Button>
             <Button
               variant={activeTab === 'speech' ? 'primary' : 'glass'}
@@ -160,123 +224,114 @@ export const EnglishPage = () => {
               onClick={() => setActiveTab('speech')}
               leftIcon={<Mic className="w-4 h-4 text-purple-400" />}
             >
-              Live AI Voice Studio
+              🎙️ Live AI Voice Studio
             </Button>
           </div>
         }
       />
 
-      {/* TAB 1: Duolingo-Style Daily English Mastery */}
+      {/* TAB 1: Duolingo-Style Zero-to-Hero Beginner Practice */}
       {activeTab === 'duolingo' && (
         <div className="space-y-8">
-          {/* Level Filter Bar */}
+          {/* Beginner Growth Ladder Stepper */}
           <LaserBorder className="p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Badge variant="cyan">Interactive Daily Practice</Badge>
-                  <span className="text-xs text-gray-400 font-mono">Duolingo Mode 🎯</span>
+                  <Badge variant="cyan">Zero-to-Hero English Ladder</Badge>
+                  <span className="text-xs text-purple-300 font-mono font-bold">Interactive Practice 💬</span>
                 </div>
                 <h2 className="text-lg font-bold text-white tracking-tight">
-                  Choose Your Current English Skill Target
+                  Select Your Current Learning Level (Steps 1..4)
                 </h2>
               </div>
+            </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
-                {[
-                  { id: 'Beginner', label: '🟢 Beginner Core' },
-                  { id: 'Intermediate', label: '🟡 Intermediate Tech' },
-                  { id: 'Executive', label: '🔴 Executive Tech Leader' }
-                ].map(lvl => (
+            {/* Stepper Pills */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-4">
+              {beginnerLadder.map((lvl, idx) => {
+                const isActive = idx === activeLevelIdx;
+                return (
                   <button
-                    key={lvl.id}
+                    key={idx}
+                    type="button"
                     onClick={() => {
-                      setActiveSkillLevel(lvl.id);
+                      setActiveLevelIdx(idx);
                       setSelectedOptionIdx(null);
                     }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                      activeSkillLevel === lvl.id
-                        ? 'bg-purple-500/20 border-purple-500 text-purple-200 shadow-md shadow-purple-500/10'
-                        : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'
+                    className={`p-3 rounded-xl text-left transition-all border flex flex-col justify-between gap-1.5 ${
+                      isActive
+                        ? 'bg-gradient-to-br from-purple-600/30 to-blue-600/30 border-purple-500 text-white font-bold shadow-lg shadow-purple-500/10'
+                        : 'bg-white/[0.03] border-white/10 text-gray-400 hover:bg-white/[0.06] hover:text-white'
                     }`}
                   >
-                    {lvl.label}
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-[10px] font-mono font-bold uppercase text-cyan-400">Level {idx + 1}</span>
+                      {isActive && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+                    </div>
+                    <span className="text-xs font-semibold">{lvl.levelTitle.split(':')[1] || lvl.levelTitle}</span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </LaserBorder>
 
-          {/* Grid Layout: Word of the Day & Sentence Drill */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left: Word of the Day & Audio Pronunciation */}
-            <div className="lg:col-span-6 space-y-6">
-              <TiltCard className="p-6 sm:p-8 space-y-4 border border-cyan-500/30 bg-gradient-to-br from-blue-950/40 via-[#14141b]/80 to-purple-950/40">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 animate-pulse text-amber-400" /> Daily Tech Word of the Day
-                  </span>
-                  <Badge variant="cyan">{activeSkillLevel}</Badge>
-                </div>
-
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                      {activeWord.word}
-                    </h3>
-                    <span className="text-xs text-purple-300 font-mono">{activeWord.phonetic}</span>
-                  </div>
-
-                  <Button
-                    size="sm"
-                    variant="glow"
-                    onClick={() => speakText(`${activeWord.word}. ${activeWord.definition}`)}
-                    leftIcon={<Volume2 className="w-4 h-4 text-cyan-300" />}
-                  >
-                    Listen Audio 🔊
-                  </Button>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5 text-xs">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Definition:</span>
-                  <p className="text-gray-200 leading-relaxed font-sans">{activeWord.definition}</p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 space-y-1.5 text-xs">
-                  <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">Example Engineering Usage:</span>
-                  <p className="text-purple-100 font-mono italic">"{activeWord.exampleSentence}"</p>
-                </div>
-              </TiltCard>
-
-              {/* Common Mistakes & Correction Card */}
-              <div className="space-y-3">
-                <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-amber-400" /> Common Indian English Mistakes & Fixes
-                </h3>
-
-                <div className="space-y-3">
-                  {commonMistakes.map((m, idx) => (
-                    <TiltCard key={idx} className="p-4 space-y-2 border border-white/10 bg-[#12121a]">
-                      <div className="flex items-center gap-2 text-xs text-rose-400 font-semibold">
-                        <X className="w-4 h-4 shrink-0" />
-                        <span className="line-through">{m.wrong}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
-                        <Check className="w-4 h-4 shrink-0" />
-                        <span>{m.correct}</span>
-                      </div>
-
-                      <p className="text-[11px] text-gray-400 pt-1 border-t border-white/5 font-sans leading-relaxed">
-                        💡 <strong>Rule:</strong> {m.reason}
-                      </p>
-                    </TiltCard>
-                  ))}
-                </div>
-              </div>
+          {/* Active Level Phrases (Listen & Repeat Out Loud Cards) */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
+                <Volume2 className="w-5 h-5 text-cyan-400" />
+                {currentLevelData.levelTitle} — Speak Out Loud
+              </h3>
+              <Badge variant="purple">{currentLevelData.badge}</Badge>
             </div>
 
-            {/* Right: Duolingo Sentence Builder Interactive Drill */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {currentLevelData.phrases.map((p, idx) => (
+                <TiltCard key={idx} className="p-6 space-y-4 border border-white/10 bg-[#12121a]">
+                  <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-mono font-bold uppercase text-cyan-400">English Phrase:</span>
+                      <h4 className="text-lg font-extrabold text-white tracking-tight leading-snug">
+                        "{p.english}"
+                      </h4>
+                    </div>
+
+                    <Button
+                      size="xs"
+                      variant="glow"
+                      onClick={() => speakText(p.english)}
+                      leftIcon={<Volume2 className="w-3.5 h-3.5 text-cyan-300" />}
+                      className="shrink-0"
+                    >
+                      Listen Pronunciation 🔊
+                    </Button>
+                  </div>
+
+                  {/* Subtle Regional Meaning Tag */}
+                  {p.marathi && (
+                    <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-mono uppercase text-purple-300">Regional Helper Tag:</span>
+                      <span className="text-purple-200 font-medium font-sans truncate">{p.marathi}</span>
+                    </div>
+                  )}
+
+                  {/* Usage Context & Pronunciation Guide */}
+                  <div className="space-y-1.5 text-xs">
+                    <p className="text-gray-300">
+                      💡 <strong>When to use:</strong> {p.context}
+                    </p>
+                    <p className="text-gray-400 font-mono text-[11px]">
+                      🗣️ <strong>Pronunciation Guide:</strong> {p.pronunciationTip}
+                    </p>
+                  </div>
+                </TiltCard>
+              ))}
+            </div>
+          </div>
+
+          {/* Interactive Duolingo Sentence Builder Drill & Common Mistakes */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
             <div className="lg:col-span-6 space-y-6">
               <TiltCard className="p-6 sm:p-8 space-y-5 border border-purple-500/30 bg-purple-950/20">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
@@ -316,11 +371,37 @@ export const EnglishPage = () => {
 
                 {selectedOptionIdx !== null && (
                   <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-xs text-purple-200 leading-relaxed animate-fadeIn space-y-1">
-                    <strong>{selectedOptionIdx === sentenceDrill.correctIdx ? "Correct Phrasing! 🎉" : "Explanation:"}</strong>
+                    <strong>{selectedOptionIdx === sentenceDrill.correctIdx ? "Correct Phrasing! 🎉" : "Note:"}</strong>
                     <p>{sentenceDrill.explanation}</p>
                   </div>
                 )}
               </TiltCard>
+            </div>
+
+            <div className="lg:col-span-6 space-y-4">
+              <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-400" /> Common English Mistakes & Corrections
+              </h3>
+
+              <div className="space-y-3">
+                {commonMistakes.map((m, idx) => (
+                  <TiltCard key={idx} className="p-4 space-y-2 border border-white/10 bg-[#12121a]">
+                    <div className="flex items-center gap-2 text-xs text-rose-400 font-semibold">
+                      <X className="w-4 h-4 shrink-0" />
+                      <span className="line-through">{m.wrong}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
+                      <Check className="w-4 h-4 shrink-0" />
+                      <span>{m.correct}</span>
+                    </div>
+
+                    <p className="text-[11px] text-gray-300 pt-1 border-t border-white/5 font-sans leading-relaxed">
+                      💡 <strong>Rule:</strong> {m.reason}
+                    </p>
+                  </TiltCard>
+                ))}
+              </div>
             </div>
           </div>
         </div>
