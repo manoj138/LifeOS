@@ -136,12 +136,29 @@ export const LearningHub = () => {
   }));
 
   const activeLessonsList = dynamicTopics
-    ? dynamicTopics.map(dt => ({
-        id: dt.id,
-        title: dt.title || dt.topicName,
-        topicName: dt.topicName || dt.title,
-        level: dt.level || 'Beginner',
-      }))
+    ? dynamicTopics
+        .map((dt, idx) => ({
+          id: dt.id,
+          title: dt.title || dt.topicName,
+          topicName: dt.topicName || dt.title,
+          level: dt.level || 'Beginner',
+          order: dt.order || idx + 1,
+        }))
+        .sort((a, b) => {
+          const getNum = (item) => {
+            const text = `${item.title || ''} ${item.topicName || ''}`.trim();
+            const match = text.match(/^(\d+)[\.\)]/);
+            if (match) return parseInt(match[1], 10);
+            if (/introduction|getting started|setup|basics|overview/i.test(text)) return 1;
+            return null;
+          };
+          const numA = getNum(a);
+          const numB = getNum(b);
+          if (numA !== null && numB !== null && numA !== numB) return numA - numB;
+          if (numA !== null && numB === null) return -1;
+          if (numA === null && numB !== null) return 1;
+          return (a.order || 999) - (b.order || 999);
+        })
     : [];
 
   const activeModuleTitle = dynamicModules.find(m => m.id === activeModule)?.title || activeModule;

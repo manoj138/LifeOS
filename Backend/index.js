@@ -48,11 +48,17 @@ app.get('/', (req, res) => {
 
 // Helper: Safely add missing columns to SQLite table without altering entire database
 const ensureTopicColumns = async () => {
-  const missingCols = ['taskTitle', 'taskDescription', 'starterCode', 'solutionCriteria'];
-  for (const colName of missingCols) {
+  const missingCols = [
+    { name: 'taskTitle', type: 'TEXT' },
+    { name: 'taskDescription', type: 'TEXT' },
+    { name: 'starterCode', type: 'TEXT' },
+    { name: 'solutionCriteria', type: 'TEXT' },
+    { name: '"order"', type: 'INTEGER DEFAULT 1' }
+  ];
+  for (const col of missingCols) {
     try {
-      await sequelize.query(`ALTER TABLE CurriculumTopics ADD COLUMN ${colName} TEXT;`);
-      console.log(`✅ Added missing column ${colName} to CurriculumTopics table.`);
+      await sequelize.query(`ALTER TABLE CurriculumTopics ADD COLUMN ${col.name} ${col.type};`);
+      console.log(`✅ Added missing column ${col.name} to CurriculumTopics table.`);
     } catch (err) {
       // Ignore if column already exists
     }

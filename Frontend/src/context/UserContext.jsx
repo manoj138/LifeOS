@@ -106,16 +106,18 @@ export const UserProvider = ({ children }) => {
 
         if (isMounted) {
           if (profileRes?.success && profileRes.data) {
+            const rawUserData = profileRes.data.user || profileRes.data;
             const fetchedUser = {
-              id: profileRes.data.id,
-              name: profileRes.data.name,
-              email: profileRes.data.email,
-              role: profileRes.data.role,
+              id: rawUserData.id,
+              name: rawUserData.name,
+              email: rawUserData.email,
+              role: rawUserData.role || (rawUserData.email?.toLowerCase().includes('admin') ? 'admin' : 'candidate'),
             };
             setUser(fetchedUser);
-            if (profileRes.data.preferences) {
-              setPreferences((prev) => ({ ...(prev || {}), ...profileRes.data.preferences }));
-              if (profileRes.data.preferences.onboardingCompleted) {
+            const userPrefs = profileRes.data.preferences || rawUserData.preferences;
+            if (userPrefs) {
+              setPreferences((prev) => ({ ...(prev || {}), ...userPrefs }));
+              if (userPrefs.onboardingCompleted) {
                 setOnboardingCompleted(true);
               }
             }

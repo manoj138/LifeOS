@@ -2,12 +2,41 @@ const CurriculumTopic = require('../modals/CurriculumTopic');
 const { sendSuccess, sendError } = require('../helper/responseHelper');
 const { generateTopicContent } = require('../helper/aiGenerator');
 
+const sortTopicsNaturally = (topics) => {
+  return [...topics].sort((a, b) => {
+    // Extract leading number or keyword index if present
+    const getNum = (item) => {
+      const text = `${item.title || ''} ${item.topicName || ''}`.trim();
+      const match = text.match(/^(\d+)[\.\)]/);
+      if (match) return parseInt(match[1], 10);
+      if (/introduction|getting started|setup|basics|overview/i.test(text)) return 1;
+      return null;
+    };
+
+    const numA = getNum(a);
+    const numB = getNum(b);
+
+    if (numA !== null && numB !== null && numA !== numB) {
+      return numA - numB;
+    }
+    if (numA !== null && numB === null) return -1;
+    if (numA === null && numB !== null) return 1;
+
+    const orderA = a.order || 999;
+    const orderB = b.order || 999;
+    if (orderA !== orderB) return orderA - orderB;
+
+    return new Date(a.createdAt) - new Date(b.createdAt);
+  });
+};
+
 const getAllTopics = async (req, res) => {
   try {
     const { moduleId } = req.query;
     const whereClause = moduleId ? { moduleId } : {};
-    const topics = await CurriculumTopic.findAll({ where: whereClause, order: [['createdAt', 'ASC']] });
-    return sendSuccess(res, 'Curriculum topics retrieved successfully', topics);
+    const topics = await CurriculumTopic.findAll({ where: whereClause, order: [['order', 'ASC'], ['createdAt', 'ASC']] });
+    const sorted = sortTopicsNaturally(topics);
+    return sendSuccess(res, 'Curriculum topics retrieved successfully', sorted);
   } catch (error) {
     return sendError(res, 'Error fetching curriculum topics', error, 500);
   }
@@ -47,6 +76,7 @@ const updateTopic = async (req, res) => {
         starterCode: req.body.starterCode || '',
         solutionCriteria: req.body.solutionCriteria || '',
         level: req.body.level || 'Beginner',
+        order: req.body.order || 1,
       });
     } else {
       await topic.update(req.body);
@@ -155,6 +185,7 @@ const bulkGenerateSequence = async (req, res) => {
               title: content.title || title,
               topicName: title,
               level: level,
+              order: globalIdx + 1,
               conceptExplanation: content.conceptExplanation || '',
               codeSnippet: content.codeSnippet || '',
               projectApplication: content.projectApplication || '',

@@ -17,7 +17,7 @@ export const MainLayout = () => {
   const { user } = useUser();
   const location = useLocation();
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
 
   return (
     <div className="min-h-screen bg-[#070709] text-gray-100 selection:bg-purple-500/30 selection:text-purple-200 relative overflow-x-hidden">

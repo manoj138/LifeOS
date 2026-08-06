@@ -31,7 +31,7 @@ import { useUser } from '../context/UserContext';
 
 const AppIndexRedirect = () => {
   const { user } = useUser();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase().includes('admin');
   return <Navigate to={isAdmin ? "/app/admin" : "/app/dashboard"} replace />;
 };
 

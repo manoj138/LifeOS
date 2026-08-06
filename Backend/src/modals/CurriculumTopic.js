@@ -23,6 +23,10 @@ const CurriculumTopic = sequelize.define('CurriculumTopic', {
     type: DataTypes.STRING,
     defaultValue: 'Beginner',
   },
+  order: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+  },
   conceptExplanation: {
     type: DataTypes.TEXT,
     allowNull: false,
