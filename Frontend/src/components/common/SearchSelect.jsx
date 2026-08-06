@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Api } from "./Api/api";
+import { Api } from "../../services/api";
 import Input from "./Input";
 import { Search, X, Loader2, ChevronDown } from "lucide-react";
 
@@ -61,7 +61,8 @@ const SearchSelect = ({
         signal: abortControllerRef.current.signal,
       });
       
-      setList(res.data.data || []);
+      const rawData = res.data?.data || res.data;
+      setList(Array.isArray(rawData) ? rawData : []);
       setShow(true);
       setActiveIndex(-1); 
     } catch (err) {
