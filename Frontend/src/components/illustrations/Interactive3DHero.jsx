@@ -38,8 +38,15 @@ export const Interactive3DHero = ({ className = "w-full h-[480px]" }) => {
         {/* Central Real Developer Code Editor & AI Studio Window */}
         <div 
           style={{ transform: 'translateZ(30px)' }} 
-          className="w-full max-w-3xl p-5 sm:p-6 rounded-3xl bg-[#0b0c13]/90 border border-white/15 backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.8)] text-left space-y-4 relative"
+          className="w-full max-w-3xl p-5 sm:p-6 rounded-3xl bg-[#0b0c13]/90 border border-white/15 backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.8)] text-left space-y-4 relative overflow-hidden"
         >
+          {/* Custom Web Development SVG Watermark */}
+          <img 
+            src="/Web Development.svg" 
+            alt="Web Dev Illustration" 
+            className="absolute -right-12 -bottom-12 w-52 h-52 opacity-15 pointer-events-none object-contain" 
+          />
+
           {/* Top IDE Window Header Bar */}
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div className="flex items-center gap-2">
@@ -96,15 +103,15 @@ export const Interactive3DHero = ({ className = "w-full h-[480px]" }) => {
           </div>
         </div>
 
-        {/* Floating AI Voice Senior Tech Lead Avatar Badge */}
+        {/* Floating Ghostsmart AI Voice Avatar Badge */}
         <motion.div
           animate={{ y: [-8, 8, -8] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           style={{ transform: 'translateZ(75px)' }}
           className="absolute -top-4 left-4 sm:left-8 px-4 py-2.5 rounded-2xl bg-[#14141d]/95 border border-purple-500/40 backdrop-blur-xl flex items-center gap-3 shadow-2xl shadow-purple-500/20 text-xs text-purple-200"
         >
-          <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300">
-            <Bot className="w-4 h-4 animate-pulse" />
+          <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-500/40 p-1 flex items-center justify-center">
+            <img src="/Ghostsmart.svg" alt="Ghostsmart AI" className="w-full h-full object-contain" />
           </div>
           <div>
             <span className="font-bold text-white block">AI Voice Mock Arena Active</span>
@@ -119,8 +126,8 @@ export const Interactive3DHero = ({ className = "w-full h-[480px]" }) => {
           style={{ transform: 'translateZ(85px)' }}
           className="absolute -bottom-4 right-4 sm:right-8 px-4 py-2.5 rounded-2xl bg-[#14141d]/95 border border-cyan-500/40 backdrop-blur-xl flex items-center gap-3 shadow-2xl shadow-cyan-500/20 text-xs text-cyan-200"
         >
-          <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-            <Flame className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 p-1 flex items-center justify-center">
+            <img src="/Algorithm.svg" alt="Algorithm" className="w-full h-full object-contain" />
           </div>
           <div>
             <span className="font-bold text-white block">🔥 14-Day Learning Streak</span>

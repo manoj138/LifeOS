@@ -20,13 +20,14 @@ export const LandingPage = () => {
   const { user, onboardingCompleted } = useUser();
   const [activeTab, setActiveTab] = useState(0);
 
-  // All 8 Core System Modules Detailed Showcase Data
+  // All 8 Core System Modules Detailed Showcase Data with Custom SVGs
   const systemModules = [
     {
       id: 'mern',
       title: '1. MERN Full-Stack Learning Hub',
       subtitle: 'Natural 1..N Sequential Curriculum',
       icon: <Code2 className="w-5 h-5 text-cyan-400" />,
+      customSvg: '/Web Development.svg',
       color: 'from-cyan-500/20 via-indigo-500/10 to-transparent',
       badge: 'Interactive Curriculum',
       desc: 'Master JavaScript, React 19, Node.js Express, and MongoDB with dynamic level-based lessons, quizzes, and live coding exercises.',
@@ -52,6 +53,7 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
       title: '2. LeetCode DSA Practice Studio',
       subtitle: 'Multi-Language Algorithmic Patterns',
       icon: <Cpu className="w-5 h-5 text-amber-400" />,
+      customSvg: '/Algorithm.svg',
       color: 'from-amber-500/20 via-orange-500/10 to-transparent',
       badge: 'Algorithmic Mastery',
       desc: 'Solve top LeetCode patterns (Arrays, Two Pointers, Dynamic Programming) in JavaScript, Python, C++, and Java with instant hints.',
@@ -70,6 +72,7 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
       title: '3. 1-on-1 AI Voice Mock Arena',
       subtitle: 'Senior Tech Lead Interviewer',
       icon: <MessageSquareCode className="w-5 h-5 text-purple-400" />,
+      customSvg: '/Ghostsmart.svg',
       color: 'from-purple-500/20 via-pink-500/10 to-transparent',
       badge: 'Voice Avatar AI',
       desc: 'Practice real-time technical interviews with an AI Senior Tech Lead avatar that speaks out loud and evaluates your answers.',
@@ -117,9 +120,10 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
     },
     {
       id: 'jobs',
-      title: '6. Job Application & Freelancing Suite',
-      subtitle: 'Hiring Portals & Client Sourcing',
+      title: '6. Job Application & Placement Target',
+      subtitle: 'Hiring Portals & Career Success',
       icon: <Briefcase className="w-5 h-5 text-rose-400" />,
+      customSvg: '/Successful target.svg',
       color: 'from-rose-500/20 via-pink-500/10 to-transparent',
       badge: 'Career Launchpad',
       desc: 'Accelerate your job search with top hiring platforms, 1-click cold email pitches, ATS resume checklist, and Upwork client proposal templates.',
@@ -200,8 +204,8 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
       >
         <Link to="/" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 p-0.5 shadow-lg shadow-cyan-500/20 flex items-center justify-center">
-            <div className="w-full h-full bg-[#0c0c10] rounded-[14px] flex items-center justify-center">
-              <Bot className="w-5 h-5 text-cyan-400" />
+            <div className="w-full h-full bg-[#0c0c10] rounded-[14px] flex items-center justify-center overflow-hidden p-1">
+              <img src="/AI logo Foriday.svg" alt="LifeOS AI Logo" className="w-full h-full object-contain" />
             </div>
           </div>
           <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white flex items-center gap-2">
@@ -238,8 +242,8 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <Badge variant="neon" className="mb-6 px-4 py-2 text-xs sm:text-sm">
-            <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+          <Badge variant="neon" className="mb-6 px-4 py-2 text-xs sm:text-sm flex items-center gap-2">
+            <img src="/AI logo Foriday.svg" alt="AI Icon" className="w-4 h-4 object-contain animate-pulse" />
             <span>Next-Gen Full-Stack Engineering & AI Interview Platform</span>
           </Badge>
         </motion.div>
@@ -325,7 +329,7 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
         </div>
       </section>
 
-      {/* ALL 8 CORE MODULES INTERACTIVE SHOWCASE */}
+      {/* ALL 8 CORE MODULES INTERACTIVE SHOWCASE WITH CUSTOM SVGs */}
       <section id="showcase" className="py-24 px-4 sm:px-12 max-w-7xl mx-auto space-y-12">
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <Badge variant="purple">Unified Engineering Ecosystem</Badge>
@@ -353,7 +357,13 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
                 }`}
               >
                 <div className="flex items-center justify-between w-full">
-                  <div className="p-1.5 rounded-lg bg-white/10">{mod.icon}</div>
+                  <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden p-1">
+                    {mod.customSvg ? (
+                      <img src={mod.customSvg} alt={mod.title} className="w-full h-full object-contain" />
+                    ) : (
+                      mod.icon
+                    )}
+                  </div>
                   <span className="text-[10px] font-mono font-bold text-cyan-400">{idx + 1}/8</span>
                 </div>
                 <span className="text-xs font-semibold line-clamp-1">{mod.title.split('.')[1] || mod.title}</span>
@@ -376,8 +386,12 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
                 {/* Left Info Column */}
                 <div className="lg:col-span-6 space-y-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30">
-                      {currentModule.icon}
+                    <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center p-2">
+                      {currentModule.customSvg ? (
+                        <img src={currentModule.customSvg} alt={currentModule.title} className="w-full h-full object-contain" />
+                      ) : (
+                        currentModule.icon
+                      )}
                     </div>
                     <div>
                       <Badge variant="cyan">{currentModule.badge}</Badge>
@@ -410,7 +424,16 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
 
                 {/* Right Interactive Visual Preview Column */}
                 <div className="lg:col-span-6">
-                  <TiltCard className="p-6 space-y-4 border border-purple-500/30 bg-[#0a0a0f] shadow-2xl">
+                  <TiltCard className="p-6 space-y-4 border border-purple-500/30 bg-[#0a0a0f] shadow-2xl relative overflow-hidden">
+                    {/* Custom Background SVG Illustration Watermark */}
+                    {currentModule.customSvg && (
+                      <img 
+                        src={currentModule.customSvg} 
+                        alt="Watermark" 
+                        className="absolute -right-8 -bottom-8 w-44 h-44 opacity-15 pointer-events-none object-contain" 
+                      />
+                    )}
+
                     <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
                         <Terminal className="w-4 h-4 text-purple-400" /> Interactive Studio Preview
@@ -442,8 +465,9 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
                     {/* Preview Type 3: Voice Interview */}
                     {currentModule.previewType === 'voice' && (
                       <div className="space-y-4">
-                        <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-xs text-purple-200 leading-relaxed italic">
-                          "{currentModule.qTitle}"
+                        <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-xs text-purple-200 leading-relaxed italic flex items-center gap-3">
+                          <img src="/Ghostsmart.svg" alt="Ghost Smart AI" className="w-8 h-8 object-contain shrink-0" />
+                          <p>"{currentModule.qTitle}"</p>
                         </div>
                         <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 font-bold">
                           <span>AI Senior Lead Evaluation:</span>
@@ -475,7 +499,10 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
                     {/* Preview Type 6: Email */}
                     {currentModule.previewType === 'email' && (
                       <div className="p-4 rounded-xl bg-[#09090d] border border-white/15 font-mono text-xs text-purple-200 space-y-2">
-                        <span className="text-[10px] text-rose-400 font-bold uppercase block">1-Click Cold Email Pitch</span>
+                        <div className="flex items-center gap-2">
+                          <img src="/Successful target.svg" alt="Target" className="w-5 h-5 object-contain" />
+                          <span className="text-[10px] text-rose-400 font-bold uppercase block">1-Click Cold Email Pitch</span>
+                        </div>
                         <p className="leading-relaxed">{currentModule.pitchText}</p>
                       </div>
                     )}
@@ -512,6 +539,9 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
       {/* Footer Call-to-Action */}
       <section className="py-16 px-4 sm:px-12 max-w-7xl mx-auto text-center">
         <LaserBorder className="p-10 space-y-6">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-cyan-500/10 border border-cyan-500/30 p-2 flex items-center justify-center">
+            <img src="/Successful target.svg" alt="Target Goal" className="w-full h-full object-contain" />
+          </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
             Ready to Elevate Your Tech Career?
           </h2>
@@ -530,7 +560,7 @@ module.exports = mongoose.model('CurriculumTopic', curriculumSchema);`
       <footer className="border-t border-white/10 py-12 px-6 sm:px-12 bg-[#050507]">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-gray-500">
           <div className="flex items-center gap-3">
-            <Bot className="w-5 h-5 text-cyan-400" />
+            <img src="/AI logo Foriday.svg" alt="LifeOS Logo" className="w-5 h-5 object-contain" />
             <span className="font-bold text-white">LifeOS AI Studio © 2026</span>
             <span>• Full-Stack & AI Interview Platform</span>
           </div>
