@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Globe, Compass, Send, Plus } from 'lucide-react';
+import { X, Sparkles, Globe } from 'lucide-react';
 import { useVoiceGuider } from '../../context/VoiceGuiderContext';
 import { AudioSpectrum } from '../ui/AudioSpectrum';
 import { AIRobotAvatar } from './AIRobotAvatar';
@@ -15,27 +15,12 @@ export const VoiceAssistantModal = () => {
     isSpeaking,
     userTranscript,
     aiResponseText,
-    processVoiceQuery,
     language,
     setLanguage,
     aiName
   } = useVoiceGuider();
 
   if (!isVoiceModalOpen) return null;
-
-  const promptSuggestions = language === 'mr'
-    ? [
-        `Add task: Prepare MERN Resume`,
-        `Add habit: Drink 3L Water`,
-        `Add goal: Master Docker and VPS`,
-        `Dashboard open kar`
-      ]
-    : [
-        `Add task: Prepare MERN Resume`,
-        `Add habit: Drink 3L Water`,
-        `Add goal: Master Docker and VPS`,
-        `Open Dashboard`
-      ];
 
   return (
     <AnimatePresence>
@@ -150,27 +135,6 @@ export const VoiceAssistantModal = () => {
                   : `Try: "Add task: Prepare Resume" or "Add habit: Exercise"`}
               </p>
             )}
-          </div>
-
-          {/* Quick Suggested Voice Commands */}
-          <div className="space-y-1.5 text-left pt-0.5">
-            <span className="text-[10px] font-semibold text-gray-400 flex items-center gap-1">
-              <Plus className="w-3 h-3 text-purple-400" />
-              {language === 'mr' ? 'त्वरित काम जोडण्यासाठी क्लिक करा:' : 'Quick Voice Data Creation:'}
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {promptSuggestions.map((prompt, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => processVoiceQuery(prompt)}
-                  className="px-2.5 py-1 rounded-xl bg-white/[0.04] hover:bg-purple-600/30 border border-white/10 hover:border-purple-500/40 text-[10px] font-medium text-gray-300 hover:text-white transition-all text-left flex items-center gap-1"
-                >
-                  <Send className="w-2.5 h-2.5 text-cyan-400" />
-                  <span>{prompt}</span>
-                </button>
-              ))}
-            </div>
           </div>
         </motion.div>
       </div>

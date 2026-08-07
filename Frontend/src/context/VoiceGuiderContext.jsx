@@ -66,16 +66,22 @@ export const VoiceGuiderProvider = ({ children }) => {
   const [pendingTasks, setPendingTasks] = useState([]);
   const [habits, setHabits] = useState([]);
   const [userGoals, setUserGoals] = useState([]);
+  const [dbTopics, setDbTopics] = useState([]);
+  const [dbQuestions, setDbQuestions] = useState([]);
+  const [dbDsaProblems, setDbDsaProblems] = useState([]);
 
-  // Dynamically fetch live user tasks & goals on mount / unlock
+  // Dynamically fetch live user tasks, goals & MongoDB Knowledge Base on mount / unlock
   useEffect(() => {
     let isMounted = true;
     const fetchLiveVoiceData = async () => {
       try {
-        const [tasksRes, goalsRes, habitsRes] = await Promise.all([
+        const [tasksRes, goalsRes, habitsRes, topicsRes, questionsRes, dsaRes] = await Promise.all([
           apiService.getPlannerTasks(),
           apiService.getGoals(),
-          apiService.getHabits()
+          apiService.getHabits(),
+          apiService.getCurriculumTopics(),
+          apiService.getInterviewQuestions(),
+          apiService.getDsaProblems()
         ]);
         if (isMounted) {
           if (tasksRes?.success && Array.isArray(tasksRes.data)) {
@@ -86,6 +92,15 @@ export const VoiceGuiderProvider = ({ children }) => {
           }
           if (habitsRes?.success && Array.isArray(habitsRes.data)) {
             setHabits(habitsRes.data);
+          }
+          if (topicsRes?.success && Array.isArray(topicsRes.data)) {
+            setDbTopics(topicsRes.data);
+          }
+          if (questionsRes?.success && Array.isArray(questionsRes.data)) {
+            setDbQuestions(questionsRes.data);
+          }
+          if (dsaRes?.success && Array.isArray(dsaRes.data)) {
+            setDbDsaProblems(dsaRes.data);
           }
         }
       } catch (err) {
@@ -178,24 +193,112 @@ export const VoiceGuiderProvider = ({ children }) => {
     window.speechSynthesis.speak(utterance);
   }, [isMuted, language, speechRate, speechPitch, isHandsFreeEnabled, isLocked, safeStopMic]);
 
-  // Expanded Knowledge Generator
+  // Dynamic MongoDB Atlas & Tech Dictionary AI Assistant Knowledge Engine
   const generateKnowledgeAnswer = useCallback((cleanQuery, targetLang) => {
-    if (cleanQuery.includes('docker') || cleanQuery.includes('डॉकर')) {
-      return targetLang === 'mr' ? 'डॉकर हे ॲप्लिकेशन लाईटवेट कंटेनरमध्ये चालवणारे प्लॅटफॉर्म आहे.' : 'Docker is a containerization platform for light-weight apps.';
+    if (!cleanQuery) return targetLang === 'mr' ? 'नमस्कार! मी ऐकत आहे, सांगा काय मदत करू?' : 'Hi! LifeOS AI is listening, how can I help you?';
+
+    const lowerQ = cleanQuery.toLowerCase().trim();
+
+    // 1. Extract core tech keywords by removing Marathi & English stop words
+    const stopWords = ['म्हणजे', 'काय', 'बद्दल', 'सांग', 'बघू', 'मदत', 'करा', 'आहे', 'आहेस', 'कसे', 'व्हाट', 'माहिती', 'उत्तर', 'what', 'is', 'tell', 'me', 'about', 'explain', 'how', 'to', 'the', 'a', 'an'];
+    const tokens = lowerQ
+      .split(/[\s,?.!]+/)
+      .filter(w => w.length > 1 && !stopWords.includes(w));
+
+    // Helper: Check if item contains any query token
+    const matchesTokens = (text) => {
+      if (!text) return false;
+      const lowerText = text.toLowerCase();
+      return tokens.some(token => lowerText.includes(token));
+    };
+
+    // 2. Search MongoDB Curriculum Topics
+    const matchedTopic = dbTopics.find(t =>
+      matchesTokens(t.topicName) ||
+      matchesTokens(t.title) ||
+      matchesTokens(t.conceptExplanation)
+    );
+
+    if (matchedTopic) {
+      const titleStr = matchedTopic.topicName || matchedTopic.title;
+      const exp = matchedTopic.conceptExplanation || matchedTopic.taskDescription || titleStr;
+      return targetLang === 'mr'
+        ? `${titleStr}: ${exp.slice(0, 160)}.`
+        : `${titleStr}: ${exp.slice(0, 160)}.`;
     }
-    if (cleanQuery.includes('vps') || cleanQuery.includes('hostinger')) {
-      return targetLang === 'mr' ? 'होस्टिंगर VPS वर Nginx आणि PM2 द्वारे ॲप लाईव्ह ठेवले जातात.' : 'Hostinger VPS runs Node.js live using Nginx and PM2.';
+
+    // 3. Search MongoDB Interview Questions
+    const matchedQuestion = dbQuestions.find(q =>
+      matchesTokens(q.question) ||
+      matchesTokens(q.marathiIntent) ||
+      matchesTokens(q.answer)
+    );
+
+    if (matchedQuestion) {
+      const qTitle = matchedQuestion.marathiIntent || matchedQuestion.question;
+      const ans = matchedQuestion.answer || qTitle;
+      return targetLang === 'mr'
+        ? `${qTitle}: ${ans.slice(0, 160)}.`
+        : `${qTitle}: ${ans.slice(0, 160)}.`;
     }
-    if (cleanQuery.includes('state') || cleanQuery.includes('स्टेट')) {
-      return targetLang === 'mr' ? 'रिॲक्ट स्टेट हे कॉम्पोनंटचा डेटा स्टोअर करते व UI अपडेट करते.' : 'React State holds dynamic component data.';
+
+    // 4. Search MongoDB DSA Problems
+    const matchedDsa = dbDsaProblems.find(d =>
+      matchesTokens(d.title) ||
+      matchesTokens(d.topic) ||
+      matchesTokens(d.description)
+    );
+
+    if (matchedDsa) {
+      const hint = matchedDsa.hint || matchedDsa.description;
+      return targetLang === 'mr'
+        ? `DSA समस्या (${matchedDsa.title}): ${hint.slice(0, 160)}.`
+        : `DSA Problem (${matchedDsa.title}): ${hint.slice(0, 160)}.`;
     }
-    if (cleanQuery.includes('mern') || cleanQuery.includes('मर्न')) {
-      return targetLang === 'mr' ? 'मर्न स्टॅक मध्ये MongoDB, Express, React आणि Node.js समाविष्ट आहेत.' : 'MERN stack includes MongoDB, Express, React, and Node.js.';
+
+    // 5. Rich Full-Stack Tech Knowledge Dictionary (Fallback AI Engine)
+    if (lowerQ.includes('react') || lowerQ.includes('रिॲक्ट')) {
+      return targetLang === 'mr'
+        ? 'रिॲक्ट ही युझर इंटरफेस (UI) तयार करण्यासाठी वापरली जाणारी लोकप्रिय जावास्क्रिप्ट लायब्ररी आहे, जी व्हर्च्युअल DOM वर काम करते.'
+        : 'React is a popular JavaScript library for building user interfaces using Virtual DOM and reusable components.';
     }
+    if (lowerQ.includes('express') || lowerQ.includes('एक्सप्रेस')) {
+      return targetLang === 'mr'
+        ? 'एक्सप्रेस हे Node.js मधील जलद आणि लाईटवेट REST API बॅकएंड फ्रेमवर्क आहे.'
+        : 'Express is a minimal and flexible Node.js web application framework for building RESTful APIs.';
+    }
+    if (lowerQ.includes('mongo') || lowerQ.includes('मोंगो')) {
+      return targetLang === 'mr' ? 'मोंगोडीबी हा NoSQL दस्तऐवज-आधारित डेटाबेस आहे जो JSON सारख्या BSON फॉरमॅटमध्ये डेटा स्टोअर करतो.' : 'MongoDB is a NoSQL document database that stores data in flexible BSON format.';
+    }
+    if (lowerQ.includes('node') || lowerQ.includes('नोड')) {
+      return targetLang === 'mr' ? 'Node.js हा जावास्क्रिप्टचा बॅकएंड रनटाईम एन्व्हायर्नमेंट आहे जो व्हॉट्सॲप सारखे रिअल-टाईम सर्व्हर चालवतो.' : 'Node.js is an asynchronous event-driven JavaScript backend runtime environment.';
+    }
+    if (lowerQ.includes('docker') || lowerQ.includes('डॉकर')) {
+      return targetLang === 'mr' ? 'डॉकर हे ॲप्लिकेशन लाईटवेट आणि पोर्टेबल कंटेनरमध्ये चालवणारे प्लॅटफॉर्म आहे.' : 'Docker is a containerization platform for deploying lightweight software applications.';
+    }
+    if (lowerQ.includes('vps') || lowerQ.includes('hostinger') || lowerQ.includes('nginx')) {
+      return targetLang === 'mr' ? 'Nginx हा हाय-परफॉर्मन्स रिव्हर्स प्रॉक्सी सर्व्हर आहे जो पोर्ट १२३५ वरून ॲप्स सर्व्ह करतो.' : 'Nginx is a high-performance reverse proxy server that routes web requests.';
+    }
+    if (lowerQ.includes('state') || lowerQ.includes('स्टेट')) {
+      return targetLang === 'mr' ? 'रिॲक्ट स्टेट हे कॉम्पोनंटचा डायनॅमिक डेटा स्टोअर करते आणि UI री-रेंडर करते.' : 'React State manages dynamic component data and triggers UI re-renders.';
+    }
+    if (lowerQ.includes('props') || lowerQ.includes('प्रॉप्स')) {
+      return targetLang === 'mr' ? 'प्रॉप्स द्वारे पॅरेंट कॉम्पोनंटकडून चाईल्ड कॉम्पोनंटला डेटा पाठवला जातो.' : 'Props are read-only properties passed from parent to child components.';
+    }
+    if (lowerQ.includes('closure') || lowerQ.includes('क्लोजर')) {
+      return targetLang === 'mr' ? 'क्लोजर मुळे इनर फंक्शन आऊटर फंक्शनच्या व्हेरियबल्सना ॲक्सेस करू शकते.' : 'A closure gives an inner function access to an outer function scope.';
+    }
+    if (lowerQ.includes('promise') || lowerQ.includes('प्रॉमिस')) {
+      return targetLang === 'mr' ? 'प्रॉमिस हे जावास्क्रिप्ट मधील अस्ंक्रोनस ऑपरेशन्स हाताळण्यासाठी वापरले जाते.' : 'Promises represent the eventual completion or failure of an asynchronous operation.';
+    }
+    if (lowerQ.includes('dsa') || lowerQ.includes('array')) {
+      return targetLang === 'mr' ? 'DSA म्हणजे डेटा स्ट्रक्चर्स आणि अल्गोरिदम्स, जे कोडिंग समस्या सोडवण्यासाठी लागतात.' : 'DSA stands for Data Structures and Algorithms for problem solving.';
+    }
+
     return targetLang === 'mr'
-      ? `मी तुमची कमांड ऐकत आहे. तुम्ही डॅशबोर्ड, प्लॅनर किंवा लर्निंग हब उघडायला सांगू शकता.`
-      : `I am ready to assist. You can ask me to open Dashboard, Daily Planner, or Learning Hub.`;
-  }, []);
+      ? `मी मोंगो डेटाबेस आणि लर्निंग हबमध्ये शोधत आहे. तुम्ही मला MERN, Docker, React, State किंवा DSA बद्दल विचारू शकता.`
+      : `Searching MERN & Engineering Knowledge Base. You can ask about React, Express, MongoDB, Docker, or DSA.`;
+  }, [dbTopics, dbQuestions, dbDsaProblems]);
 
   // Process User Voice Query
   const processVoiceQuery = useCallback((query) => {
