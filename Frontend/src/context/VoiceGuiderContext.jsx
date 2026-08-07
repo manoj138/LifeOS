@@ -193,8 +193,8 @@ export const VoiceGuiderProvider = ({ children }) => {
       return targetLang === 'mr' ? 'मर्न स्टॅक मध्ये MongoDB, Express, React आणि Node.js समाविष्ट आहेत.' : 'MERN stack includes MongoDB, Express, React, and Node.js.';
     }
     return targetLang === 'mr'
-      ? `मी तुमचे ऐकले: "${cleanQuery}". मी लाईफ ओएस मध्ये माहिती विश्लेषित करत आहे.`
-      : `I heard: "${cleanQuery}". LifeOS AI is processing your input.`;
+      ? `मी तुमची कमांड ऐकत आहे. तुम्ही डॅशबोर्ड, प्लॅनर किंवा लर्निंग हब उघडायला सांगू शकता.`
+      : `I am ready to assist. You can ask me to open Dashboard, Daily Planner, or Learning Hub.`;
   }, []);
 
   // Process User Voice Query
@@ -204,7 +204,13 @@ export const VoiceGuiderProvider = ({ children }) => {
     let cleanQuery = query.toLowerCase().trim();
     setUserTranscript(query);
 
-    const wakePrefixes = ['hey lifeos', 'hey assistant', 'hi lifeos', 'lifeos', 'jarvis', 'अहो lifeos', aiName.toLowerCase()];
+    const wakePrefixes = [
+      'hey life os', 'hi life os', 'hello life os', 'hey lifeos', 'hi lifeos',
+      'hello lifeos', 'life os', 'live os', 'light os', 'lifeos',
+      'hey assistant', 'hi assistant', 'hey jarvis', 'jarvis',
+      'अहो lifeos', 'लायफ ओएस', 'लाइफ ओएस', 'लायफ', 'लाइफ',
+      aiName.toLowerCase()
+    ];
     for (const prefix of wakePrefixes) {
       if (cleanQuery.startsWith(prefix)) {
         cleanQuery = cleanQuery.slice(prefix.length).trim().replace(/^[,.\s]+/, '');
@@ -235,11 +241,11 @@ export const VoiceGuiderProvider = ({ children }) => {
       navTarget = '/app/habits';
       reply = language === 'mr' ? 'हॅबिट ट्रॅकर उघडत आहे!' : 'Opening Habit Tracker!';
     }
-    // Standalone Wake Word Greeting
-    else if (cleanQuery === '' || cleanQuery === 'hey' || cleanQuery === 'hi') {
+    // Standalone Wake Word Greeting (Natural & Helpful, No Robotic Echo!)
+    else if (cleanQuery === '' || cleanQuery === 'hey' || cleanQuery === 'hi' || cleanQuery === 'hello' || cleanQuery === 'lifeos' || cleanQuery === 'life os') {
       reply = language === 'mr'
-        ? `नमस्कार ${userName}! मी ${aiName} ऐकत आहे, बोला मी काय मदत करू?`
-        : `Hi ${userName}! ${aiName} is listening, how can I help you?`;
+        ? `नमस्कार! मी ऐकत आहे, सांगा मी काय मदत करू?`
+        : `Hi! LifeOS AI is listening, how can I help you?`;
     }
     // General Q&A
     else {
@@ -255,7 +261,7 @@ export const VoiceGuiderProvider = ({ children }) => {
         navigate(navTarget);
       }, 1200);
     }
-  }, [language, userName, aiName, speakText, navigate, generateKnowledgeAnswer]);
+  }, [language, aiName, speakText, navigate, generateKnowledgeAnswer]);
 
   // Unified Speech Recognition State Machine Engine
   const startListening = useCallback(async () => {
@@ -297,11 +303,12 @@ export const VoiceGuiderProvider = ({ children }) => {
           const rawClean = textChunk.toLowerCase().trim();
           const normalized = rawClean
             .replace(/\s+/g, '')
-            .replace(/liveos|lightos|life-os|life_os|lifehouse/g, 'lifeos')
-            .replace(/लाइफओएस|लायफओएस|लाइफओस|लायफओॲस/g, 'lifeos');
+            .replace(/liveos|lightos|life-os|life_os|lifehouse|laifos|laif/g, 'lifeos')
+            .replace(/लाइफओएस|लायफओएस|लाइफओस|लायफओॲस|लायफ|लाइफ/g, 'lifeos');
 
           const wakeWords = [
             'lifeos', 'heylifeos', 'heyassistant', 'jarvis', 'अहोlifeos',
+            'life', 'os', 'hey', 'hi', 'hello', 'laif', 'laifos',
             aiName.toLowerCase().replace(/\s+/g, ''),
             'hey' + aiName.toLowerCase().replace(/\s+/g, '')
           ];
@@ -311,8 +318,12 @@ export const VoiceGuiderProvider = ({ children }) => {
             rawClean.includes('life os') ||
             rawClean.includes('live os') ||
             rawClean.includes('light os') ||
+            rawClean.includes('hi life') ||
+            rawClean.includes('hey life') ||
             rawClean.includes('लाइफ') ||
-            rawClean.includes('लायफ')
+            rawClean.includes('लायफ') ||
+            rawClean.includes('hey') ||
+            rawClean.includes('hi')
           );
 
           setUserTranscript(textChunk);
