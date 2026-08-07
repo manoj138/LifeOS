@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const curriculumTopicSchema = new mongoose.Schema({
-  _id: { type: String },
+  _id: { type: String, default: function() { return this.id || `topic-${Date.now()}`; } },
   id: { type: String },
   moduleId: { type: String, required: true, default: 'js' },
   title: { type: String, required: true },
@@ -18,13 +18,6 @@ const curriculumTopicSchema = new mongoose.Schema({
   solutionCriteria: { type: String, default: '' }
 }, {
   timestamps: true
-});
-
-curriculumTopicSchema.pre('save', function(next) {
-  if (this.id && !this._id) {
-    this._id = this.id;
-  }
-  next();
 });
 
 module.exports = mongoose.model('CurriculumTopic', curriculumTopicSchema);

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const roadmapModuleSchema = new mongoose.Schema({
-  _id: { type: String },
+  _id: { type: String, default: function() { return this.id || `mod-${Date.now()}`; } },
   id: { type: String },
   title: { type: String, required: true },
   iconName: { type: String, default: 'Code2' },
@@ -9,13 +9,6 @@ const roadmapModuleSchema = new mongoose.Schema({
   description: { type: String, default: '' }
 }, {
   timestamps: true
-});
-
-roadmapModuleSchema.pre('save', function(next) {
-  if (this.id && !this._id) {
-    this._id = this.id;
-  }
-  next();
 });
 
 module.exports = mongoose.model('RoadmapModule', roadmapModuleSchema);

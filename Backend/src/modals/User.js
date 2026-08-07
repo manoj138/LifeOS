@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  _id: { type: Number },
-  id: { type: Number },
+  _id: { type: Number, default: () => Date.now() },
+  id: { type: Number, default: function() { return this._id; } },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -10,14 +10,6 @@ const userSchema = new mongoose.Schema({
   role: { type: String, default: 'user' }
 }, {
   timestamps: true
-});
-
-userSchema.pre('save', function(next) {
-  if (this.isNew && !this._id) {
-    this._id = Date.now();
-    this.id = this._id;
-  }
-  next();
 });
 
 module.exports = mongoose.model('User', userSchema);

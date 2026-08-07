@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const dsaProblemSchema = new mongoose.Schema({
-  _id: { type: String },
+  _id: { type: String, default: function() { return this.id || `dsa-${Date.now()}`; } },
   id: { type: String },
   title: { type: String, required: true },
   difficulty: { type: String, default: 'Medium' },
@@ -14,13 +14,6 @@ const dsaProblemSchema = new mongoose.Schema({
   solutionCode: { type: String, default: '' }
 }, {
   timestamps: true
-});
-
-dsaProblemSchema.pre('save', function(next) {
-  if (this.id && !this._id) {
-    this._id = this.id;
-  }
-  next();
 });
 
 module.exports = mongoose.model('DsaProblem', dsaProblemSchema);

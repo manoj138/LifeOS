@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const plannerTaskSchema = new mongoose.Schema({
-  _id: { type: String },
+  _id: { type: String, default: function() { return this.id || `t_${Date.now()}`; } },
   id: { type: String },
   userId: { type: mongoose.Schema.Types.Mixed, required: true },
   title: { type: String, required: true },
@@ -13,13 +13,6 @@ const plannerTaskSchema = new mongoose.Schema({
   date: { type: String, default: () => new Date().toISOString().split('T')[0] }
 }, {
   timestamps: true
-});
-
-plannerTaskSchema.pre('save', function(next) {
-  if (this.id && !this._id) {
-    this._id = this.id;
-  }
-  next();
 });
 
 module.exports = mongoose.model('PlannerTask', plannerTaskSchema);

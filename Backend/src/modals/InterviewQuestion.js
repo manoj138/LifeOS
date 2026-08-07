@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const interviewQuestionSchema = new mongoose.Schema({
-  _id: { type: String },
+  _id: { type: String, default: function() { return this.id || `iq-${Date.now()}`; } },
   id: { type: String },
   category: { type: String, required: true, default: 'js' },
   question: { type: String, required: true },
@@ -10,13 +10,6 @@ const interviewQuestionSchema = new mongoose.Schema({
   difficulty: { type: String, default: 'Beginner' }
 }, {
   timestamps: true
-});
-
-interviewQuestionSchema.pre('save', function(next) {
-  if (this.id && !this._id) {
-    this._id = this.id;
-  }
-  next();
 });
 
 module.exports = mongoose.model('InterviewQuestion', interviewQuestionSchema);
