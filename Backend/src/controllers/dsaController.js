@@ -1,9 +1,10 @@
 const DsaProblem = require('../modals/DsaProblem');
 const { sendSuccess, sendError } = require('../helper/responseHelper');
+const { generateDsaProblemsBulk } = require('../helper/aiGenerator');
 
 const getProblems = async (req, res) => {
   try {
-    const problems = await DsaProblem.findAll({ order: [['createdAt', 'ASC']] });
+    const problems = await DsaProblem.find().sort({ createdAt: 1 });
     return sendSuccess(res, 'DSA problems fetched successfully', problems);
   } catch (error) {
     return sendError(res, 'Error fetching DSA problems', error, 500);
@@ -13,7 +14,7 @@ const getProblems = async (req, res) => {
 const createProblem = async (req, res) => {
   try {
     const id = req.body.id || `dsa-${Date.now()}`;
-    const newProblem = await DsaProblem.create({ id, ...req.body });
+    const newProblem = await DsaProblem.create({ _id: id, id, ...req.body });
     return sendSuccess(res, 'DSA problem created successfully', newProblem, 201);
   } catch (error) {
     return sendError(res, 'Error creating DSA problem', error, 500);
@@ -23,14 +24,12 @@ const createProblem = async (req, res) => {
 const deleteProblem = async (req, res) => {
   try {
     const { id } = req.params;
-    await DsaProblem.destroy({ where: { id } });
+    await DsaProblem.deleteOne({ _id: id });
     return sendSuccess(res, 'DSA problem deleted successfully', null);
   } catch (error) {
     return sendError(res, 'Error deleting DSA problem', error, 500);
   }
 };
-
-const { generateDsaProblemsBulk } = require('../helper/aiGenerator');
 
 const bulkGenerateSequence = async (req, res) => {
   try {
@@ -40,7 +39,7 @@ const bulkGenerateSequence = async (req, res) => {
     }
     const generatedItems = generateDsaProblemsBulk(titles);
     
-    const existing = await DsaProblem.findAll({ attributes: ['title'] });
+    const existing = await DsaProblem.find().select('title');
     const existingSet = new Set(existing.map(e => (e.title || '').toLowerCase().trim()));
     const uniqueItems = generatedItems.filter(item => !existingSet.has((item.title || '').toLowerCase().trim()));
 
@@ -48,7 +47,13 @@ const bulkGenerateSequence = async (req, res) => {
       return sendSuccess(res, 'All DSA problems in this batch already exist', []);
     }
 
-    const created = await DsaProblem.bulkCreate(uniqueItems);
+    const itemsWithIds = uniqueItems.map(item => ({
+      _id: item.id || `dsa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: item.id || `dsa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      ...item
+    }));
+
+    const created = await DsaProblem.insertMany(itemsWithIds);
     return sendSuccess(res, `Bulk generated ${created.length} unique DSA problems`, created, 201);
   } catch (error) {
     return sendError(res, 'Error generating bulk DSA problems', error, 500);
@@ -116,6 +121,7 @@ const bulkImportRawDsa = async (req, res) => {
     for (const item of itemsToProcess) {
       const id = `dsa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       const created = await DsaProblem.create({
+        _id: id,
         id,
         title: item.title,
         topic: item.topic || defaultTopic,
@@ -142,8 +148,8 @@ const deleteProblemsByLanguage = async (req, res) => {
     if (!language) {
       return sendError(res, 'Language parameter is required', null, 400);
     }
-    const count = await DsaProblem.destroy({ where: { language } });
-    return sendSuccess(res, `Deleted ${count} DSA problems for language ${language}`, { deletedCount: count });
+    const result = await DsaProblem.deleteMany({ language });
+    return sendSuccess(res, `Deleted ${result.deletedCount} DSA problems for language ${language}`, { deletedCount: result.deletedCount });
   } catch (error) {
     return sendError(res, 'Error deleting DSA problems by language', error, 500);
   }

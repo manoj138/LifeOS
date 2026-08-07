@@ -1,34 +1,22 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
+const mongoose = require('mongoose');
 
-const InterviewQuestion = sequelize.define('InterviewQuestion', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  category: {
-    type: DataTypes.STRING, // 'js', 'react', 'node', 'system-design', 'hr'
-    allowNull: false,
-    defaultValue: 'js',
-  },
-  question: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  answer: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  marathiIntent: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  difficulty: {
-    type: DataTypes.STRING, // 'Beginner', 'Intermediate', 'Advanced'
-    defaultValue: 'Beginner',
-  },
+const interviewQuestionSchema = new mongoose.Schema({
+  _id: { type: String },
+  id: { type: String },
+  category: { type: String, required: true, default: 'js' },
+  question: { type: String, required: true },
+  answer: { type: String, required: true },
+  marathiIntent: { type: String, default: '' },
+  difficulty: { type: String, default: 'Beginner' }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-module.exports = InterviewQuestion;
+interviewQuestionSchema.pre('save', function(next) {
+  if (this.id && !this._id) {
+    this._id = this.id;
+  }
+  next();
+});
+
+module.exports = mongoose.model('InterviewQuestion', interviewQuestionSchema);

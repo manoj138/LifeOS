@@ -1,66 +1,30 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
+const mongoose = require('mongoose');
 
-const CurriculumTopic = sequelize.define('CurriculumTopic', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  moduleId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'js',
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  topicName: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  level: {
-    type: DataTypes.STRING,
-    defaultValue: 'Beginner',
-  },
-  order: {
-    type: DataTypes.INTEGER,
-    defaultValue: 1,
-  },
-  conceptExplanation: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  codeSnippet: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  projectApplication: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  quizQuestions: {
-    type: DataTypes.JSON,
-    defaultValue: [],
-  },
-  taskTitle: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  taskDescription: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  starterCode: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  solutionCriteria: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
+const curriculumTopicSchema = new mongoose.Schema({
+  _id: { type: String },
+  id: { type: String },
+  moduleId: { type: String, required: true, default: 'js' },
+  title: { type: String, required: true },
+  topicName: { type: String, required: true },
+  level: { type: String, default: 'Beginner' },
+  order: { type: Number, default: 1 },
+  conceptExplanation: { type: String, default: '' },
+  codeSnippet: { type: String, default: '' },
+  projectApplication: { type: String, default: '' },
+  quizQuestions: { type: Array, default: [] },
+  taskTitle: { type: String, default: '' },
+  taskDescription: { type: String, default: '' },
+  starterCode: { type: String, default: '' },
+  solutionCriteria: { type: String, default: '' }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-module.exports = CurriculumTopic;
+curriculumTopicSchema.pre('save', function(next) {
+  if (this.id && !this._id) {
+    this._id = this.id;
+  }
+  next();
+});
+
+module.exports = mongoose.model('CurriculumTopic', curriculumTopicSchema);

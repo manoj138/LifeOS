@@ -21,31 +21,35 @@ const register = async (req, res) => {
       return sendError(res, 'Email and password are required', null, 400);
     }
 
-    const existingUser = await User.findOne({ where: { email } });
+    const cleanEmail = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
       return sendError(res, 'Email is already registered', null, 400);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userRole = email.includes('admin') ? 'admin' : 'candidate';
+    const userRole = cleanEmail.includes('admin') ? 'admin' : 'candidate';
+    const userId = Date.now();
+
     const newUser = await User.create({
+      _id: userId,
+      id: userId,
       name: name || 'Member',
-      email,
+      email: cleanEmail,
       password: hashedPassword,
       pin: pin || '1234',
       role: userRole,
     });
 
-    // Create associated preferences & learning progress records
-    const preferences = await UserPreference.create({ userId: newUser.id });
-    await LearningProgress.create({ userId: newUser.id });
+    const preferences = await UserPreference.create({ userId: newUser.id || newUser._id });
+    await LearningProgress.create({ userId: newUser.id || newUser._id });
 
-    const token = generateToken(newUser.id);
+    const token = generateToken(newUser.id || newUser._id);
 
     return sendSuccess(res, 'Account created successfully', {
       token,
       user: {
-        id: newUser.id,
+        id: newUser.id || newUser._id,
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
@@ -65,10 +69,8 @@ const login = async (req, res) => {
       return sendError(res, 'Email and password are required', null, 400);
     }
 
-    const user = await User.findOne({
-      where: { email },
-      include: [{ model: UserPreference, as: 'preferences' }],
-    });
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
       return sendError(res, 'Invalid email or password', null, 401);
@@ -79,17 +81,18 @@ const login = async (req, res) => {
       return sendError(res, 'Invalid email or password', null, 401);
     }
 
-    const token = generateToken(user.id);
+    const preferences = await UserPreference.findOne({ userId: user.id || user._id });
+    const token = generateToken(user.id || user._id);
 
     return sendSuccess(res, 'Logged in successfully', {
       token,
       user: {
-        id: user.id,
+        id: user.id || user._id,
         name: user.name,
         email: user.email,
         role: user.role,
       },
-      preferences: user.preferences,
+      preferences: preferences || {},
     });
   } catch (error) {
     return sendError(res, 'Login error', error, 500);
@@ -104,26 +107,26 @@ const pinLogin = async (req, res) => {
       return sendError(res, 'Email and PIN are required for PIN verification', null, 400);
     }
 
-    const user = await User.findOne({
-      where: { email: email.trim().toLowerCase(), pin: String(pin).trim() },
-      include: [{ model: UserPreference, as: 'preferences' }],
-    });
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPin = String(pin).trim();
 
+    const user = await User.findOne({ email: cleanEmail, pin: cleanPin });
     if (!user) {
       return sendError(res, 'Invalid Email or PIN combination', null, 401);
     }
 
-    const token = generateToken(user.id);
+    const preferences = await UserPreference.findOne({ userId: user.id || user._id });
+    const token = generateToken(user.id || user._id);
 
     return sendSuccess(res, 'PIN login successful', {
       token,
       user: {
-        id: user.id,
+        id: user.id || user._id,
         name: user.name,
         email: user.email,
         role: user.role,
       },
-      preferences: user.preferences,
+      preferences: preferences || {},
     });
   } catch (error) {
     return sendError(res, 'PIN verification error', error, 500);
@@ -132,12 +135,13 @@ const pinLogin = async (req, res) => {
 
 const getMe = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
-      attributes: { exclude: ['password'] },
-      include: [{ model: UserPreference, as: 'preferences' }],
-    });
+    const user = await User.findOne({ _id: req.user.id }).select('-password');
+    const preferences = await UserPreference.findOne({ userId: req.user.id });
 
-    return sendSuccess(res, 'User profile fetched successfully', user);
+    const userData = user ? user.toObject() : {};
+    userData.preferences = preferences || {};
+
+    return sendSuccess(res, 'User profile fetched successfully', userData);
   } catch (error) {
     return sendError(res, 'Error fetching user profile', error, 500);
   }

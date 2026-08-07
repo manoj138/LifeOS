@@ -1,53 +1,25 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
-const User = require('./User');
+const mongoose = require('mongoose');
 
-const PlannerTask = sequelize.define('PlannerTask', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
-    },
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  start: {
-    type: DataTypes.STRING,
-    defaultValue: '09:00 AM',
-  },
-  end: {
-    type: DataTypes.STRING,
-    defaultValue: '10:00 AM',
-  },
-  category: {
-    type: DataTypes.STRING,
-    defaultValue: 'Deep Work',
-  },
-  energy: {
-    type: DataTypes.STRING,
-    defaultValue: 'High',
-  },
-  completed: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
-  date: {
-    type: DataTypes.STRING,
-    defaultValue: () => new Date().toISOString().split('T')[0],
-  },
+const plannerTaskSchema = new mongoose.Schema({
+  _id: { type: String },
+  id: { type: String },
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  title: { type: String, required: true },
+  start: { type: String, default: '09:00 AM' },
+  end: { type: String, default: '10:00 AM' },
+  category: { type: String, default: 'Deep Work' },
+  energy: { type: String, default: 'High' },
+  completed: { type: Boolean, default: false },
+  date: { type: String, default: () => new Date().toISOString().split('T')[0] }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-User.hasMany(PlannerTask, { foreignKey: 'userId' });
-PlannerTask.belongsTo(User, { foreignKey: 'userId' });
+plannerTaskSchema.pre('save', function(next) {
+  if (this.id && !this._id) {
+    this._id = this.id;
+  }
+  next();
+});
 
-module.exports = PlannerTask;
+module.exports = mongoose.model('PlannerTask', plannerTaskSchema);

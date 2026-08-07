@@ -1,87 +1,46 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
-const User = require('./User');
+const mongoose = require('mongoose');
 
-const UserPreference = sequelize.define('UserPreference', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
-    },
-  },
-  targetRole: {
-    type: DataTypes.STRING,
-    defaultValue: 'Full-Stack Web Developer',
-  },
-  careerLevel: {
-    type: DataTypes.STRING,
-    defaultValue: 'Intermediate (1-3 yrs experience)',
-  },
-  focusAreas: {
-    type: DataTypes.JSON,
-    defaultValue: ['Coding & DSA', 'DevOps & Cloud', 'English Fluency', 'System Design & Projects'],
-  },
-  skillLevels: {
-    type: DataTypes.JSON,
-    defaultValue: { dsa: 'Intermediate', devops: 'Beginner', english: 'Intermediate' },
-  },
-  dailyHours: {
-    type: DataTypes.INTEGER,
-    defaultValue: 4,
-  },
-  targetDate: {
-    type: DataTypes.STRING,
-    defaultValue: '2026-12-31',
-  },
-  aiPersona: {
-    type: DataTypes.STRING,
-    defaultValue: 'Motivational Tech Mentor',
-  },
-  cityState: { type: DataTypes.STRING, defaultValue: '' },
-  aiLanguage: { type: DataTypes.STRING, defaultValue: 'English' },
-  degree: { type: DataTypes.STRING, defaultValue: '' },
-  collegeName: { type: DataTypes.STRING, defaultValue: '' },
-  collegeCity: { type: DataTypes.STRING, defaultValue: '' },
-  educationStatus: { type: DataTypes.STRING, defaultValue: '' },
-  currentSemester: { type: DataTypes.STRING, defaultValue: '' },
-  graduationPeriod: { type: DataTypes.STRING, defaultValue: '' },
-  hasExperience: { type: DataTypes.STRING, defaultValue: 'No' },
-  experienceType: { type: DataTypes.STRING, defaultValue: 'Fresher' },
-  companyName: { type: DataTypes.STRING, defaultValue: '' },
-  experienceRole: { type: DataTypes.STRING, defaultValue: '' },
-  experienceDuration: { type: DataTypes.STRING, defaultValue: '' },
-  companyTechStack: { type: DataTypes.STRING, defaultValue: '' },
-  project1Name: { type: DataTypes.STRING, defaultValue: '' },
-  project1Tagline: { type: DataTypes.STRING, defaultValue: '' },
-  project1Desc: { type: DataTypes.STRING, defaultValue: '' },
-  project1TechStack: { type: DataTypes.STRING, defaultValue: '' },
-  project1Link: { type: DataTypes.STRING, defaultValue: '' },
-  project2Name: { type: DataTypes.STRING, defaultValue: '' },
-  project2Desc: { type: DataTypes.STRING, defaultValue: '' },
-  project2TechStack: { type: DataTypes.STRING, defaultValue: '' },
-  leetcodeHandle: { type: DataTypes.STRING, defaultValue: '' },
-  githubHandle: { type: DataTypes.STRING, defaultValue: '' },
-  linkedinUrl: { type: DataTypes.STRING, defaultValue: '' },
-  targetCompanyTier: { type: DataTypes.STRING, defaultValue: 'Product Startups' },
-  weakDsaTopics: { type: DataTypes.JSON, defaultValue: [] },
-  weakDevopsTopics: { type: DataTypes.JSON, defaultValue: [] },
-  preferredTimeSlot: { type: DataTypes.STRING, defaultValue: 'Flexible' },
-  onboardingCompleted: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
+const userPreferenceSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  targetRole: { type: String, default: 'Full-Stack Web Developer' },
+  careerLevel: { type: String, default: 'Intermediate (1-3 yrs experience)' },
+  focusAreas: { type: Array, default: ['Coding & DSA', 'DevOps & Cloud', 'English Fluency', 'System Design & Projects'] },
+  skillLevels: { type: Object, default: { dsa: 'Intermediate', devops: 'Beginner', english: 'Intermediate' } },
+  dailyHours: { type: Number, default: 4 },
+  targetDate: { type: String, default: '2026-12-31' },
+  aiPersona: { type: String, default: 'Motivational Tech Mentor' },
+  cityState: { type: String, default: '' },
+  aiLanguage: { type: String, default: 'English' },
+  degree: { type: String, default: '' },
+  collegeName: { type: String, default: '' },
+  collegeCity: { type: String, default: '' },
+  educationStatus: { type: String, default: '' },
+  currentSemester: { type: String, default: '' },
+  graduationPeriod: { type: String, default: '' },
+  hasExperience: { type: String, default: 'No' },
+  experienceType: { type: String, default: 'Fresher' },
+  companyName: { type: String, default: '' },
+  experienceRole: { type: String, default: '' },
+  experienceDuration: { type: String, default: '' },
+  companyTechStack: { type: String, default: '' },
+  project1Name: { type: String, default: '' },
+  project1Tagline: { type: String, default: '' },
+  project1Desc: { type: String, default: '' },
+  project1TechStack: { type: String, default: '' },
+  project1Link: { type: String, default: '' },
+  project2Name: { type: String, default: '' },
+  project2Desc: { type: String, default: '' },
+  project2TechStack: { type: String, default: '' },
+  leetcodeHandle: { type: String, default: '' },
+  githubHandle: { type: String, default: '' },
+  linkedinUrl: { type: String, default: '' },
+  targetCompanyTier: { type: String, default: 'Product Startups' },
+  weakDsaTopics: { type: Array, default: [] },
+  weakDevopsTopics: { type: Array, default: [] },
+  preferredTimeSlot: { type: String, default: 'Flexible' },
+  onboardingCompleted: { type: Boolean, default: false }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-User.hasOne(UserPreference, { foreignKey: 'userId', as: 'preferences' });
-UserPreference.belongsTo(User, { foreignKey: 'userId', as: 'user' });
-
-module.exports = UserPreference;
+module.exports = mongoose.model('UserPreference', userPreferenceSchema);

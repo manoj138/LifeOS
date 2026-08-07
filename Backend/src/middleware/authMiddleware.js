@@ -12,7 +12,7 @@ const authMiddleware = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key');
     
-    const user = await User.findByPk(decoded.id);
+    const user = await User.findOne({ _id: decoded.id });
     if (!user) {
       return sendError(res, 'User no longer exists', null, 401);
     }

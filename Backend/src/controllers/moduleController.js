@@ -4,7 +4,7 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getAllModules = async (req, res) => {
   try {
-    const modules = await RoadmapModule.findAll({ order: [['order', 'ASC']] });
+    const modules = await RoadmapModule.find().sort({ order: 1 });
     return sendSuccess(res, 'Roadmap modules fetched successfully', modules);
   } catch (error) {
     return sendError(res, 'Error fetching roadmap modules', error, 500);
@@ -20,12 +20,13 @@ const createModule = async (req, res) => {
 
     const moduleId = id ? id.toLowerCase().replace(/\s+/g, '-') : `mod-${Date.now()}`;
 
-    const existing = await RoadmapModule.findByPk(moduleId);
+    const existing = await RoadmapModule.findOne({ _id: moduleId });
     if (existing) {
       return sendError(res, 'Module ID already exists', null, 400);
     }
 
     const newModule = await RoadmapModule.create({
+      _id: moduleId,
       id: moduleId,
       title,
       iconName,
@@ -42,12 +43,12 @@ const createModule = async (req, res) => {
 const updateModule = async (req, res) => {
   try {
     const { id } = req.params;
-    const module = await RoadmapModule.findByPk(id);
+    const module = await RoadmapModule.findOne({ _id: id });
     if (!module) {
       return sendError(res, 'Module not found', null, 404);
     }
-    await module.update(req.body);
-    return sendSuccess(res, 'Roadmap module updated successfully', module);
+    const updated = await RoadmapModule.findOneAndUpdate({ _id: id }, req.body, { new: true });
+    return sendSuccess(res, 'Roadmap module updated successfully', updated);
   } catch (error) {
     return sendError(res, 'Error updating roadmap module', error, 500);
   }
@@ -56,13 +57,13 @@ const updateModule = async (req, res) => {
 const deleteModule = async (req, res) => {
   try {
     const { id } = req.params;
-    const module = await RoadmapModule.findByPk(id);
+    const module = await RoadmapModule.findOne({ _id: id });
     if (!module) {
       return sendError(res, 'Module not found', null, 404);
     }
     // Delete associated topics for this module
-    await CurriculumTopic.destroy({ where: { moduleId: id } });
-    await module.destroy();
+    await CurriculumTopic.deleteMany({ moduleId: id });
+    await RoadmapModule.deleteOne({ _id: id });
     return sendSuccess(res, 'Roadmap module and associated topics deleted successfully', { id });
   } catch (error) {
     return sendError(res, 'Error deleting roadmap module', error, 500);

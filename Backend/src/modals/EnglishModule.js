@@ -1,33 +1,22 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
+const mongoose = require('mongoose');
 
-const EnglishModule = sequelize.define('EnglishModule', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  category: {
-    type: DataTypes.STRING, // 'pronunciation', 'vocabulary', 'scenario'
-    allowNull: false,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  badgeLabel: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  badgeColor: {
-    type: DataTypes.STRING,
-    defaultValue: 'emerald',
-  },
+const englishModuleSchema = new mongoose.Schema({
+  _id: { type: String },
+  id: { type: String },
+  category: { type: String, required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  badgeLabel: { type: String, default: '' },
+  badgeColor: { type: String, default: 'emerald' }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-module.exports = EnglishModule;
+englishModuleSchema.pre('save', function(next) {
+  if (this.id && !this._id) {
+    this._id = this.id;
+  }
+  next();
+});
+
+module.exports = mongoose.model('EnglishModule', englishModuleSchema);

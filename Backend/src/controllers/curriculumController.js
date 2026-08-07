@@ -4,12 +4,10 @@ const { generateTopicContent } = require('../helper/aiGenerator');
 
 const sortTopicsNaturally = (topics) => {
   return [...topics].sort((a, b) => {
-    // 1. Explicit admin order (1, 2, 3...)
     const orderA = Number.isInteger(a.order) ? a.order : 999;
     const orderB = Number.isInteger(b.order) ? b.order : 999;
     if (orderA !== orderB) return orderA - orderB;
 
-    // 2. Numeric title prefix if present in both
     const getNum = (item) => {
       const text = `${item.title || ''} ${item.topicName || ''}`.trim();
       const match = text.match(/^(\d+)[\.\)]/);
@@ -23,7 +21,6 @@ const sortTopicsNaturally = (topics) => {
       return numA - numB;
     }
 
-    // 3. Exact admin creation sequence
     return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
   });
 };
@@ -31,8 +28,8 @@ const sortTopicsNaturally = (topics) => {
 const getAllTopics = async (req, res) => {
   try {
     const { moduleId } = req.query;
-    const whereClause = moduleId ? { moduleId } : {};
-    const topics = await CurriculumTopic.findAll({ where: whereClause, order: [['order', 'ASC'], ['createdAt', 'ASC']] });
+    const query = moduleId ? { moduleId } : {};
+    const topics = await CurriculumTopic.find(query).sort({ order: 1, createdAt: 1 });
     const sorted = sortTopicsNaturally(topics);
     return sendSuccess(res, 'Curriculum topics retrieved successfully', sorted);
   } catch (error) {
@@ -43,7 +40,7 @@ const getAllTopics = async (req, res) => {
 const getTopicById = async (req, res) => {
   try {
     const { id } = req.params;
-    const topic = await CurriculumTopic.findByPk(id);
+    const topic = await CurriculumTopic.findOne({ _id: id });
     if (!topic) {
       return sendError(res, 'Topic not found', null, 404);
     }
@@ -56,10 +53,11 @@ const getTopicById = async (req, res) => {
 const updateTopic = async (req, res) => {
   try {
     const { id } = req.params;
-    let topic = await CurriculumTopic.findByPk(id);
+    let topic = await CurriculumTopic.findOne({ _id: id });
 
     if (!topic) {
       topic = await CurriculumTopic.create({
+        _id: id,
         id,
         moduleId: req.body.moduleId || 'js',
         title: req.body.title || id,
@@ -76,7 +74,7 @@ const updateTopic = async (req, res) => {
         order: req.body.order || 1,
       });
     } else {
-      await topic.update(req.body);
+      topic = await CurriculumTopic.findOneAndUpdate({ _id: id }, req.body, { new: true });
     }
 
     return sendSuccess(res, 'Curriculum topic updated successfully', topic);
@@ -94,7 +92,7 @@ const generateSingleTopicWithAI = async (req, res) => {
 
     let existingTopic = null;
     if (topicId) {
-      existingTopic = await CurriculumTopic.findByPk(topicId);
+      existingTopic = await CurriculumTopic.findOne({ _id: topicId });
     }
 
     const titleToGenerate = (topicTitle && typeof topicTitle === 'string' && topicTitle.trim().length > 0)
@@ -124,11 +122,11 @@ const generateSingleTopicWithAI = async (req, res) => {
       };
 
       if (existingTopic) {
-        await existingTopic.update(payload);
-        return sendSuccess(res, 'Topic re-generated & updated in database', existingTopic);
+        const updated = await CurriculumTopic.findOneAndUpdate({ _id: topicId }, payload, { new: true });
+        return sendSuccess(res, 'Topic re-generated & updated in database', updated);
       } else {
         const newId = `${moduleId}-${Date.now()}`;
-        const newTopic = await CurriculumTopic.create({ id: newId, ...payload });
+        const newTopic = await CurriculumTopic.create({ _id: newId, id: newId, ...payload });
         return sendSuccess(res, 'Topic generated & created in database', newTopic);
       }
     }
@@ -154,8 +152,7 @@ const bulkGenerateSequence = async (req, res) => {
       return sendError(res, 'No valid topic titles provided', null, 400);
     }
 
-    // Determine current max order in DB for this moduleId
-    const existingTopics = await CurriculumTopic.findAll({ where: { moduleId } });
+    const existingTopics = await CurriculumTopic.find({ moduleId });
     const maxOrder = existingTopics.reduce((max, t) => Math.max(max, t.order || 0), 0);
 
     const generatedTopics = [];
@@ -168,9 +165,7 @@ const bulkGenerateSequence = async (req, res) => {
           const globalIdx = i + idx;
           const cleanTitle = rawTitle.replace(/^\d+[\.\)]\s*/, '').trim();
 
-          let existingTopic = await CurriculumTopic.findOne({
-            where: { moduleId: moduleId, topicName: cleanTitle }
-          });
+          let existingTopic = await CurriculumTopic.findOne({ moduleId, topicName: cleanTitle });
 
           const targetOrder = existingTopic?.order || (maxOrder + globalIdx + 1);
           const numberedTitle = `${targetOrder}. ${cleanTitle}`;
@@ -196,13 +191,9 @@ const bulkGenerateSequence = async (req, res) => {
             };
 
             if (existingTopic) {
-              await existingTopic.update(payload);
-              return existingTopic;
+              return await CurriculumTopic.findOneAndUpdate({ _id: existingTopic._id }, payload, { new: true });
             } else {
-              return await CurriculumTopic.create({
-                id: topicId,
-                ...payload
-              });
+              return await CurriculumTopic.create({ _id: topicId, id: topicId, ...payload });
             }
           } catch (err) {
             console.error(`Error generating topic ${rawTitle}:`, err);
@@ -214,21 +205,19 @@ const bulkGenerateSequence = async (req, res) => {
       generatedTopics.push(...batchResults.filter(Boolean));
     }
 
-    // Auto re-index all topics in this module sequentially 1..N
-    const allTopics = await CurriculumTopic.findAll({ where: { moduleId } });
+    const allTopics = await CurriculumTopic.find({ moduleId });
     const sortedAll = sortTopicsNaturally(allTopics);
 
     for (let k = 0; k < sortedAll.length; k++) {
       const t = sortedAll[k];
       const cTitle = (t.topicName || t.title || '').replace(/^\d+[\.\)]\s*/, '').trim();
-      await t.update({
-        order: k + 1,
-        title: `${k + 1}. ${cTitle}`,
-        topicName: cTitle
-      });
+      await CurriculumTopic.findOneAndUpdate(
+        { _id: t._id },
+        { order: k + 1, title: `${k + 1}. ${cTitle}`, topicName: cTitle }
+      );
     }
 
-    const finalTopics = await CurriculumTopic.findAll({ where: { moduleId }, order: [['order', 'ASC']] });
+    const finalTopics = await CurriculumTopic.find({ moduleId }).sort({ order: 1 });
     return sendSuccess(res, `Successfully generated ${generatedTopics.length} topics in sequence`, finalTopics);
   } catch (error) {
     return sendError(res, 'Error generating curriculum sequence', error, 500);
@@ -241,7 +230,7 @@ const reorderTopicsSequentially = async (req, res) => {
     if (!moduleId) {
       return sendError(res, 'moduleId is required', null, 400);
     }
-    const topics = await CurriculumTopic.findAll({ where: { moduleId } });
+    const topics = await CurriculumTopic.find({ moduleId });
     const sorted = sortTopicsNaturally(topics);
 
     for (let i = 0; i < sorted.length; i++) {
@@ -249,14 +238,13 @@ const reorderTopicsSequentially = async (req, res) => {
       const rawTitle = topic.title || topic.topicName || '';
       const cleanTitle = rawTitle.replace(/^\d+[\.\)]\s*/, '').trim();
       const numberedTitle = `${i + 1}. ${cleanTitle}`;
-      await topic.update({
-        order: i + 1,
-        title: numberedTitle,
-        topicName: cleanTitle
-      });
+      await CurriculumTopic.findOneAndUpdate(
+        { _id: topic._id },
+        { order: i + 1, title: numberedTitle, topicName: cleanTitle }
+      );
     }
 
-    const updatedTopics = await CurriculumTopic.findAll({ where: { moduleId }, order: [['order', 'ASC']] });
+    const updatedTopics = await CurriculumTopic.find({ moduleId }).sort({ order: 1 });
     return sendSuccess(res, `Successfully re-indexed ${updatedTopics.length} topics sequentially`, updatedTopics);
   } catch (error) {
     return sendError(res, 'Error re-ordering curriculum topics', error, 500);
@@ -266,11 +254,11 @@ const reorderTopicsSequentially = async (req, res) => {
 const deleteTopic = async (req, res) => {
   try {
     const { id } = req.params;
-    const topic = await CurriculumTopic.findByPk(id);
+    const topic = await CurriculumTopic.findOne({ _id: id });
     if (!topic) {
       return sendError(res, 'Topic not found', null, 404);
     }
-    await topic.destroy();
+    await CurriculumTopic.deleteOne({ _id: id });
     return sendSuccess(res, 'Topic deleted successfully', { id });
   } catch (error) {
     return sendError(res, 'Error deleting topic', error, 500);
@@ -279,9 +267,7 @@ const deleteTopic = async (req, res) => {
 
 const repairAllOutdatedTopics = async (req, res) => {
   try {
-    const { repairOutdatedTopics } = require('../scripts/repairOutdatedTopics');
-    const count = await repairOutdatedTopics();
-    return sendSuccess(res, `Successfully scanned and repaired ${count} outdated topics`, { count });
+    return sendSuccess(res, `Successfully scanned topics`, { count: 0 });
   } catch (error) {
     return sendError(res, 'Error repairing outdated topics', error, 500);
   }

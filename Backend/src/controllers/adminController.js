@@ -1,58 +1,52 @@
-const sequelize = require('../config/sqliteDB');
 const User = require('../modals/User');
 const UserPreference = require('../modals/UserPreference');
 const LearningProgress = require('../modals/LearningProgress');
 const PlannerTask = require('../modals/PlannerTask');
 const Project = require('../modals/Project');
-const JobApplication = require('../modals/JobApplication');
 const { sendSuccess, sendError } = require('../helper/responseHelper');
 
 const getAdminMetrics = async (req, res) => {
   try {
-    const allUsers = await User.findAll({
-      attributes: { exclude: ['password'] },
-      include: [{ model: UserPreference, as: 'preferences' }],
+    const allUsers = await User.find().select('-password');
+    const allPrefs = await UserPreference.find();
+
+    const prefsMap = {};
+    allPrefs.forEach(p => {
+      prefsMap[p.userId] = p;
     });
 
-    // Exclude Admin self-account from candidate metrics
     const candidateUsers = allUsers.filter(
       (u) => u.role !== 'admin' && !u.email?.toLowerCase().includes('admin') && u.name !== 'System Admin'
     );
 
     const totalCandidates = candidateUsers.length;
-    const onboardedCount = candidateUsers.filter((u) => u.preferences?.onboardingCompleted).length;
-    const allPreferences = candidateUsers.map((u) => u.preferences).filter(Boolean);
+    const onboardedCount = candidateUsers.filter((u) => prefsMap[u.id || u._id]?.onboardingCompleted).length;
+    const allPreferences = candidateUsers.map((u) => prefsMap[u.id || u._id]).filter(Boolean);
 
     const onboardingRate = totalCandidates > 0
       ? Number(((onboardedCount / totalCandidates) * 100).toFixed(1))
       : 0;
 
-    // Compute average velocity from user target daily hours
     let avgVelocity = 0;
     if (allPreferences.length > 0) {
       const totalHours = allPreferences.reduce((acc, pref) => acc + (pref.dailyHours || 0), 0);
       avgVelocity = Number((totalHours / allPreferences.length).toFixed(1));
     }
 
-    // Compute placement ready candidates (onboarded users with readiness score >= 80)
     const placementReady = onboardedCount;
 
-    // Role distribution analytics
     const roleCounts = {};
     const skillCounts = { Beginner: 0, Intermediate: 0, Advanced: 0 };
     const commitmentCounts = { '1 Hour / day': 0, '2 Hours / day': 0, '4 Hours / day': 0, '6+ Hours / day': 0 };
 
     allPreferences.forEach((pref) => {
-      // Role
       const role = pref.targetRole || 'Full-Stack Web Developer';
       roleCounts[role] = (roleCounts[role] || 0) + 1;
 
-      // Skill level
       const levelRaw = (typeof pref.careerLevel === 'string' && pref.careerLevel) ? pref.careerLevel.split(' ')[0] : 'Intermediate';
       const level = ['Beginner', 'Intermediate', 'Advanced'].includes(levelRaw) ? levelRaw : 'Intermediate';
       skillCounts[level] = (skillCounts[level] || 0) + 1;
 
-      // Daily hours
       const hours = Number(pref.dailyHours) || 4;
       if (hours <= 1) commitmentCounts['1 Hour / day'] += 1;
       else if (hours <= 2) commitmentCounts['2 Hours / day'] += 1;
@@ -95,26 +89,27 @@ const getAdminMetrics = async (req, res) => {
 
 const getCandidates = async (req, res) => {
   try {
-    const users = await User.findAll({
-      attributes: { exclude: ['password'] },
-      include: [
-        { model: UserPreference, as: 'preferences' },
-        { model: LearningProgress, as: 'learningProgress' },
-      ],
-    });
+    const users = await User.find().select('-password');
+    const allPrefs = await UserPreference.find();
+    const allProgs = await LearningProgress.find();
 
-    // Exclude Admin self-account from candidate directory
+    const prefsMap = {};
+    allPrefs.forEach(p => { prefsMap[p.userId] = p; });
+
+    const progsMap = {};
+    allProgs.forEach(p => { progsMap[p.userId] = p; });
+
     const candidateOnlyUsers = users.filter(
       (u) => u.role !== 'admin' && !u.email?.toLowerCase().includes('admin') && u.name !== 'System Admin'
     );
 
     const candidates = candidateOnlyUsers.map((u) => {
-      const pref = u.preferences || {};
-      const prog = u.learningProgress || {};
+      const uId = u.id || u._id;
+      const pref = prefsMap[uId] || {};
+      const prog = progsMap[uId] || {};
       const completedLessons = Array.isArray(prog.completedLessons) ? prog.completedLessons : [];
       const completedTopics = completedLessons.length > 0 ? completedLessons.length : (pref.onboardingCompleted ? 1 : 0);
 
-      // Dynamic Readiness Score calculation
       const onboardingScore = pref.onboardingCompleted ? 40 : 10;
       const topicsScore = Math.min(50, completedTopics * 10);
       const hoursScore = Math.min(10, (Number(pref.dailyHours) || 1) * 2.5);
@@ -124,7 +119,7 @@ const getCandidates = async (req, res) => {
       const status = readinessScore >= 80 ? 'Placement Ready' : 'In Learning Phase';
 
       return {
-        id: u.id,
+        id: uId,
         name: u.name,
         email: u.email,
         role: u.role,
@@ -151,28 +146,13 @@ const deleteCandidate = async (req, res) => {
     const { id } = req.params;
     const targetId = Number(id) || id;
 
-    // Delete child records sequentially to prevent SQLITE_BUSY and foreign key constraint errors
-    const models = [
-      UserPreference,
-      LearningProgress,
-      PlannerTask,
-      Project,
-      JobApplication
-    ];
+    await UserPreference.deleteMany({ userId: targetId });
+    await LearningProgress.deleteMany({ userId: targetId });
+    await PlannerTask.deleteMany({ userId: targetId });
+    await Project.deleteMany({ userId: targetId });
+    await User.deleteOne({ _id: targetId });
 
-    for (const model of models) {
-      if (model && model.destroy) {
-        try {
-          await model.destroy({ where: { userId: targetId } });
-        } catch (err) {
-          // ignore if table/record absent
-        }
-      }
-    }
-
-    const deletedRows = await User.destroy({ where: { id: targetId } });
-
-    return sendSuccess(res, 'Candidate deleted successfully', { id: targetId, deletedRows });
+    return sendSuccess(res, 'Candidate deleted successfully', { id: targetId });
   } catch (error) {
     return sendError(res, 'Error deleting candidate', error.message || error, 500);
   }
@@ -183,6 +163,3 @@ module.exports = {
   getCandidates,
   deleteCandidate,
 };
-
-
-

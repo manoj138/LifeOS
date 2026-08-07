@@ -1,49 +1,30 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
-const User = require('./User');
+const mongoose = require('mongoose');
 
-const Project = sequelize.define('Project', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
-    },
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  status: {
-    type: DataTypes.STRING,
-    defaultValue: 'In Progress',
-  },
-  techStack: {
-    type: DataTypes.JSON,
-    defaultValue: ['React', 'Node.js', 'Express', 'SQLite'],
-  },
+const projectSchema = new mongoose.Schema({
+  _id: { type: String },
+  id: { type: String },
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  title: { type: String, required: true },
+  description: { type: String, default: '' },
+  status: { type: String, default: 'In Progress' },
+  techStack: { type: Array, default: ['React', 'Node.js', 'Express', 'MongoDB'] },
   kanbanTasks: {
-    type: DataTypes.JSON,
-    defaultValue: [
+    type: Array,
+    default: [
       { id: 'k1', title: 'Setup Authentication & JWT', column: 'done' },
       { id: 'k2', title: 'Design RESTful API Schema', column: 'inProgress' },
-      { id: 'k3', title: 'Deploy Nginx & Docker VPS', column: 'todo' },
-    ],
-  },
+      { id: 'k3', title: 'Deploy Nginx & Docker VPS', column: 'todo' }
+    ]
+  }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-User.hasMany(Project, { foreignKey: 'userId' });
-Project.belongsTo(User, { foreignKey: 'userId' });
+projectSchema.pre('save', function(next) {
+  if (this.id && !this._id) {
+    this._id = this.id;
+  }
+  next();
+});
 
-module.exports = Project;
+module.exports = mongoose.model('Project', projectSchema);

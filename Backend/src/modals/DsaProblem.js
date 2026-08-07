@@ -1,49 +1,26 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
+const mongoose = require('mongoose');
 
-const DsaProblem = sequelize.define('DsaProblem', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  difficulty: {
-    type: DataTypes.STRING, // 'Easy', 'Medium', 'Hard'
-    defaultValue: 'Medium',
-  },
-  topic: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  timeLimit: {
-    type: DataTypes.STRING,
-    defaultValue: 'O(N)',
-  },
-  language: {
-    type: DataTypes.STRING, // 'javascript', 'python', 'java', 'c', 'cpp', 'general'
-    defaultValue: 'javascript',
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  hint: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  starterCode: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  solutionCode: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
+const dsaProblemSchema = new mongoose.Schema({
+  _id: { type: String },
+  id: { type: String },
+  title: { type: String, required: true },
+  difficulty: { type: String, default: 'Medium' },
+  topic: { type: String, required: true },
+  timeLimit: { type: String, default: 'O(N)' },
+  language: { type: String, default: 'javascript' },
+  description: { type: String, required: true },
+  hint: { type: String, default: '' },
+  starterCode: { type: String, default: '' },
+  solutionCode: { type: String, default: '' }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-module.exports = DsaProblem;
+dsaProblemSchema.pre('save', function(next) {
+  if (this.id && !this._id) {
+    this._id = this.id;
+  }
+  next();
+});
+
+module.exports = mongoose.model('DsaProblem', dsaProblemSchema);

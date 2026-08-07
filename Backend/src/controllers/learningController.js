@@ -4,7 +4,7 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 const getProgress = async (req, res) => {
   try {
     const userId = req.user.id;
-    let progress = await LearningProgress.findOne({ where: { userId } });
+    let progress = await LearningProgress.findOne({ userId });
     if (!progress) {
       progress = await LearningProgress.create({ userId });
     }
@@ -23,16 +23,12 @@ const completeLesson = async (req, res) => {
       return sendError(res, 'lessonId is required', null, 400);
     }
 
-    let progress = await LearningProgress.findOne({ where: { userId } });
+    let progress = await LearningProgress.findOne({ userId });
     if (!progress) {
       progress = await LearningProgress.create({ userId });
     }
 
     let currentLessons = progress.completedLessons || [];
-    if (typeof currentLessons === 'string') {
-      try { currentLessons = JSON.parse(currentLessons); } catch (e) { currentLessons = []; }
-    }
-
     let updatedLessons = [...currentLessons];
     if (updatedLessons.includes(lessonId)) {
       updatedLessons = updatedLessons.filter((id) => id !== lessonId);
@@ -40,7 +36,7 @@ const completeLesson = async (req, res) => {
       updatedLessons.push(lessonId);
     }
 
-    await progress.update({ completedLessons: updatedLessons });
+    progress = await LearningProgress.findOneAndUpdate({ userId }, { completedLessons: updatedLessons }, { new: true });
 
     return sendSuccess(res, 'Lesson completion status updated', progress);
   } catch (error) {
@@ -57,16 +53,12 @@ const toggleSolvedDsa = async (req, res) => {
       return sendError(res, 'dsaId is required', null, 400);
     }
 
-    let progress = await LearningProgress.findOne({ where: { userId } });
+    let progress = await LearningProgress.findOne({ userId });
     if (!progress) {
       progress = await LearningProgress.create({ userId });
     }
 
     let currentSolved = progress.solvedDsaProblems || [];
-    if (typeof currentSolved === 'string') {
-      try { currentSolved = JSON.parse(currentSolved); } catch (e) { currentSolved = []; }
-    }
-
     let updatedSolved = [...currentSolved];
     if (updatedSolved.includes(dsaId)) {
       updatedSolved = updatedSolved.filter((id) => id !== dsaId);
@@ -74,7 +66,7 @@ const toggleSolvedDsa = async (req, res) => {
       updatedSolved.push(dsaId);
     }
 
-    await progress.update({ solvedDsaProblems: updatedSolved });
+    progress = await LearningProgress.findOneAndUpdate({ userId }, { solvedDsaProblems: updatedSolved }, { new: true });
 
     return sendSuccess(res, 'DSA problem solved status updated', progress);
   } catch (error) {

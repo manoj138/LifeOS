@@ -1,39 +1,23 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
+const mongoose = require('mongoose');
 
-const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-    validate: {
-      isEmail: true,
-    },
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  pin: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    defaultValue: '1234',
-  },
-  role: {
-    type: DataTypes.STRING,
-    defaultValue: 'user',
-  },
+const userSchema = new mongoose.Schema({
+  _id: { type: Number },
+  id: { type: Number },
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  pin: { type: String, default: '1234' },
+  role: { type: String, default: 'user' }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-module.exports = User;
+userSchema.pre('save', function(next) {
+  if (this.isNew && !this._id) {
+    this._id = Date.now();
+    this.id = this._id;
+  }
+  next();
+});
+
+module.exports = mongoose.model('User', userSchema);

@@ -1,29 +1,21 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
+const mongoose = require('mongoose');
 
-const RoadmapModule = sequelize.define('RoadmapModule', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  iconName: {
-    type: DataTypes.STRING,
-    defaultValue: 'Code2',
-  },
-  order: {
-    type: DataTypes.INTEGER,
-    defaultValue: 1,
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
+const roadmapModuleSchema = new mongoose.Schema({
+  _id: { type: String },
+  id: { type: String },
+  title: { type: String, required: true },
+  iconName: { type: String, default: 'Code2' },
+  order: { type: Number, default: 1 },
+  description: { type: String, default: '' }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-module.exports = RoadmapModule;
+roadmapModuleSchema.pre('save', function(next) {
+  if (this.id && !this._id) {
+    this._id = this.id;
+  }
+  next();
+});
+
+module.exports = mongoose.model('RoadmapModule', roadmapModuleSchema);

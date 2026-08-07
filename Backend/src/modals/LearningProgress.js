@@ -1,42 +1,13 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sqliteDB');
-const User = require('./User');
+const mongoose = require('mongoose');
 
-const LearningProgress = sequelize.define('LearningProgress', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
-    },
-  },
-  lastActiveModule: {
-    type: DataTypes.STRING,
-    defaultValue: 'js',
-  },
-  completedLessons: {
-    type: DataTypes.JSON,
-    defaultValue: ['js-0'],
-  },
-  solvedDsaProblems: {
-    type: DataTypes.JSON,
-    defaultValue: [],
-  },
-  passedQuizzes: {
-    type: DataTypes.JSON,
-    defaultValue: {},
-  },
+const learningProgressSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  lastActiveModule: { type: String, default: 'js' },
+  completedLessons: { type: Array, default: ['js-0'] },
+  solvedDsaProblems: { type: Array, default: [] },
+  passedQuizzes: { type: Object, default: {} }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-User.hasOne(LearningProgress, { foreignKey: 'userId', as: 'learningProgress' });
-LearningProgress.belongsTo(User, { foreignKey: 'userId' });
-
-module.exports = LearningProgress;
+module.exports = mongoose.model('LearningProgress', learningProgressSchema);

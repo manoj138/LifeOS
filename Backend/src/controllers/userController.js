@@ -5,26 +5,16 @@ const { sendSuccess, sendError } = require('../helper/responseHelper');
 const saveOnboarding = async (req, res) => {
   try {
     const userId = req.user.id;
-    const {
-      name,
-      pin,
-      targetRole,
-      careerLevel,
-      focusAreas,
-      skillLevels,
-      dailyHours,
-      targetDate,
-      aiPersona,
-    } = req.body;
+    const { name, pin } = req.body;
 
     if (name || pin) {
       const userUpdates = {};
       if (name) userUpdates.name = name;
       if (pin) userUpdates.pin = pin;
-      await User.update(userUpdates, { where: { id: userId } });
+      await User.findOneAndUpdate({ _id: userId }, userUpdates);
     }
 
-    let pref = await UserPreference.findOne({ where: { userId } });
+    let pref = await UserPreference.findOne({ userId });
     if (!pref) {
       pref = await UserPreference.create({ userId });
     }
@@ -33,7 +23,7 @@ const saveOnboarding = async (req, res) => {
     delete payload.name;
     delete payload.pin;
 
-    await pref.update(payload);
+    pref = await UserPreference.findOneAndUpdate({ userId }, payload, { new: true });
 
     return sendSuccess(res, 'Onboarding completed and saved to database', pref);
   } catch (error) {
@@ -44,7 +34,7 @@ const saveOnboarding = async (req, res) => {
 const getPreferences = async (req, res) => {
   try {
     const userId = req.user.id;
-    let pref = await UserPreference.findOne({ where: { userId } });
+    let pref = await UserPreference.findOne({ userId });
     if (!pref) {
       pref = await UserPreference.create({ userId });
     }
@@ -57,11 +47,7 @@ const getPreferences = async (req, res) => {
 const updatePreferences = async (req, res) => {
   try {
     const userId = req.user.id;
-    let pref = await UserPreference.findOne({ where: { userId } });
-    if (!pref) {
-      pref = await UserPreference.create({ userId });
-    }
-    await pref.update(req.body);
+    let pref = await UserPreference.findOneAndUpdate({ userId }, req.body, { new: true, upsert: true });
     return sendSuccess(res, 'Preferences updated successfully', pref);
   } catch (error) {
     return sendError(res, 'Error updating preferences', error, 500);
@@ -71,10 +57,7 @@ const updatePreferences = async (req, res) => {
 const resetOnboarding = async (req, res) => {
   try {
     const userId = req.user.id;
-    let pref = await UserPreference.findOne({ where: { userId } });
-    if (pref) {
-      await pref.update({ onboardingCompleted: false });
-    }
+    await UserPreference.findOneAndUpdate({ userId }, { onboardingCompleted: false });
     return sendSuccess(res, 'Onboarding status reset successfully', { onboardingCompleted: false });
   } catch (error) {
     return sendError(res, 'Error resetting onboarding status', error, 500);
@@ -84,8 +67,8 @@ const resetOnboarding = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
-    let pref = await UserPreference.findOne({ where: { userId } });
+    const user = await User.findOne({ _id: userId }).select('-password');
+    let pref = await UserPreference.findOne({ userId });
     if (!pref) {
       pref = await UserPreference.create({ userId });
     }
@@ -103,18 +86,11 @@ const updateProfile = async (req, res) => {
     if (name) userUpdates.name = name;
     if (email) userUpdates.email = email;
     if (Object.keys(userUpdates).length > 0) {
-      await User.update(userUpdates, { where: { id: userId } });
+      await User.findOneAndUpdate({ _id: userId }, userUpdates);
     }
 
-    let pref = await UserPreference.findOne({ where: { userId } });
-    if (!pref) {
-      pref = await UserPreference.create({ userId });
-    }
-    if (Object.keys(prefData).length > 0) {
-      await pref.update(prefData);
-    }
-
-    const updatedUser = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
+    let pref = await UserPreference.findOneAndUpdate({ userId }, prefData, { new: true, upsert: true });
+    const updatedUser = await User.findOne({ _id: userId }).select('-password');
     return sendSuccess(res, 'User profile updated successfully', { user: updatedUser, preferences: pref });
   } catch (error) {
     return sendError(res, 'Error updating user profile', error, 500);
