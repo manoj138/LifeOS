@@ -116,16 +116,28 @@ export const UserProvider = ({ children }) => {
             setUser(fetchedUser);
             const userPrefs = profileRes.data.preferences || rawUserData.preferences;
             if (userPrefs) {
-              setPreferences((prev) => ({ ...(prev || {}), ...userPrefs }));
-              if (userPrefs.onboardingCompleted) {
+              const isOnboarded = Boolean(
+                userPrefs.onboardingCompleted ||
+                (userPrefs.targetRole && userPrefs.targetRole !== '') ||
+                (userPrefs.degree && userPrefs.degree !== '')
+              );
+              const mergedPrefs = { ...(userPrefs || {}), onboardingCompleted: isOnboarded };
+              setPreferences((prev) => ({ ...(prev || {}), ...mergedPrefs }));
+              if (isOnboarded) {
                 setOnboardingCompleted(true);
               }
             }
           }
 
           if (prefRes?.success && prefRes.data) {
-            setPreferences((prev) => ({ ...(prev || {}), ...prefRes.data }));
-            if (prefRes.data.onboardingCompleted) {
+            const isOnboarded = Boolean(
+              prefRes.data.onboardingCompleted ||
+              (prefRes.data.targetRole && prefRes.data.targetRole !== '') ||
+              (prefRes.data.degree && prefRes.data.degree !== '')
+            );
+            const mergedPrefs = { ...(prefRes.data || {}), onboardingCompleted: isOnboarded };
+            setPreferences((prev) => ({ ...(prev || {}), ...mergedPrefs }));
+            if (isOnboarded) {
               setOnboardingCompleted(true);
             }
           }
@@ -213,28 +225,44 @@ export const UserProvider = ({ children }) => {
     if (data.user) {
       setUser((prev) => ({ ...(prev || {}), ...data.user }));
     }
-    if (data.preferences) {
-      setPreferences((prev) => ({ ...(prev || {}), ...data.preferences }));
-    }
+    const updatedPrefs = {
+      ...(data.preferences || {}),
+      onboardingCompleted: true,
+    };
+    setPreferences((prev) => ({ ...(prev || {}), ...updatedPrefs }));
     setOnboardingCompleted(true);
+
+    if (user || data.user) {
+      localStorage.setItem('lifeos_session', JSON.stringify({
+        user: user || data.user,
+        preferences: updatedPrefs,
+        onboardingCompleted: true,
+      }));
+    }
 
     // Asynchronously sync with Backend API
     apiService.saveOnboarding({
       name: data.user?.name,
-      ...data.preferences,
+      ...updatedPrefs,
+      onboardingCompleted: true,
     }).catch((err) => console.log('Backend sync offline fallback active.'));
   };
 
   const loginUser = (userData, preferencesData) => {
     setUser(userData || null);
     const prefs = preferencesData || DEFAULT_PREFERENCES;
-    setPreferences(prefs);
-    const isCompleted = Boolean(prefs?.onboardingCompleted);
+    const isCompleted = Boolean(
+      prefs?.onboardingCompleted ||
+      (prefs?.targetRole && prefs?.targetRole !== '') ||
+      (prefs?.degree && prefs?.degree !== '')
+    );
+    const updatedPrefs = { ...prefs, onboardingCompleted: isCompleted };
+    setPreferences(updatedPrefs);
     setOnboardingCompleted(isCompleted);
     if (userData) {
       localStorage.setItem('lifeos_session', JSON.stringify({
         user: userData,
-        preferences: prefs,
+        preferences: updatedPrefs,
         onboardingCompleted: isCompleted,
       }));
     }

@@ -490,7 +490,12 @@ export const apiService = {
   },
 
   async saveOnboarding(data) {
-    return this.updatePreferences(data);
+    try {
+      const res = await Api.post('/user/onboarding', data);
+      return res.data;
+    } catch (err) {
+      return { success: false, fallback: true };
+    }
   },
 
   // Daily Planner Tasks

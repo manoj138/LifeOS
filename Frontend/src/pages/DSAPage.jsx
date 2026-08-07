@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Code2, Cpu, CheckCircle2, Play, ArrowRight, Sparkles, Terminal, HelpCircle, Eye, EyeOff } from 'lucide-react';
 import { SectionHeader, Badge, Button, GlassCard, EmptyState } from '../components/common';
 import { TiltCard } from '../components/ui/TiltCard';
@@ -151,102 +152,118 @@ export const DSAPage = () => {
 
         {/* Right Column: Problem Description + Guided Hints + Code Sandbox */}
         <div className="lg:col-span-8 space-y-6">
-          {currentProblem ? (
-            <>
-              <TiltCard className="p-6 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-amber-400 font-mono font-bold uppercase">
-                        [{currentProblem.topic || 'DSA'}]
-                      </span>
-                      <Badge variant="purple">
-                        {(currentProblem.language || 'javascript').toUpperCase()}
-                      </Badge>
+          <AnimatePresence mode="wait">
+            {currentProblem ? (
+              <motion.div
+                key={currentProblem.id || activeProblem}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="space-y-6"
+              >
+                <TiltCard className="p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-amber-400 font-mono font-bold uppercase">
+                          [{currentProblem.topic || 'DSA'}]
+                        </span>
+                        <Badge variant="purple">
+                          {(currentProblem.language || 'javascript').toUpperCase()}
+                        </Badge>
+                      </div>
+                      <h2 className="text-xl font-extrabold text-white tracking-tight mt-0.5">
+                        {currentProblem.title}
+                      </h2>
                     </div>
-                    <h2 className="text-xl font-extrabold text-white tracking-tight mt-0.5">
-                      {currentProblem.title}
-                    </h2>
+                    <Badge variant={currentProblem.difficulty === 'Hard' ? 'rose' : 'amber'}>
+                      Target: {currentProblem.timeLimit || '20m'}
+                    </Badge>
                   </div>
-                  <Badge variant={currentProblem.difficulty === 'Hard' ? 'rose' : 'amber'}>
-                    Target: {currentProblem.timeLimit || '20m'}
-                  </Badge>
-                </div>
 
-                <p className="text-sm text-gray-300 leading-relaxed font-sans">
-                  {currentProblem.description}
-                </p>
+                  <p className="text-sm text-gray-300 leading-relaxed font-sans">
+                    {currentProblem.description}
+                  </p>
 
-                {/* Guided Actions (Hint, Solution Toggles & Mark Solved) */}
-                <div className="flex items-center gap-3 pt-2 flex-wrap">
-                  <Button
-                    size="xs"
-                    variant={userProgress?.solvedDsaIds?.includes(currentProblem.id) ? "glow" : "glass"}
-                    onClick={() => toggleSolvedDsa(currentProblem.id)}
-                    leftIcon={<CheckCircle2 className={`w-3.5 h-3.5 ${userProgress?.solvedDsaIds?.includes(currentProblem.id) ? 'text-emerald-400' : 'text-gray-400'}`} />}
-                  >
-                    {userProgress?.solvedDsaIds?.includes(currentProblem.id) ? "✓ Solved & Mastered" : "Mark Problem Solved"}
-                  </Button>
+                  {/* Guided Actions (Hint, Solution Toggles & Mark Solved) */}
+                  <div className="flex items-center gap-3 pt-2 flex-wrap">
+                    <Button
+                      size="xs"
+                      variant={userProgress?.solvedDsaIds?.includes(currentProblem.id) ? "glow" : "glass"}
+                      onClick={() => toggleSolvedDsa(currentProblem.id)}
+                      leftIcon={<CheckCircle2 className={`w-3.5 h-3.5 ${userProgress?.solvedDsaIds?.includes(currentProblem.id) ? 'text-emerald-400' : 'text-gray-400'}`} />}
+                    >
+                      {userProgress?.solvedDsaIds?.includes(currentProblem.id) ? "✓ Solved & Mastered" : "Mark Problem Solved"}
+                    </Button>
 
-                  <Button
-                    size="xs"
-                    variant="glass"
-                    onClick={() => setShowHint(!showHint)}
-                    leftIcon={<HelpCircle className="w-3.5 h-3.5 text-cyan-400" />}
-                  >
-                    {showHint ? "Hide AI Hint" : "Need a Hint?"}
-                  </Button>
+                    <Button
+                      size="xs"
+                      variant="glass"
+                      onClick={() => setShowHint(!showHint)}
+                      leftIcon={<HelpCircle className="w-3.5 h-3.5 text-cyan-400" />}
+                    >
+                      {showHint ? "Hide AI Hint" : "Need a Hint?"}
+                    </Button>
 
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    onClick={() => setShowSolution(!showSolution)}
-                    leftIcon={showSolution ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  >
-                    {showSolution ? "Hide Solution" : "View Full Solution"}
-                  </Button>
-                </div>
-
-                {/* AI Hint Box */}
-                {showHint && (
-                  <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-200">
-                    💡 <strong>AI Hint:</strong> {currentProblem.hint}
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      onClick={() => setShowSolution(!showSolution)}
+                      leftIcon={showSolution ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    >
+                      {showSolution ? "Hide Solution" : "View Full Solution"}
+                    </Button>
                   </div>
-                )}
+
+                  {/* AI Hint Box */}
+                  <AnimatePresence>
+                    {showHint && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-200 overflow-hidden"
+                      >
+                        💡 <strong>AI Hint:</strong> {currentProblem.hint}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </TiltCard>
+
+                {/* Code Editor Sandbox */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                      <Terminal className="w-4 h-4 text-cyan-400" />
+                      Problem Code Workspace ({ (currentProblem.language || 'javascript').toUpperCase() })
+                    </h3>
+                    <span className="text-xs text-gray-400">Write & Test Code</span>
+                  </div>
+
+                  {(() => {
+                    const langConfig = getLangExtension(currentProblem.language);
+                    return (
+                      <CodeEditor
+                        key={currentProblem.id || activeProblem}
+                        initialFiles={[
+                          {
+                            name: `solution.${langConfig.ext}`,
+                            lang: langConfig.mode,
+                            code: showSolution ? (currentProblem.solutionCode || '// Solution code') : (currentProblem.starterCode || '// Starter code')
+                          }
+                        ]}
+                      />
+                    );
+                  })()}
+                </div>
+              </motion.div>
+            ) : (
+              <TiltCard className="p-8 text-center space-y-3">
+                <p className="text-gray-400 text-sm">Loading DSA problems or no problems available...</p>
               </TiltCard>
-
-              {/* Code Editor Sandbox */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-cyan-400" />
-                    Problem Code Workspace ({ (currentProblem.language || 'javascript').toUpperCase() })
-                  </h3>
-                  <span className="text-xs text-gray-400">Write & Test Code</span>
-                </div>
-
-                {(() => {
-                  const langConfig = getLangExtension(currentProblem.language);
-                  return (
-                    <CodeEditor
-                      key={currentProblem.id || activeProblem}
-                      initialFiles={[
-                        {
-                          name: `solution.${langConfig.ext}`,
-                          lang: langConfig.mode,
-                          code: showSolution ? (currentProblem.solutionCode || '// Solution code') : (currentProblem.starterCode || '// Starter code')
-                        }
-                      ]}
-                    />
-                  );
-                })()}
-              </div>
-            </>
-          ) : (
-            <TiltCard className="p-8 text-center space-y-3">
-              <p className="text-gray-400 text-sm">Loading DSA problems or no problems available...</p>
-            </TiltCard>
-          )}
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

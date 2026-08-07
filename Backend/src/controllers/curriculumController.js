@@ -4,6 +4,12 @@ const { generateTopicContent } = require('../helper/aiGenerator');
 
 const sortTopicsNaturally = (topics) => {
   return [...topics].sort((a, b) => {
+    // 1. Explicit admin order (1, 2, 3...)
+    const orderA = Number.isInteger(a.order) ? a.order : 999;
+    const orderB = Number.isInteger(b.order) ? b.order : 999;
+    if (orderA !== orderB) return orderA - orderB;
+
+    // 2. Numeric title prefix if present in both
     const getNum = (item) => {
       const text = `${item.title || ''} ${item.topicName || ''}`.trim();
       const match = text.match(/^(\d+)[\.\)]/);
@@ -13,18 +19,12 @@ const sortTopicsNaturally = (topics) => {
 
     const numA = getNum(a);
     const numB = getNum(b);
-
     if (numA !== null && numB !== null && numA !== numB) {
       return numA - numB;
     }
-    if (numA !== null && numB === null) return -1;
-    if (numA === null && numB !== null) return 1;
 
-    const orderA = Number.isInteger(a.order) ? a.order : 999;
-    const orderB = Number.isInteger(b.order) ? b.order : 999;
-    if (orderA !== orderB) return orderA - orderB;
-
-    return new Date(a.createdAt) - new Date(b.createdAt);
+    // 3. Exact admin creation sequence
+    return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
   });
 };
 
@@ -154,6 +154,10 @@ const bulkGenerateSequence = async (req, res) => {
       return sendError(res, 'No valid topic titles provided', null, 400);
     }
 
+    // Determine current max order in DB for this moduleId
+    const existingTopics = await CurriculumTopic.findAll({ where: { moduleId } });
+    const maxOrder = existingTopics.reduce((max, t) => Math.max(max, t.order || 0), 0);
+
     const generatedTopics = [];
     const BATCH_SIZE = 4;
 
@@ -163,26 +167,24 @@ const bulkGenerateSequence = async (req, res) => {
         batchTitles.map(async (rawTitle, idx) => {
           const globalIdx = i + idx;
           const cleanTitle = rawTitle.replace(/^\d+[\.\)]\s*/, '').trim();
-          const numberedTitle = `${globalIdx + 1}. ${cleanTitle}`;
+
+          let existingTopic = await CurriculumTopic.findOne({
+            where: { moduleId: moduleId, topicName: cleanTitle }
+          });
+
+          const targetOrder = existingTopic?.order || (maxOrder + globalIdx + 1);
+          const numberedTitle = `${targetOrder}. ${cleanTitle}`;
           const topicId = `${moduleId}-${Date.now()}-${globalIdx}`;
+
           try {
             const content = await generateTopicContent(cleanTitle, moduleId, level);
-
-            let existingTopic = await CurriculumTopic.findOne({
-              where: { moduleId: moduleId, topicName: cleanTitle }
-            });
-            if (!existingTopic) {
-              existingTopic = await CurriculumTopic.findOne({
-                where: { moduleId: moduleId, title: numberedTitle }
-              });
-            }
 
             const payload = {
               moduleId: moduleId,
               title: numberedTitle,
               topicName: cleanTitle,
               level: level,
-              order: globalIdx + 1,
+              order: targetOrder,
               conceptExplanation: content.conceptExplanation || '',
               codeSnippet: content.codeSnippet || '',
               projectApplication: content.projectApplication || '',
@@ -212,7 +214,22 @@ const bulkGenerateSequence = async (req, res) => {
       generatedTopics.push(...batchResults.filter(Boolean));
     }
 
-    return sendSuccess(res, `Successfully generated ${generatedTopics.length} topics in sequence`, generatedTopics);
+    // Auto re-index all topics in this module sequentially 1..N
+    const allTopics = await CurriculumTopic.findAll({ where: { moduleId } });
+    const sortedAll = sortTopicsNaturally(allTopics);
+
+    for (let k = 0; k < sortedAll.length; k++) {
+      const t = sortedAll[k];
+      const cTitle = (t.topicName || t.title || '').replace(/^\d+[\.\)]\s*/, '').trim();
+      await t.update({
+        order: k + 1,
+        title: `${k + 1}. ${cTitle}`,
+        topicName: cTitle
+      });
+    }
+
+    const finalTopics = await CurriculumTopic.findAll({ where: { moduleId }, order: [['order', 'ASC']] });
+    return sendSuccess(res, `Successfully generated ${generatedTopics.length} topics in sequence`, finalTopics);
   } catch (error) {
     return sendError(res, 'Error generating curriculum sequence', error, 500);
   }

@@ -58,8 +58,13 @@ export const AuthPage = () => {
             resetOnboarding();
             navigate('/onboarding');
           } else {
-            loginUser(userData, prefData);
-            const hasCompletedOnboarding = Boolean(prefData.onboardingCompleted);
+            const hasCompletedOnboarding = Boolean(
+              prefData?.onboardingCompleted ||
+              (prefData?.targetRole && prefData?.targetRole !== '') ||
+              (prefData?.degree && prefData?.degree !== '')
+            );
+            const finalPrefs = { ...prefData, onboardingCompleted: hasCompletedOnboarding };
+            loginUser(userData, finalPrefs);
             if (!hasCompletedOnboarding) {
               navigate('/onboarding');
             } else {

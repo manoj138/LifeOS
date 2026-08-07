@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bot, Mic, MicOff, Play, Sparkles, Award, MessageSquare, CheckCircle2,
   ChevronRight, Activity, HelpCircle, Eye, EyeOff, UserCheck, FileText,
@@ -343,534 +344,404 @@ Thank you for giving me the opportunity to introduce myself.`;
         }
       />
 
-      {activeTab === 'self-intro' && (
-        /* SELF INTRODUCTION STUDIO (MANOJ MANSING CHOUGULE) */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-7 space-y-6">
-            <LaserBorder className="p-8 space-y-6">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold">
-                    MC
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-white tracking-tight">{selfIntroData.name}</h3>
-                    <span className="text-xs text-cyan-400 font-mono">{selfIntroData.currentRole}</span>
-                  </div>
-                </div>
-
-                <Badge variant="emerald">Interview Ready</Badge>
-              </div>
-
-              {/* Teleprompter Display Box */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs text-gray-400">
-                  <span className="flex items-center gap-1.5 font-bold text-purple-400">
-                    <FileText className="w-4 h-4" /> Live Interview Script Teleprompter
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px]">Speed:</span>
-                    {['1x', '1.25x', '1.5x'].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setTeleprompterSpeed(s)}
-                        className={`px-2 py-0.5 rounded text-[10px] ${teleprompterSpeed === s ? 'bg-purple-500 text-white font-bold' : 'bg-white/5 text-gray-400'}`}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-[#08080c]/90 border border-purple-500/30 text-sm sm:text-base text-gray-100 leading-relaxed font-sans max-h-[420px] overflow-y-auto space-y-4 shadow-[inset_0_2px_15px_rgba(0,0,0,0.8)] backdrop-blur-xl custom-scrollbar">
-                  {selfIntroData.fullScript.split('\n\n').map((paragraph, pIdx) => (
-                    <p key={pIdx} className="text-gray-200 font-normal leading-relaxed tracking-wide">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </div>
-
-              {/* Live Audio Recording Section */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between text-xs text-gray-400">
-                  <span>Practice Speaking Self Introduction</span>
-                  <Badge variant={isRecording ? 'rose' : 'emerald'}>
-                    {isRecording ? '● Voice Analysis Active' : 'Mic Ready'}
-                  </Badge>
-                </div>
-
-                <AudioSpectrum isActive={isRecording} barCount={32} />
-
-                <div className="flex justify-center">
-                  <Button
-                    variant={isRecording ? 'danger' : 'glow'}
-                    size="xl"
-                    onClick={handleToggleRecording}
-                    leftIcon={isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                  >
-                    {isRecording ? 'Stop & Get AI Delivery Score' : 'Start Speaking Intro'}
-                  </Button>
-                </div>
-              </div>
-            </LaserBorder>
-          </div>
-
-          <div className="lg:col-span-5 space-y-6">
-            <TiltCard className="p-6 space-y-4">
-              <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-cyan-400" />
-                Education & Background
-              </h3>
-
-              <div className="space-y-2 text-xs text-gray-300">
-                <p><strong>Education:</strong> {selfIntroData.education}</p>
-                <p><strong>Location:</strong> {selfIntroData.location}</p>
-                <p><strong>Role:</strong> {selfIntroData.currentRole}</p>
-              </div>
-
-              <div className="pt-2 border-t border-white/10">
-                <span className="text-xs font-bold text-purple-300 block mb-2">Technical Skill Set:</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {selfIntroData.skills.map((sk, i) => (
-                    <Badge key={i} variant="neon">{sk}</Badge>
-                  ))}
-                </div>
-              </div>
-            </TiltCard>
-
-            {/* Dynamic Follow-Up Questions Derived from Onboarding Intro */}
-            <LaserBorder className="p-6 space-y-4 border border-purple-500/30 bg-purple-950/20">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
-                  Likely Interviewer Follow-Ups (From Your Intro)
-                </h4>
-                <Badge variant="cyan">95% LIKELY</Badge>
-              </div>
-
-              <div className="space-y-3">
-                {derivedFollowUpQuestions.map((fq, idx) => (
-                  <div key={idx} className="p-3.5 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
-                    <h5 className="text-xs font-bold text-white flex items-start gap-2">
-                      <span className="text-purple-400 font-mono">Q{idx + 1}.</span>
-                      <span>{fq.q}</span>
-                    </h5>
-                    <p className="text-[11px] text-gray-300 font-mono bg-black/40 p-2 rounded-lg border border-purple-500/20">
-                      <strong>Sample Answer:</strong> {fq.a}
-                    </p>
-                    <p className="text-[11px] text-purple-300 font-sans italic">
-                      💡 <strong>मराठी हेतू:</strong> {fq.mr}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </LaserBorder>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'master-bank' && (
-        /* AI VOICE MOCK INTERVIEW DRILLS */
-        <div className="space-y-6">
-          {/* Category Selector Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2">
-            {categoryList.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  setSelectedCategory(cat.id);
-                  setActiveQuestionIdx(0);
-                  setAiEvaluation(null);
-                }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap border ${
-                  selectedCategory === cat.id
-                    ? 'bg-gradient-to-r from-blue-600/40 to-purple-600/40 border-purple-500 text-white shadow-lg'
-                    : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white hover:bg-white/[0.08]'
-                }`}
-              >
-                {cat.icon}
-                <span>{cat.label}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Questions Sidebar List */}
-            <div className="lg:col-span-4 space-y-4">
-              <div className="p-4 rounded-2xl bg-[#0f0f15] border border-white/10 space-y-3">
-                <h3 className="text-sm font-bold text-white tracking-tight">
-                  Questions ({currentQuestions.length})
-                </h3>
-
-                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-                  {currentQuestions.map((q, idx) => (
-                    <button
-                      key={q.id || idx}
-                      onClick={() => {
-                        setActiveQuestionIdx(idx);
-                        setAiEvaluation(null);
-                      }}
-                      className={`w-full text-left p-3.5 rounded-xl text-xs transition-all border ${
-                        activeQuestionIdx === idx
-                          ? 'bg-gradient-to-r from-purple-600/30 to-blue-600/30 border-purple-500/50 text-white font-bold'
-                          : 'bg-white/[0.03] border-white/10 text-gray-300 hover:bg-white/[0.06]'
-                      }`}
-                    >
-                      <span className="font-bold line-clamp-2">{q.question || q.q || 'Question'}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Question Detail & Answer Studio */}
-            <div className="lg:col-span-8 space-y-6">
-              {currentActiveQ ? (
-                <LaserBorder className="p-6 space-y-6">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          {activeTab === 'self-intro' && (
+            /* SELF INTRODUCTION STUDIO */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-7 space-y-6">
+                <LaserBorder className="p-8 space-y-6">
                   <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                    <Badge variant="purple">Question {activeQuestionIdx + 1} of {currentQuestions.length}</Badge>
-
-                    {/* AI Read Question Out Loud Button */}
-                    <Button
-                      variant="glass"
-                      size="sm"
-                      onClick={handleReadQuestion}
-                      leftIcon={<Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
-                    >
-                      Ask Me Question (AI Voice)
-                    </Button>
-                  </div>
-
-                  <h2 className="text-xl font-extrabold text-white tracking-tight">
-                    "{currentQText}"
-                  </h2>
-
-                  {/* English Master Answer */}
-                  <div className="p-4 rounded-2xl bg-[#09090d] border border-purple-500/30 space-y-2">
-                    <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                      🌟 Word-for-Word English Interview Answer:
-                    </span>
-                    <p className="text-sm text-gray-100 leading-relaxed font-sans font-medium">
-                      "{currentAText}"
-                    </p>
-                  </div>
-
-                  {/* Marathi Interviewer Intent Box */}
-                  {currentActiveQ.marathiIntent && (
-                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 leading-relaxed">
-                      💡 <strong>इंटरव्ह्यूवर काय तपासत आहे? (Marathi Intent):</strong> {currentActiveQ.marathiIntent}
-                    </div>
-                  )}
-
-                  {/* AI Score Evaluation Banner */}
-                  {aiEvaluation && (
-                    <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-purple-950/80 to-cyan-950/80 border border-emerald-500/40 space-y-3 shadow-xl">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                          <span className="text-sm font-bold text-white">AI Delivery & Technical Rating</span>
-                        </div>
-                        <Badge variant="emerald" className="text-sm px-3 py-1 font-bold">
-                          Score: {aiEvaluation.score} / 10
-                        </Badge>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold">
+                        MC
                       </div>
+                      <div>
+                        <h3 className="text-base font-bold text-white tracking-tight">{selfIntroData.name}</h3>
+                        <span className="text-xs text-cyan-400 font-mono">{selfIntroData.currentRole}</span>
+                      </div>
+                    </div>
 
-                      <p className="text-xs text-emerald-200 font-medium leading-relaxed">
-                        {aiEvaluation.feedback}
-                      </p>
+                    <Badge variant="emerald">Interview Ready</Badge>
+                  </div>
 
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        <span className="text-[10px] font-bold text-gray-400 self-center">Keywords Recognized:</span>
-                        {aiEvaluation.keywordsFound.map((kw, i) => (
-                          <span key={i} className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                            ✓ {kw}
-                          </span>
+                  {/* Teleprompter Display Box */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span className="flex items-center gap-1.5 font-bold text-purple-400">
+                        <FileText className="w-4 h-4" /> Live Interview Script Teleprompter
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px]">Speed:</span>
+                        {['1x', '1.25x', '1.5x'].map((s) => (
+                          <button
+                            key={s}
+                            onClick={() => setTeleprompterSpeed(s)}
+                            className={`px-2 py-0.5 rounded text-[10px] ${teleprompterSpeed === s ? 'bg-purple-500 text-white font-bold' : 'bg-white/5 text-gray-400'}`}
+                          >
+                            {s}
+                          </button>
                         ))}
                       </div>
                     </div>
-                  )}
 
-                  {/* Live Voice Recording & Rating Area */}
-                  <div className="p-4 rounded-2xl bg-[#09090d] border border-white/10 space-y-4">
-                    <AudioSpectrum isActive={isRecording} barCount={28} />
-                    <div className="flex justify-center">
+                    <div className="p-6 rounded-2xl bg-[#08080c]/90 border border-purple-500/30 text-sm sm:text-base text-gray-100 leading-relaxed font-sans max-h-[420px] overflow-y-auto space-y-4 shadow-[inset_0_2px_15px_rgba(0,0,0,0.8)] backdrop-blur-xl custom-scrollbar">
+                      {selfIntroData.fullScript.split('\n\n').map((paragraph, pIdx) => (
+                        <p key={pIdx} className="text-gray-200 font-normal leading-relaxed tracking-wide">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Live Audio Recording Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>Practice Speaking Self Introduction</span>
+                      <Badge variant={isRecording ? 'rose' : 'emerald'}>
+                        {isRecording ? '● Voice Analysis Active' : 'Mic Ready'}
+                      </Badge>
+                    </div>
+
+                    {isRecording && <AudioSpectrum isPlaying={true} className="py-2" />}
+
+                    <div className="flex items-center gap-3">
                       <Button
                         variant={isRecording ? 'danger' : 'glow'}
-                        size="lg"
+                        size="md"
                         onClick={handleToggleRecording}
-                        leftIcon={isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                        leftIcon={isRecording ? <MicOff className="w-4 h-4 animate-pulse" /> : <Mic className="w-4 h-4 text-cyan-400" />}
+                        className="flex-1"
                       >
-                        {isRecording ? 'Stop & Get AI Score' : 'Practice Answer Out Loud'}
+                        {isRecording ? 'Stop Recording & Evaluate' : '🎙️ Start Voice Self-Intro Practice'}
                       </Button>
                     </div>
                   </div>
-                </LaserBorder>
-              ) : (
-                <LaserBorder className="p-8 text-center space-y-3">
-                  <p className="text-gray-400 text-sm">No interview questions available for this category.</p>
-                </LaserBorder>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
-      {activeTab === 'live-arena' && (
-        /* ⚡ LIVE MOCK INTERVIEW ARENA (3rd Tab) */
-        <div className="space-y-6 animate-fadeIn">
-          {arenaState === 'setup' && (
-            <LaserBorder className="p-8 space-y-6 max-w-3xl mx-auto">
-              <div className="text-center space-y-2">
-                <Badge variant="emerald" className="px-3 py-1 text-xs">⚡ Interactive AI Mock Arena</Badge>
-                <h2 className="text-2xl font-extrabold text-white tracking-tight">
-                  Simulate Real Technical Tech Lead Interview
-                </h2>
-                <p className="text-xs text-gray-400 max-w-lg mx-auto">
-                  Our AI Senior Tech Lead reads questions out loud, evaluates your live verbal response, and scores your technical delivery!
-                </p>
+                  {/* Voice AI Evaluation Results */}
+                  {aiEvaluation && (
+                    <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 space-y-2 animate-fadeIn">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-purple-300 uppercase tracking-wider">AI Speech Rating</span>
+                        <Badge variant="amber">Delivery Score: {aiEvaluation.score} / 10</Badge>
+                      </div>
+                      <p className="text-xs text-gray-200">{aiEvaluation.feedback}</p>
+                    </div>
+                  )}
+                </LaserBorder>
               </div>
 
-              <div className="space-y-4 pt-2">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-xs font-bold text-gray-300">1. Select Target Tech Domain (Your Onboarding Stack):</label>
-                    <span className="text-[10px] text-emerald-400 font-mono font-bold">Synced with {userName}'s Profile</span>
+              <div className="lg:col-span-5 space-y-6">
+                <TiltCard className="p-6 space-y-4">
+                  <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                    <Award className="w-4 h-4 text-amber-400" />
+                    Interview Candidate Profile Card
+                  </h3>
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex justify-between">
+                      <span className="text-gray-400">Target Role:</span>
+                      <span className="text-cyan-400 font-bold">{targetRole}</span>
+                    </div>
+                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex justify-between">
+                      <span className="text-gray-400">Education:</span>
+                      <span className="text-white font-medium">{degree}</span>
+                    </div>
+                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex justify-between">
+                      <span className="text-gray-400">Key Projects:</span>
+                      <span className="text-purple-400 font-bold">{proj1Name}, {proj2Name}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                </TiltCard>
+
+                {/* Derived Follow Up Questions */}
+                <div className="p-6 rounded-2xl bg-[#0f0f15] border border-white/10 space-y-4">
+                  <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-400" />
+                    Expected Follow-Up Questions
+                  </h3>
+                  <div className="space-y-3">
+                    {derivedFollowUpQuestions.map((item, idx) => (
+                      <div key={idx} className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 text-xs">
+                        <span className="font-bold text-cyan-300 block">Q: {item.q}</span>
+                        <p className="text-gray-300 italic text-[11px]">"{item.a}"</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'master-bank' && (
+            /* AI VOICE INTERVIEW DRILLS */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-4 space-y-4">
+                <div className="p-4 rounded-2xl bg-[#0f0f15] border border-white/10 space-y-4">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Select Technical Domain:
+                  </h3>
+                  <div className="space-y-2">
                     {categoryList.map((cat) => (
                       <button
                         key={cat.id}
-                        type="button"
-                        onClick={() => setArenaDomain(cat.id)}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
-                          arenaDomain === cat.id
-                            ? 'bg-gradient-to-r from-emerald-600/40 to-cyan-600/40 border-emerald-500 text-white shadow-lg'
+                        onClick={() => {
+                          setSelectedCategory(cat.id);
+                          setActiveQuestionIdx(0);
+                          setAiEvaluation(null);
+                        }}
+                        className={`w-full text-left p-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between border ${
+                          selectedCategory === cat.id
+                            ? 'bg-purple-500/20 border-purple-500 text-white'
                             : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'
                         }`}
                       >
-                        {cat.icon}
-                        <span>{cat.label}</span>
+                        <span className="flex items-center gap-2">{cat.icon} {cat.label}</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     ))}
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-300 mb-2">2. Interview Question Count:</label>
-                  <div className="flex items-center gap-3">
-                    {[3, 5, 10].map((num) => (
-                      <button
-                        key={num}
-                        type="button"
-                        onClick={() => setArenaQuestionCount(num)}
-                        className={`flex-1 py-3 rounded-xl text-xs font-bold border transition-all ${
-                          arenaQuestionCount === num
-                            ? 'bg-purple-600/40 border-purple-500 text-white shadow-lg'
-                            : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'
-                        }`}
-                      >
-                        {num} Questions ({num * 2} mins)
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 flex justify-center">
-                <Button
-                  variant="glow"
-                  size="xl"
-                  onClick={handleStartLiveArena}
-                  className="px-10 py-4 text-base bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 shadow-[0_0_40px_rgba(16,185,129,0.3)]"
-                  leftIcon={<PlayCircle className="w-6 h-6 text-white animate-pulse" />}
-                >
-                  🚀 Start Live Mock Interview Simulation
-                </Button>
-              </div>
-            </LaserBorder>
-          )}
-
-          {arenaState === 'active' && arenaQuestions[arenaCurrentIdx] && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* Talking AI Avatar Sidebar */}
-              <div className="lg:col-span-4 space-y-4">
-                <GlassCard className="p-6 text-center space-y-4 border border-emerald-500/40 bg-emerald-950/20">
-                  <div className="relative w-48 h-48 mx-auto rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-b from-emerald-950/40 via-slate-900 to-black overflow-hidden flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.4)]">
-                    <img src={talkingGreenManSvg} alt="AI Senior Interviewer" className="w-full h-full object-contain scale-[1.85] translate-y-1 transition-transform duration-500" />
-                    {isArenaAiSpeaking && (
-                      <div className="absolute inset-0 border-4 border-emerald-400 rounded-3xl animate-ping opacity-40" />
-                    )}
-                  </div>
-
-                  <div className="space-y-1">
-                    <h4 className="text-sm font-extrabold text-white flex items-center justify-center gap-1.5">
-                      <Bot className="w-4 h-4 text-emerald-400" /> Alex (Senior Tech Lead)
-                    </h4>
-                    <p className="text-[11px] text-emerald-300 font-medium">
-                      {isArenaAiSpeaking ? '🗣️ Speaking question out loud...' : '👂 Listening to your response'}
-                    </p>
-                  </div>
-
-                  <AudioSpectrum isActive={isArenaAiSpeaking || isRecording} barCount={24} />
-
-                  <Button
-                    variant="glass"
-                    size="sm"
-                    className="w-full text-xs"
-                    onClick={() => playArenaQuestion(arenaQuestions[arenaCurrentIdx])}
-                    leftIcon={<Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
-                  >
-                    Repeat Question (AI Voice)
-                  </Button>
-                </GlassCard>
-
-                {/* Progress bar */}
-                <div className="p-4 rounded-2xl bg-slate-950/80 border border-white/10 space-y-2">
-                  <div className="flex justify-between text-xs font-bold text-gray-300">
-                    <span>Interview Progress</span>
-                    <span>Question {arenaCurrentIdx + 1} of {arenaQuestions.length}</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-white/10">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all duration-500"
-                      style={{ width: `${((arenaCurrentIdx + 1) / arenaQuestions.length) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Live Question & Answering Box */}
-              <div className="lg:col-span-8 space-y-6">
-                <LaserBorder className="p-6 space-y-6">
-                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                    <Badge variant="cyan">
-                      {(arenaQuestions[arenaCurrentIdx].category || arenaDomain).toUpperCase()}
-                    </Badge>
-                    <Badge variant="purple">
-                      {arenaQuestions[arenaCurrentIdx].difficulty || 'Intermediate'}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Current Interview Question:</span>
-                    <h2 className="text-xl font-extrabold text-white leading-snug">
-                      "{(arenaQuestions[arenaCurrentIdx].question || arenaQuestions[arenaCurrentIdx].q || '').replace(/^(Question|Q\d*|\d+[\.\)])\s*[:.-]?\s*/i, '').trim()}"
-                    </h2>
-                  </div>
-
-                  {arenaQuestions[arenaCurrentIdx].marathiIntent && (
-                    <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200">
-                      💡 <strong>इंटरव्ह्यूवर काय तपासत आहे? (Marathi Intent):</strong> {arenaQuestions[arenaCurrentIdx].marathiIntent}
+                  <div className="pt-3 border-t border-white/10 space-y-2">
+                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Question Bank ({currentQuestions.length})</span>
+                    <div className="space-y-1 max-h-[320px] overflow-y-auto pr-1">
+                      {currentQuestions.map((q, idx) => (
+                        <button
+                          key={q.id || idx}
+                          onClick={() => {
+                            setActiveQuestionIdx(idx);
+                            setAiEvaluation(null);
+                          }}
+                          className={`w-full text-left p-2.5 rounded-lg text-xs transition-all border truncate ${
+                            activeQuestionIdx === idx
+                              ? 'bg-gradient-to-r from-purple-600/30 to-blue-600/30 border-purple-500/50 text-white font-bold'
+                              : 'bg-white/[0.02] border-white/5 text-gray-400 hover:text-gray-200'
+                          }`}
+                        >
+                          Q{idx + 1}. {(q.question || q.q || '').replace(/^(Question|Q\d*|\d+[\.\)])\s*[:.-]?\s*/i, '')}
+                        </button>
+                      ))}
                     </div>
-                  )}
+                  </div>
+                </div>
+              </div>
 
-                  {/* Speech Answering Studio */}
-                  <div className="space-y-3 pt-2">
-                    <div className="flex items-center justify-between text-xs text-gray-300">
-                      <span className="font-bold text-white flex items-center gap-1.5">
-                        <Mic className="w-4 h-4 text-emerald-400" /> Your Response (Voice / Text):
-                      </span>
-                      <Button
-                        variant={isRecording ? 'danger' : 'glow'}
-                        size="xs"
-                        onClick={handleToggleRecording}
-                        leftIcon={isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                      >
-                        {isRecording ? 'Stop Recording' : '🎤 Speak Answer (Speech-to-Text)'}
+              <div className="lg:col-span-8 space-y-6">
+                {currentActiveQ ? (
+                  <TiltCard className="p-8 space-y-6">
+                    <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                      <Badge variant="purple">Question #{activeQuestionIdx + 1} of {currentQuestions.length}</Badge>
+                      <Button size="xs" variant="glow" onClick={handleReadQuestion} leftIcon={<Volume2 className="w-3.5 h-3.5 text-cyan-400" />}>
+                        🔊 Listen Question Audio
                       </Button>
                     </div>
 
-                    <textarea
-                      rows={5}
-                      value={arenaCandidateAns || userTranscript}
-                      onChange={(e) => setArenaCandidateAns(e.target.value)}
-                      placeholder="Type your technical response here, or click the mic button above to speak your answer out loud..."
-                      className="w-full bg-[#09090d] border border-white/15 rounded-2xl p-4 text-xs text-white leading-relaxed focus:outline-none focus:border-emerald-500 font-sans"
-                    />
-                  </div>
+                    <div className="space-y-2">
+                      <h2 className="text-lg font-bold text-white leading-relaxed">{currentQText}</h2>
+                      {currentActiveQ.marathiIntent && (
+                        <p className="text-xs text-purple-300 font-sans italic">मराठी भावार्थ: "{currentActiveQ.marathiIntent}"</p>
+                      )}
+                    </div>
 
-                  <div className="pt-2 flex justify-end gap-3">
-                    <Button
-                      variant="glow"
-                      size="lg"
-                      onClick={handleSubmitArenaAnswer}
-                      className="bg-gradient-to-r from-emerald-600 to-cyan-600 px-8"
-                      rightIcon={<ArrowRight className="w-4 h-4" />}
-                    >
-                      {arenaCurrentIdx + 1 === arenaQuestions.length ? 'Submit & Finish Mock Interview' : 'Submit Answer & Next Question ➔'}
-                    </Button>
-                  </div>
-                </LaserBorder>
+                    <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2">
+                      <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4" /> Recommended Ideal Answer
+                      </span>
+                      <p className="text-xs text-emerald-100 leading-relaxed font-sans">{currentAText}</p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        onClick={() => {
+                          if (activeQuestionIdx > 0) setActiveQuestionIdx(activeQuestionIdx - 1);
+                        }}
+                        disabled={activeQuestionIdx === 0}
+                      >
+                        ← Previous Q
+                      </Button>
+                      <Button
+                        size="xs"
+                        variant="primary"
+                        onClick={() => {
+                          if (activeQuestionIdx + 1 < currentQuestions.length) setActiveQuestionIdx(activeQuestionIdx + 1);
+                        }}
+                        disabled={activeQuestionIdx + 1 >= currentQuestions.length}
+                        rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                      >
+                        Next Q →
+                      </Button>
+                    </div>
+                  </TiltCard>
+                ) : (
+                  <TiltCard className="p-8 text-center text-xs text-gray-400">
+                    Select a question from the bank to start voice practice drills.
+                  </TiltCard>
+                )}
               </div>
             </div>
           )}
 
-          {arenaState === 'scorecard' && (
-            <LaserBorder className="p-8 space-y-6 max-w-4xl mx-auto">
-              <div className="text-center space-y-2 pb-4 border-b border-white/10">
-                <Badge variant="emerald" className="px-4 py-1 text-xs">🎉 Live Mock Simulation Complete!</Badge>
-                <h2 className="text-2xl font-extrabold text-white tracking-tight">
-                  Senior Developer Technical Scorecard
-                </h2>
-                <p className="text-xs text-gray-400">
-                  Performance report generated for {userName} ({targetRole}).
-                </p>
-              </div>
+          {activeTab === 'live-arena' && (
+            /* LIVE MOCK INTERVIEW ARENA */
+            <div className="space-y-6">
+              {arenaState === 'setup' && (
+                <TiltCard className="p-8 max-w-2xl mx-auto space-y-6 text-center">
+                  <div className="w-16 h-16 rounded-3xl bg-amber-500/20 border border-amber-400 flex items-center justify-center mx-auto">
+                    <Zap className="w-8 h-8 text-amber-300 animate-pulse" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-extrabold text-white">⚡ AI Live Mock Interview Arena</h2>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Simulate a real technical interview. The AI will ask real-time questions via audio, evaluate your verbal responses, and compute your overall hiring scorecard!
+                    </p>
+                  </div>
 
-              {/* Overall Rating Banner */}
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-teal-950/80 to-cyan-950/80 border border-emerald-500/40 text-center space-y-2">
-                <span className="text-xs font-bold text-emerald-300 uppercase tracking-widest">Average Technical Hiring Rating:</span>
-                <div className="text-4xl font-extrabold text-white tracking-tight">
-                  {(arenaSubmittedAnswers.reduce((acc, curr) => acc + parseFloat(curr.score), 0) / Math.max(1, arenaSubmittedAnswers.length)).toFixed(1)} / 10
-                </div>
-                <Badge variant="emerald" className="text-xs font-bold px-3 py-1">
-                  STRONG HIRE RECOMMENDATION
-                </Badge>
-              </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left pt-2">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-gray-300">Select Tech Domain:</label>
+                      <select
+                        value={arenaDomain}
+                        onChange={(e) => setArenaDomain(e.target.value)}
+                        className="w-full bg-[#08080c] border border-white/10 rounded-xl p-2.5 text-xs text-white"
+                      >
+                        {categoryList.map(c => (
+                          <option key={c.id} value={c.id}>{c.label}</option>
+                        ))}
+                      </select>
+                    </div>
 
-              {/* Question Answers Review Breakdown */}
-              <div className="space-y-4 pt-2">
-                <h4 className="text-sm font-bold text-white tracking-tight">
-                  Detailed Question Breakdown ({arenaSubmittedAnswers.length} Questions):
-                </h4>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-gray-300">Number of Questions:</label>
+                      <select
+                        value={arenaQuestionCount}
+                        onChange={(e) => setArenaQuestionCount(Number(e.target.value))}
+                        className="w-full bg-[#08080c] border border-white/10 rounded-xl p-2.5 text-xs text-white"
+                      >
+                        <option value={3}>3 Rapid Questions</option>
+                        <option value={5}>5 Full Technical Questions</option>
+                      </select>
+                    </div>
+                  </div>
 
-                <div className="space-y-4">
-                  {arenaSubmittedAnswers.map((item, idx) => (
-                    <GlassCard key={idx} className="p-5 space-y-3 border border-white/10">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-emerald-400 font-mono">Q{idx + 1}. {item.question}</span>
-                        <Badge variant="purple">Score: {item.score} / 10</Badge>
+                  <Button
+                    variant="glow"
+                    size="lg"
+                    onClick={handleStartLiveArena}
+                    leftIcon={<Play className="w-4 h-4 text-amber-400" />}
+                    className="w-full bg-gradient-to-r from-amber-600 to-purple-600"
+                  >
+                    Start Live Mock Interview Simulation 🚀
+                  </Button>
+                </TiltCard>
+              )}
+
+              {arenaState === 'active' && arenaQuestions[arenaCurrentIdx] && (
+                <LaserBorder className="p-8 max-w-3xl mx-auto space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <span className="text-xs font-bold text-amber-400 flex items-center gap-2">
+                      <Zap className="w-4 h-4 animate-pulse" /> Question {arenaCurrentIdx + 1} of {arenaQuestions.length}
+                    </span>
+                    <Badge variant="purple">Live Voice Session</Badge>
+                  </div>
+
+                  <div className="p-6 rounded-2xl bg-black/40 border border-white/10 space-y-3 text-center">
+                    {isArenaAiSpeaking ? (
+                      <div className="space-y-2">
+                        <AudioSpectrum isPlaying={true} className="py-2" />
+                        <span className="text-xs text-cyan-300 font-bold animate-pulse">🤖 AI Interviewer is asking question...</span>
                       </div>
+                    ) : (
+                      <h3 className="text-base sm:text-lg font-bold text-white">
+                        {(arenaQuestions[arenaCurrentIdx]?.question || arenaQuestions[arenaCurrentIdx]?.q || '').replace(/^(Question|Q\d*|\d+[\.\)])\s*[:.-]?\s*/i, '')}
+                      </h3>
+                    )}
+                  </div>
 
-                      <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase">Your Answer:</span>
-                        <p className="text-xs text-gray-200 italic">"{item.candidateAns}"</p>
-                      </div>
+                  <div className="space-y-3">
+                    <label className="text-xs font-bold text-gray-300 block">Your Verbal / Written Answer:</label>
+                    <textarea
+                      rows={4}
+                      value={arenaCandidateAns || userTranscript}
+                      onChange={(e) => setArenaCandidateAns(e.target.value)}
+                      placeholder="Speak using microphone or type your technical answer here..."
+                      className="w-full p-4 rounded-xl bg-[#08080c] border border-white/10 text-xs text-white placeholder-gray-500 focus:border-amber-400 focus:outline-none font-sans"
+                    />
 
-                      <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-1">
-                        <span className="text-[10px] font-bold text-emerald-400 uppercase">🌟 Ideal Senior Developer Answer:</span>
-                        <p className="text-xs text-emerald-100 font-medium">"{item.idealAnswer}"</p>
-                      </div>
-                    </GlassCard>
-                  ))}
-                </div>
-              </div>
+                    <div className="flex items-center justify-between pt-2">
+                      <Button
+                        size="xs"
+                        variant={isRecording ? "danger" : "glass"}
+                        onClick={handleToggleRecording}
+                        leftIcon={isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5 text-cyan-400" />}
+                      >
+                        {isRecording ? "Stop Dictation" : "Dictate via Mic"}
+                      </Button>
 
-              <div className="pt-4 flex justify-center">
-                <Button
-                  variant="glow"
-                  size="lg"
-                  onClick={() => setArenaState('setup')}
-                  leftIcon={<RotateCcw className="w-4 h-4" />}
-                >
-                  🔄 Retake Mock Interview Simulation
-                </Button>
-              </div>
-            </LaserBorder>
+                      <Button
+                        size="sm"
+                        variant="glow"
+                        onClick={handleSubmitArenaAnswer}
+                        rightIcon={<ArrowRight className="w-4 h-4" />}
+                      >
+                        {arenaCurrentIdx + 1 === arenaQuestions.length ? 'Submit & Finish Mock Interview' : 'Submit Answer & Next Question ➔'}
+                      </Button>
+                    </div>
+                  </div>
+                </LaserBorder>
+              )}
+
+              {arenaState === 'scorecard' && (
+                <LaserBorder className="p-8 max-w-3xl mx-auto space-y-6">
+                  <div className="text-center space-y-2">
+                    <Award className="w-12 h-12 text-amber-400 mx-auto animate-bounce" />
+                    <h2 className="text-2xl font-black text-white">🎉 Simulation Complete!</h2>
+                    <p className="text-xs text-gray-300">Detailed candidate breakdown and ideal solutions:</p>
+                  </div>
+
+                  <div className="space-y-4 pt-2">
+                    {arenaSubmittedAnswers.map((item, idx) => (
+                      <GlassCard key={idx} className="p-5 space-y-3 border border-white/10">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-emerald-400 font-mono">Q{idx + 1}. {item.question}</span>
+                          <Badge variant="purple">Score: {item.score} / 10</Badge>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase">Your Answer:</span>
+                          <p className="text-xs text-gray-200 italic">"{item.candidateAns}"</p>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-1">
+                          <span className="text-[10px] font-bold text-emerald-400 uppercase">🌟 Ideal Senior Developer Answer:</span>
+                          <p className="text-xs text-emerald-100 font-medium">"{item.idealAnswer}"</p>
+                        </div>
+                      </GlassCard>
+                    ))}
+                  </div>
+
+                  <div className="pt-4 flex justify-center">
+                    <Button
+                      variant="glow"
+                      size="lg"
+                      onClick={() => setArenaState('setup')}
+                      leftIcon={<RotateCcw className="w-4 h-4" />}
+                    >
+                      🔄 Retake Mock Interview Simulation
+                    </Button>
+                  </div>
+                </LaserBorder>
+              )}
+            </div>
           )}
-        </div>
-      )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };

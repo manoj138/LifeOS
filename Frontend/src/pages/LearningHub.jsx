@@ -146,6 +146,10 @@ export const LearningHub = () => {
           order: dt.order || idx + 1,
         }))
         .sort((a, b) => {
+          const orderA = Number.isInteger(a.order) ? a.order : 999;
+          const orderB = Number.isInteger(b.order) ? b.order : 999;
+          if (orderA !== orderB) return orderA - orderB;
+
           const getNum = (item) => {
             const text = `${item.title || ''} ${item.topicName || ''}`.trim();
             const match = text.match(/^(\d+)[\.\)]/);
@@ -155,8 +159,7 @@ export const LearningHub = () => {
           const numA = getNum(a);
           const numB = getNum(b);
           if (numA !== null && numB !== null && numA !== numB) return numA - numB;
-          if (numA !== null && numB === null) return -1;
-          if (numA === null && numB !== null) return 1;
+
           return (a.order || 999) - (b.order || 999);
         })
     : [];
