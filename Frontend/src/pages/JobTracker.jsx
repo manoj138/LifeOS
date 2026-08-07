@@ -29,25 +29,7 @@ export const JobTracker = () => {
   const [location, setLocation] = useState('Remote');
   const [salary, setSalary] = useState('');
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchJobs = async () => {
-      setLoading(true);
-      const res = await apiService.getJobApplications();
-      if (isMounted) {
-        if (res?.success && Array.isArray(res.data)) {
-          setJobs(res.data);
-        } else {
-          setJobs([]);
-        }
-        setLoading(false);
-      }
-    };
-    fetchJobs();
-    return () => { isMounted = false; };
-  }, []);
-
-  const handleAddJob = async (e) => {
+  const handleAddJob = (e) => {
     e.preventDefault();
     if (!company.trim() || !role.trim()) return;
 
@@ -62,7 +44,6 @@ export const JobTracker = () => {
     };
 
     setJobs([newJob, ...jobs]);
-    await apiService.createJobApplication(newJob);
     setCompany('');
     setRole('');
     setSalary('');

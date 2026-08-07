@@ -13,20 +13,6 @@ export const DevOpsPage = () => {
   const [activeTab, setActiveTab] = useState('hpanel'); // 'hpanel' | 'tutorial' | 'terminal'
   const [activeStepIdx, setActiveStepIdx] = useState(0);
   const [copiedIdx, setCopiedIdx] = useState(null);
-  const [dynamicDevOpsTopics, setDynamicDevOpsTopics] = useState(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    const fetchDevOpsTopics = async () => {
-      const res = await apiService.getDevopsSteps();
-      if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
-        setDynamicDevOpsTopics(res.data);
-      }
-    };
-    fetchDevOpsTopics();
-    return () => { isMounted = false; };
-  }, []);
-
   // Hostinger Web hPanel Click-by-Click Guide Steps
   const hPanelSteps = [
     {
@@ -37,7 +23,6 @@ export const DevOpsPage = () => {
       targetClick: "Hostinger Home -> VPS -> Select KVM Plan -> OS: Ubuntu 22.04"
     },
     {
-      step: "Step B",
       step: "Step B",
       title: "2. Set Root SSH Password & Server Location",
       action: "Hostinger Setup Wizard -> Set Root Password -> Select Server Location (e.g. India / Singapore / Europe)",
@@ -117,7 +102,7 @@ export const DevOpsPage = () => {
     }
   ];
 
-  const setupSteps = (dynamicDevOpsTopics && dynamicDevOpsTopics.length > 0) ? dynamicDevOpsTopics : defaultDeploymentSteps;
+  const setupSteps = defaultDeploymentSteps;
   const currentStep = setupSteps[activeStepIdx] || setupSteps[0];
 
   const handleCopyCommand = (cmdText, idx) => {
